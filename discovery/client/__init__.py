@@ -11,6 +11,7 @@ import httpx
 
 # Local Imports
 from ..shared import Example, SecretSpiceSimulationInput, SecretSpiceSimulationOutput
+from ..shared.git import GitInfo
 
 # Load the .env file
 env = dotenv_values()
@@ -25,6 +26,13 @@ def alive() -> str:
     """Server aliveness check"""
     resp = httpx.get(f"http://{THE_SERVER_URL}/")
     return resp.text
+
+
+def version() -> GitInfo:
+    """Server version"""
+    resp = httpx.get(f"http://{THE_SERVER_URL}/version")
+    print(resp)
+    return GitInfo(**resp.json())
 
 
 def example(example: Example) -> Example:

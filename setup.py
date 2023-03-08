@@ -31,6 +31,7 @@ setup(
         "python-dotenv==1.0.0",
         "fastapi>=0.92.0",
         "httpx>=0.23.3",
+        "GitPython>=3.1.31",
         "uvicorn >= 0.20.0",
     ],
     extras_require={

@@ -7,6 +7,7 @@ from fastapi import FastAPI, Body
 
 # Local Imports
 from ..shared import Example, SecretSpiceSimulationInput, SecretSpiceSimulationOutput
+from ..shared.git import GitInfo
 
 
 app = FastAPI()
@@ -20,9 +21,16 @@ async def alive() -> str:
     return "bwrc_ams_ml_discovery_server_alive"
 
 
+@app.get("/version")
+async def version() -> GitInfo:
+    """# Get the server git version info"""
+
+    return GitInfo.get()
+
+
 @app.post("/example")
 async def example(example: Example = Body(...)) -> Example:
-    """# Example POST endpoint"""
+    """# Example POST RPC endpoint"""
 
     return Example(txt=example.txt * example.num, num=1)
 
