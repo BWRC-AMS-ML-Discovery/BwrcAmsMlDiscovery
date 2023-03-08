@@ -2,16 +2,11 @@
 # Discovery Server
 """
 
-# Std-Lib Imports
-import functools
-from typing import Optional, List, Any
-from dataclasses import asdict
-
 # PyPi Imports
 from fastapi import FastAPI, Body
 
 # Local Imports
-from ..shared import dataclass, Example
+from ..shared import Example, SecretSpiceSimulationInput, SecretSpiceSimulationOutput
 
 
 app = FastAPI()
@@ -30,3 +25,12 @@ async def example(example: Example = Body(...)) -> Example:
     """# Example POST endpoint"""
 
     return Example(txt=example.txt * example.num, num=1)
+
+
+@app.post("/secret_spice_sim")
+async def secret_spice_sim(
+    _inp: SecretSpiceSimulationInput = Body(...),
+) -> SecretSpiceSimulationOutput:
+    """# Super-secret SPICE simulation"""
+
+    return SecretSpiceSimulationOutput(id=5e-6)

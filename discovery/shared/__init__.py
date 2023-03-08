@@ -3,27 +3,8 @@
 Shared server-client code
 """
 
-# Std-Lib Imports
-import functools
-from typing import Optional, List, Any
-from dataclasses import asdict
-
-# PyPi Imports
-import pydantic
-
-
-def dataclass(*args, **kwargs):
-    """# The dataclasses workaround from
-    https://github.com/tiangolo/fastapi/issues/265#issuecomment-557849193"""
-
-    class ORMConfig:
-        orm_mode = True
-        arbitrary_types_allowed = True
-
-    return pydantic.dataclasses.dataclass(config=ORMConfig)(*args, **kwargs)
-
-
-functools.update_wrapper(wrapper=dataclass, wrapped=pydantic.dataclasses.dataclass)
+# Local Imports
+from .dataclasses import dataclass
 
 
 @dataclass
@@ -34,4 +15,17 @@ class Example:
     num: int
 
 
-__all__ = ["Example"]
+@dataclass
+class SecretSpiceSimulationInput:
+    """# Input to a very secret SPICE simulation"""
+
+    w: int  # Width
+    l: int  # Length
+    v: int  # Voltage (mV)
+
+
+@dataclass
+class SecretSpiceSimulationOutput:
+    """# Output from a very secret SPICE simulation"""
+
+    id: float  # Id (A)
