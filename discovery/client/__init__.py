@@ -6,12 +6,19 @@
 from dataclasses import asdict
 
 # PyPi Imports
+from dotenv import dotenv_values
 import httpx
 
 # Local Imports
 from ..shared import Example, SecretSpiceSimulationInput, SecretSpiceSimulationOutput
 
-THE_SERVER_URL = "localhost:8001"
+# Load the .env file
+env = dotenv_values()
+
+# And get the server URL
+THE_SERVER_URL = env.get("THE_SERVER_URL", None)
+if not THE_SERVER_URL:
+    raise ValueError("THE_SERVER_URL not set in .env file")
 
 
 def alive() -> str:

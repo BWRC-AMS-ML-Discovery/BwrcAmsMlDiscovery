@@ -27,7 +27,8 @@ setup(
     packages=find_packages(),
     python_requires=">=3.7, <4",
     install_requires=[
-        "hdl21>=3.0",
+        "hdl21>=3.0.1",
+        "python-dotenv==1.0.0",
         "fastapi>=0.92.0",
         "httpx>=0.23.3",
         "uvicorn >= 0.20.0",
