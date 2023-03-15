@@ -2,8 +2,12 @@
 # Example Discovery Client Script 
 """
 
-from discovery import Example, SecretSpiceSimulationInput
-from discovery.client import alive, version, example, secret_spice_sim
+import sys
+sys.path.append("/Users/aakarshv1/Desktop/bwrc-ams/BwrcAmsMlDiscovery") #put your own path name
+
+
+from discovery.shared import Example, ObjParams, Measurements
+from discovery.client import alive, version, example, measure
 
 # Call the server's root endpoint.
 # Gets a general health-indication of whether we can contact the server.
@@ -16,4 +20,4 @@ print(version())
 print(example(Example(txt="Hello World!", num=3)))
 
 # Now invoke a super-secret SPICE simulation
-print(secret_spice_sim(SecretSpiceSimulationInput(w=1000, l=150, v=1000)))
+print(measure(ObjParams(w=1000, l=150, v=1000)))
