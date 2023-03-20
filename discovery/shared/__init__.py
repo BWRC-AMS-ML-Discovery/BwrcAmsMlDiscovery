@@ -41,4 +41,5 @@ class WhoAmIInput:
 
 @dataclass
 class WhoAmIOutput:
-    current_user: str
+    # TODO can filter out only fields that are needed
+    current_user: dict | None
