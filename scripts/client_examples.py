@@ -17,3 +17,13 @@ print(example(Example(txt="Hello World!", num=3)))
 
 # Now invoke a super-secret SPICE simulation
 print(secret_spice_sim(SecretSpiceSimulationInput(w=1000, l=150, v=1000)))
+
+
+# Requires auth
+
+
+from discovery import WhoAmIInput
+from discovery.client import whoami
+
+
+print(whoami(WhoAmIInput(api_key="")))
