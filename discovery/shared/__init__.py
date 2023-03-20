@@ -37,3 +37,8 @@ class SecretSpiceSimulationOutput:
 @dataclass
 class WhoAmIInput:
     api_key: str
+
+
+@dataclass
+class WhoAmIOutput:
+    current_user: str

@@ -42,3 +42,17 @@ async def secret_spice_sim(
     """# Super-secret SPICE simulation"""
 
     return SecretSpiceSimulationOutput(id=5e-6)
+
+
+# Requires auth
+
+
+from .firebase_auth import auth  # Todo
+from ..shared import WhoAmIInput, WhoAmIOutput
+
+
+@app.post("/whoami")
+async def whoami(
+    _inp: WhoAmIInput = Body(...),
+) -> None:
+    return WhoAmIOutput(current_user="me")
