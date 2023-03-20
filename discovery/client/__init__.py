@@ -43,7 +43,17 @@ def example(example: Example) -> Example:
 
 def secret_spice_sim(inp: SecretSpiceSimulationInput) -> SecretSpiceSimulationOutput:
     """Invoke a (very secret) SPICE simulation"""
-    resp = httpx.post(
-        f"http://{THE_SERVER_URL}/secret_spice_sim", json=asdict(inp)
-    )
+    resp = httpx.post(f"http://{THE_SERVER_URL}/secret_spice_sim", json=asdict(inp))
     return SecretSpiceSimulationOutput(**resp.json())
+
+
+# Requires auth
+
+
+from ..shared import WhoAmIInput, WhoAmIOutput
+
+
+def whoami(inp: WhoAmIInput):
+    """Pass in an ID token"""
+    resp = httpx.post(f"http://{THE_SERVER_URL}/whoami", json=asdict(inp))
+    return WhoAmIOutput(**resp.json())
