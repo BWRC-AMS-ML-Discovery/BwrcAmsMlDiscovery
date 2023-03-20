@@ -47,12 +47,25 @@ async def secret_spice_sim(
 # Requires auth
 
 
-from .firebase_auth import auth  # Todo
+from .firebase_auth import init_firebase_admin
+from firebase_admin import auth
+from firebase_admin._auth_utils import InvalidIdTokenError
 from ..shared import WhoAmIInput, WhoAmIOutput
+
+
+init_firebase_admin()
 
 
 @app.post("/whoami")
 async def whoami(
-    _inp: WhoAmIInput = Body(...),
+    inp: WhoAmIInput = Body(...),
 ) -> None:
-    return WhoAmIOutput(current_user="me")
+    current_user = None
+
+    try:
+        current_user = auth.verify_id_token(inp.api_key)
+    except InvalidIdTokenError:
+        pass
+    # TODO Handle other errors
+
+    return WhoAmIOutput(current_user=current_user)
