@@ -67,5 +67,6 @@ async def whoami(
     except InvalidIdTokenError:
         pass
     # TODO Handle other errors
+    # TODO Expiration time too short
 
     return WhoAmIOutput(current_user=current_user)
