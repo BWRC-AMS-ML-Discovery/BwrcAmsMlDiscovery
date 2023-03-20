@@ -1,12 +1,14 @@
-# BWRC AMS ML Discovery 
+# BWRC AMS ML Discovery
 
-## Installation 
+## Installation
+
+Recommend using a virtual environment
 
 ```
 pip install -e ".[dev]"
 ```
 
-## Running a Local Dev Server 
+## Running a Local Dev Server
 
 ```
 bash scripts/serve.sh
