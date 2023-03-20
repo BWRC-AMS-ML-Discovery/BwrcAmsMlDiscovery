@@ -29,3 +29,11 @@ class SecretSpiceSimulationOutput:
     """# Output from a very secret SPICE simulation"""
 
     id: float  # Id (A)
+
+
+# Requires auth
+
+
+@dataclass
+class WhoAmIInput:
+    api_key: str
