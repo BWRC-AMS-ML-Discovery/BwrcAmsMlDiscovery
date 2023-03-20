@@ -3,6 +3,7 @@
 ## Installation
 
 Recommend using a virtual environment
+python version <= 3.10
 
 ```
 pip install -e ".[dev]"
