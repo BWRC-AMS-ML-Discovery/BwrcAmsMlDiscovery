@@ -10,7 +10,7 @@ from dotenv import dotenv_values
 import httpx
 
 # Local Imports
-from ..shared import Example, SecretSpiceSimulationInput, SecretSpiceSimulationOutput
+from ..shared import *
 from ..shared.git import GitInfo
 
 # Load the .env file
@@ -45,3 +45,7 @@ def secret_spice_sim(inp: SecretSpiceSimulationInput) -> SecretSpiceSimulationOu
     """Invoke a (very secret) SPICE simulation"""
     resp = httpx.post(f"http://{THE_SERVER_URL}/secret_spice_sim", json=asdict(inp))
     return SecretSpiceSimulationOutput(**resp.json())
+
+def create_module(inp: TestModuleInput) -> TestModuleOutput:
+    """Create a module"""
+    return TestModuleOutput(inp)
