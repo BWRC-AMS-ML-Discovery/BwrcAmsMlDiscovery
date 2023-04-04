@@ -57,3 +57,29 @@ class SecretSpiceSimulationOutput:
     """# Output from a very secret SPICE simulation"""
 
     id: float  # Id (A)
+
+# test on google meet
+
+@dataclass
+class PackageInput:
+    """# Input for Circuit Module to be built in HDL21"""
+
+    def __init__(self, new_domain, new_modules, new ext_modules):
+        self.domain = new_domain
+        ...
+
+@dataclass
+class PackageOutput:
+    """# Output for Circuit Module to be built in HDL21"""
+
+    def __init__(self, module_input):
+        self.m = h.Module(name=module_input.name)
+        self.i = h.Input()
+        self.o = h.Output(width=module_input.o)
+        self.s = h.Signal()
+
+    def tostring(self):
+        return (f'Type: TestModuleOutput\n'
+                f'Attributes:\n'
+                f'  Name: {self.m}\n'
+                f'  o: {self.o}')

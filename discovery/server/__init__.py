@@ -48,5 +48,4 @@ async def create_module(
     _inp: TestModuleInput = Body(...),
 ) -> TestModuleOutput:
     """# Super-secret SPICE simulation"""
-
     return TestModuleOutput(_inp.name, _inp.i, _inp.o, _inp.s)

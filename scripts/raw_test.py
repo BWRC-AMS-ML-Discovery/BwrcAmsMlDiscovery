@@ -32,3 +32,11 @@ for i in range(1, 5):
     new_module = create_module(TestModuleInput(new_name="test1", new_i=1, new_o=i, new_s=3))
     print("\n" + new_module.tostring() + "\n")
     time.sleep(1)
+
+
+    '''
+    send point request
+    print point request
+
+    send ...
+    '''
