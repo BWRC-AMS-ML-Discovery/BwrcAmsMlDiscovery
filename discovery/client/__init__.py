@@ -41,8 +41,8 @@ def example(example: Example) -> Example:
     return Example(**resp.json())
 
 
-def measure(inp: ObjParams) -> Measurements:
-    """Invoke a (very secret) SPICE simulation"""
-    resp = httpx.post(f"http://{THE_SERVER_URL}/measure", json=asdict(inp))
-    return Measurements(**resp.json())
+def point(inp: PointInput) -> PointOutput:
+
+    resp = httpx.post(f"http://{THE_SERVER_URL}/point", json=asdict(inp))
+    return PointOutput(**resp.json())
 

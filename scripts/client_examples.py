@@ -2,8 +2,8 @@
 # Example Discovery Client Script 
 """
 
-import sys
-sys.path.append("/Users/aakarshv1/Desktop/bwrc-ams/BwrcAmsMlDiscovery") #put your own path name
+#import sys
+#sys.path.append("/Users/aakarshv1/Desktop/bwrc-ams/BwrcAmsMlDiscovery") #put your own path name
 
 
 from discovery.shared import Example, ObjParams, Measurements

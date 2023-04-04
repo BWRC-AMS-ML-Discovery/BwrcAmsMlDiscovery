@@ -5,7 +5,7 @@ Shared server-client code
 
 # Local Imports
 from .dataclasses import dataclass
-from typing import Optional
+#import hdl21 as h
 
 
 @dataclass
@@ -17,36 +17,132 @@ class Example:
 
 
 @dataclass
-class ObjParams:
-    """# Object for parameters"""
+class SecretSpiceSimulationInput:
+    """# Input to a very secret SPICE simulation"""
 
     w: int  # Width
     l: int  # Length
     v: int  # Voltage (mV)
-    #x1: Optional[int] = 0
-    #x2: Optional[int] = 0
-    #x3: Optional[str] = "Default"
-
 
 @dataclass
-class Measurements:
+class SecretSpiceSimulationOutput:
     """# Output from a very secret SPICE simulation"""
 
-    m1: float  # Measurement 1
-    m2: float  # Measurement 2
-    mtype: Optional[str] = None # Measurement type
+    id: float  # Id (A)
+
+"""# HDL Raw Polygon Schema"""
 
 @dataclass
-class GenList:
-    """# Output list of generators"""
-
-    gens: list  # List of generators
+class PointInput:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
 @dataclass
-class Topology:
-    """# Output Topology"""
+class PointOutput:
+    def __init__(self, point):
+        self.x = point.x
+        self.y = point.y
 
-    topology: str # Topology
+    def __str__(self):
+        return (f'Type: PointOutput\n'
+                f'Attributes:\n'
+                f'  x: {self.x}\n'
+                f'  y: {self.y}')
 
 
 
+@dataclass
+class LayerInput:
+    def __init__(self, number, purpose):
+        self.x = number
+        self.y = purpose
+
+@dataclass
+class LayerOutput:
+    def __init__(self, point):
+        self.x = point.number
+        self.y = point.purpose
+
+    def __str__(self):
+        return (f'Type: LayerOutput\n'
+                f'Attributes:\n'
+                f'  x: {self.number}\n'
+                f'  y: {self.purpose}')
+
+'''
+@dataclass
+class RectangeInput:
+
+@dataclass
+class RectangleOutput:
+
+
+@dataclass
+class PolygonInput:
+
+@dataclass
+class PolygonOutput:
+
+
+@dataclass
+class PathInput:
+
+@dataclass
+class PathOutput:
+
+
+@dataclass
+class LayerShapesInput:
+
+@dataclass
+class LayerShapesOutput:
+
+
+@dataclass
+class TextElementInput:
+
+@dataclass
+class TextElementOutput:
+
+
+@dataclass
+class InstanceInput:
+
+@dataclass
+class InstanceOutput:
+
+
+@dataclass
+class LayoutInput:
+
+@dataclass
+class LayoutOutput:
+
+
+@dataclass
+class AbstractInput:
+
+@dataclass
+class AbstractOutput:
+
+
+@dataclass
+class AbstractPortInput:
+
+@dataclass
+class AbstractPortOutput:
+
+
+@dataclass
+class CellInput:
+
+@dataclass
+class CellOutput:
+
+
+@dataclass
+class LibraryInput:
+
+@dataclass
+class LibraryOutput:'''

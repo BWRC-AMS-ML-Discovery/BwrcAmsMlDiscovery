@@ -6,7 +6,7 @@
 from fastapi import FastAPI, Body
 
 # Local Imports
-from ..shared import Example, ObjParams, Measurements
+from ..shared import *
 from ..shared.git import GitInfo
 
 
@@ -35,17 +35,9 @@ async def example(example: Example = Body(...)) -> Example:
     return Example(txt=example.txt * example.num, num=1)
 
 
-'''@app.post("/secret_spice_sim")
-async def secret_spice_sim(
-    _inp: SecretSpiceSimulationInput = Body(...),
-) -> SecretSpiceSimulationOutput:
-    """# Super-secret SPICE simulation"""
+@app.post("/create_point")
+async def create_point(
+    _inp: PointInput = Body(...),
+) -> PointOutput:
 
-    return SecretSpiceSimulationOutput(id=5e-6)'''
-
-@app.post("/measure")
-async def measure(params: ObjParams = Body(...)):
-
-    return Measurements(m1=params.w + params.l, m2= params.v)
-
-
+    return PointOutput(_inp)
