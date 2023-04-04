@@ -6,8 +6,8 @@
 from fastapi import FastAPI, Body
 
 # Local Imports
-from ..shared import Example, SecretSpiceSimulationInput, SecretSpiceSimulationOutput
-from ..shared.git import GitInfo
+from ..shared import *
+from ..shared.git import *
 
 
 app = FastAPI()
@@ -42,3 +42,10 @@ async def secret_spice_sim(
     """# Super-secret SPICE simulation"""
 
     return SecretSpiceSimulationOutput(id=5e-6)
+
+@app.post("/spice_sim")
+async def create_module(
+    _inp: TestModuleInput = Body(...),
+) -> TestModuleOutput:
+    """# Super-secret SPICE simulation"""
+    return TestModuleOutput(_inp.name, _inp.i, _inp.o, _inp.s)
