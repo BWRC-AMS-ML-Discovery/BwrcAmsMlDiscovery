@@ -44,8 +44,8 @@ async def secret_spice_sim(
     return SecretSpiceSimulationOutput(id=5e-6)
 
 @app.post("/spice_sim")
-async def create_module(
-    _inp: TestModuleInput = Body(...),
-) -> TestModuleOutput:
+async def create_spice_sim(
+    _inp: SpiceInput = Body(...),
+) -> SpiceOutput:
     """# Super-secret SPICE simulation"""
-    return TestModuleOutput(_inp.name, _inp.i, _inp.o, _inp.s)
+    return SpiceOutput(_inp.pkg, _inp.top, _inp.opts, _inp.an, _inp.ctrls)
