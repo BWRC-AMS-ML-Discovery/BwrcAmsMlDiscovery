@@ -6,7 +6,13 @@
 from fastapi import FastAPI, Body
 
 # Local Imports
-from ..shared import Example, SecretSpiceSimulationInput, SecretSpiceSimulationOutput
+from ..shared import (
+    Example,
+    SecretSpiceSimulationInput,
+    SecretSpiceSimulationOutput,
+    InverterBetaRatioInput,
+    InverterBetaRatioOutput,
+)
 from ..shared.git import GitInfo
 
 
@@ -47,3 +53,18 @@ async def secret_spice_sim(
     """# Super-secret SPICE simulation"""
 
     return SecretSpiceSimulationOutput(id=5e-6)
+
+
+@app.post("/inverter_beta_ratio")
+async def inverter_beta_ratio(
+    inp: InverterBetaRatioInput = Body(...),
+) -> InverterBetaRatioOutput:
+    """# Super-elaborate inverter beta ratio simulation"""
+    wp = inp.wp
+    wn = inp.wn
+    the_ratio = 1.2
+
+    return InverterBetaRatioOutput(
+        trise=1e-9 * the_ratio * wp /(the_ratio * wp + wn),
+        tfall=1e-9 * wn /(the_ratio * wp + wn),
+    )

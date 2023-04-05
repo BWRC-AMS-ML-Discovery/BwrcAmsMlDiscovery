@@ -10,7 +10,7 @@ from dotenv import dotenv_values
 import httpx
 
 # Local Imports
-from ..shared import Example, SecretSpiceSimulationInput, SecretSpiceSimulationOutput
+from ..shared import Example, SecretSpiceSimulationInput, SecretSpiceSimulationOutput, InverterBetaRatioInput, InverterBetaRatioOutput
 from ..shared.git import GitInfo
 
 # Load the .env file
@@ -45,3 +45,8 @@ def secret_spice_sim(inp: SecretSpiceSimulationInput) -> SecretSpiceSimulationOu
     """Invoke a (very secret) SPICE simulation"""
     resp = httpx.post(f"http://{THE_SERVER_URL}/secret_spice_sim", json=asdict(inp))
     return SecretSpiceSimulationOutput(**resp.json())
+
+def inverter_beta_ratio(inp: InverterBetaRatioInput) -> InverterBetaRatioOutput:
+    """Invoke a (very secret) SPICE simulation"""
+    resp = httpx.post(f"http://{THE_SERVER_URL}/inverter_beta_ratio", json=asdict(inp))
+    return InverterBetaRatioOutput(**resp.json())

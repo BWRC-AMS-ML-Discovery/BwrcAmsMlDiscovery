@@ -2,8 +2,8 @@
 # Example Discovery Client Script 
 """
 
-from discovery import Example, SecretSpiceSimulationInput
-from discovery.client import alive, version, example, secret_spice_sim
+from discovery import Example, SecretSpiceSimulationInput, InverterBetaRatioInput
+from discovery.client import alive, version, example, secret_spice_sim, inverter_beta_ratio
 
 # Call the server's root endpoint.
 # Gets a general health-indication of whether we can contact the server.
@@ -17,3 +17,5 @@ print(example(Example(txt="Hello World!", num=3)))
 
 # Now invoke a super-secret SPICE simulation
 print(secret_spice_sim(SecretSpiceSimulationInput(w=1000, l=150, v=1000)))
+
+print(inverter_beta_ratio(InverterBetaRatioInput(wp=1e-6, wn=2e-6)))

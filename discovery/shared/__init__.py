@@ -3,6 +3,8 @@
 Shared server-client code
 """
 
+import hdl21 as h
+
 # Local Imports
 from .dataclasses import dataclass
 
@@ -29,3 +31,15 @@ class SecretSpiceSimulationOutput:
     """# Output from a very secret SPICE simulation"""
 
     id: float  # Id (A)
+
+
+@dataclass
+class InverterBetaRatioInput:
+    wp: float
+    wn: float
+
+
+@dataclass
+class InverterBetaRatioOutput:
+    trise: float
+    tfall: float
