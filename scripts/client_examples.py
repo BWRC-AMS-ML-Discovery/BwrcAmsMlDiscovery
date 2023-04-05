@@ -3,7 +3,13 @@
 """
 
 from discovery import Example, SecretSpiceSimulationInput, InverterBetaRatioInput
-from discovery.client import alive, version, example, secret_spice_sim, inverter_beta_ratio
+from discovery.client import (
+    alive,
+    version,
+    example,
+    secret_spice_sim,
+    inverter_beta_ratio,
+)
 
 # Call the server's root endpoint.
 # Gets a general health-indication of whether we can contact the server.

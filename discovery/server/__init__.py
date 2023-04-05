@@ -65,6 +65,6 @@ async def inverter_beta_ratio(
     the_ratio = 1.2
 
     return InverterBetaRatioOutput(
-        trise=1e-9 * the_ratio * wp /(the_ratio * wp + wn),
-        tfall=1e-9 * wn /(the_ratio * wp + wn),
+        trise=1e-9 * the_ratio * wp / (the_ratio * wp + wn),
+        tfall=1e-9 * wn / (the_ratio * wp + wn),
     )
