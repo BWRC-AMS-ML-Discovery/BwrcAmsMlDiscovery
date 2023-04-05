@@ -3,6 +3,12 @@
 Shared server-client code
 """
 
+# Std-Lib Imports
+from enum import Enum
+
+# PyPi Imports
+import hdl21 as h
+
 # Local Imports
 from .dataclasses import dataclass
 
@@ -29,3 +35,25 @@ class SecretSpiceSimulationOutput:
     """# Output from a very secret SPICE simulation"""
 
     id: float  # Id (A)
+
+
+class VlsirProtoBufKind(Enum):
+    """# VLSIR ProtoBuf Kind
+    Enumerated types for `VlsirProtoBufBinary` data."""
+
+    CKT_PACKAGE = "CKT_PACKAGE"  # Circuit Package
+    SIM_INPUT = "SIM_INPUT"  # SimInput
+    SIM_RESULT = "SIM_RESULT"  # SimResult
+
+
+@dataclass
+class VlsirProtoBufBinary:
+    """# VLSIR ProtoBuf-Encoded Binary Data"""
+
+    kind: VlsirProtoBufKind
+    proto_bytes: bytes
+
+
+@h.paramclass
+class OpAmpParams:
+    nf_something = h.Param(dtype=int, desc="Number of fingers of something", default=2)
