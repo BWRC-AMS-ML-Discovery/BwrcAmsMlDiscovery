@@ -44,7 +44,7 @@ async def secret_spice_sim(
     return SecretSpiceSimulationOutput(id=5e-6)
 
 @app.post("/spice_sim")
-async def create_spice_sim(
+async def spice_sim(
     _inp: SpiceInput = Body(...),
 ) -> SpiceOutput:
     """# Super-secret SPICE simulation"""
