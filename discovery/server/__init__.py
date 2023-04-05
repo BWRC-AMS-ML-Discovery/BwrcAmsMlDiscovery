@@ -10,7 +10,12 @@ from ..shared import Example, SecretSpiceSimulationInput, SecretSpiceSimulationO
 from ..shared.git import GitInfo
 
 
-app = FastAPI()
+app = FastAPI(
+    debug=False,
+    title="BWRC AMS ML CktGym",
+    description="BWRC AMS ML CktGym",
+    version="0.0.1",
+)
 
 
 @app.get("/")
