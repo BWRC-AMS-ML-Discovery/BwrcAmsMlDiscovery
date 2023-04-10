@@ -64,6 +64,15 @@ async def inverter_beta_ratio(
     wn = inp.wn
     the_ratio = 1.2
 
+    # TODO implement
+    # Mock a paraboloid
+
+    output = (wp - 3) ** 2 + (wn - 4) ** 2
+    return InverterBetaRatioOutput(
+        trise=output / 2,
+        tfall=output / 2,
+    )
+
     return InverterBetaRatioOutput(
         trise=1e-9 * the_ratio * wp / (the_ratio * wp + wn),
         tfall=1e-9 * wn / (the_ratio * wp + wn),
