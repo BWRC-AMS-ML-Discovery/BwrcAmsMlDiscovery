@@ -2,7 +2,12 @@
 # Example Discovery Client Script 
 """
 
-from discovery import Example, SecretSpiceSimulationInput, OpAmpParams
+from discovery import (
+    Example,
+    SecretSpiceSimulationInput,
+    OpAmpParams,
+    InverterBetaRatioInput,
+)
 from discovery.client import (
     alive,
     version,
@@ -10,6 +15,7 @@ from discovery.client import (
     secret_spice_sim,
     simulate_that_opamp,
     elaborate_that_opamp_here_and_simulate_on_the_server,
+    inverter_beta_ratio,
 )
 
 # Call the server's root endpoint.
@@ -28,3 +34,5 @@ print(secret_spice_sim(SecretSpiceSimulationInput(w=1000, l=150, v=1000)))
 simulate_that_opamp(OpAmpParams())
 
 elaborate_that_opamp_here_and_simulate_on_the_server(OpAmpParams())
+
+print(inverter_beta_ratio(InverterBetaRatioInput(wp=1e-6, wn=2e-6)))

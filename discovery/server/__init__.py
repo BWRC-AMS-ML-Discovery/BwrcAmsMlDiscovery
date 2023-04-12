@@ -15,6 +15,8 @@ from ..shared import (
     OpAmpParams,
     VlsirProtoBufKind,
     VlsirProtoBufBinary,
+    InverterBetaRatioInput,
+    InverterBetaRatioOutput,
 )
 from ..shared.git import GitInfo
 
@@ -133,4 +135,19 @@ async def simulate_on_the_server(
     return VlsirProtoBufBinary(
         kind=VlsirProtoBufKind.SIM_RESULT,
         proto_bytes=sim_result.SerializeToString(),
+    )
+
+
+@app.post("/inverter_beta_ratio")
+async def inverter_beta_ratio(
+    inp: InverterBetaRatioInput = Body(...),
+) -> InverterBetaRatioOutput:
+    """# Super-elaborate inverter beta ratio simulation"""
+    wp = inp.wp
+    wn = inp.wn
+    the_ratio = 1.2
+
+    return InverterBetaRatioOutput(
+        trise=1e-9 * the_ratio * wp / (the_ratio * wp + wn),
+        tfall=1e-9 * wn / (the_ratio * wp + wn),
     )

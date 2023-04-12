@@ -18,6 +18,8 @@ from ..shared import (
     OpAmpParams,
     VlsirProtoBufBinary,
     VlsirProtoBufKind,
+    InverterBetaRatioInput,
+    InverterBetaRatioOutput,
 )
 from ..shared.git import GitInfo
 
@@ -116,3 +118,9 @@ def elaborate_that_opamp_here_and_simulate_on_the_server(
     sim_result = h.sim.SimResultProto.ParseFromString(from_the_server.proto_bytes)
     print(sim_result)
     return sim_result
+
+
+def inverter_beta_ratio(inp: InverterBetaRatioInput) -> InverterBetaRatioOutput:
+    """Invoke a (very secret) SPICE simulation"""
+    resp = httpx.post(f"http://{THE_SERVER_URL}/inverter_beta_ratio", json=asdict(inp))
+    return InverterBetaRatioOutput(**resp.json())
