@@ -53,10 +53,11 @@ from .firebase_auth import init_firebase_admin
 from firebase_admin import auth
 from firebase_admin._auth_utils import InvalidIdTokenError
 from ..shared import WhoAmIInput, WhoAmIOutput
+from firebase_auth import check_token
 from firebase_admin import firestore
-db = firestore.client()
 
 init_firebase_admin()
+db = firestore.client()
 
 
 @app.post("/whoami")
@@ -64,16 +65,10 @@ async def whoami(
     inp: WhoAmIInput = Body(...),
 ) -> None:
     current_user = None
+    time_days_constraint = 1
     
-    # access database, if input user exist, return stored info in the database
-    user_doc = db.collection('users').document(inp.api_key).get()
-    if user_doc:
-        user_info = user_doc.to_dict()
-
-
-    if user_info:
-        user_exp = datetime.strptime(user_info['exp'], '%a, %d %b %Y %H:%M:%S GMT')
-        
+    if (check_token(inp, time_days_constraint)):
+        return check_token(inp, time_days_constraint)
 
     try:
         current_user = auth.verify_id_token(inp.api_key)
@@ -83,7 +78,7 @@ async def whoami(
         if match:
             day, month, year, hour, minute, second = match.groups()
             date = datetime.strptime(f"{day} {month} {year} {hour}:{minute}:{second}", '%d %b %Y %H:%M:%S')
-            date += timedelta(days=1)
+            date += timedelta(days=time_days_constraint)
             new_date_string = date.strftime('%a, %d %b %Y %H:%M:%S GMT')
             current_user['exp'] = new_date_string
             
