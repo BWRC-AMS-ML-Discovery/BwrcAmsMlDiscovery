@@ -54,6 +54,7 @@ from firebase_admin import auth
 from firebase_admin._auth_utils import InvalidIdTokenError
 from ..shared import WhoAmIInput, WhoAmIOutput
 from firebase_admin import firestore
+db = firestore.client()
 
 init_firebase_admin()
 
@@ -64,10 +65,15 @@ async def whoami(
 ) -> None:
     current_user = None
     
-    db = firestore.client()
+    # access database, if input user exist, return stored info in the database
     user_doc = db.collection('users').document(inp.api_key).get()
-    if user_doc.exists:
-        return WhoAmIOutput(current_user=user_doc.to_dict())
+    if user_doc:
+        user_info = user_doc.to_dict()
+
+
+    if user_info:
+        user_exp = datetime.strptime(user_info['exp'], '%a, %d %b %Y %H:%M:%S GMT')
+        
 
     try:
         current_user = auth.verify_id_token(inp.api_key)
