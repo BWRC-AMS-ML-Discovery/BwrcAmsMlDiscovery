@@ -13,6 +13,7 @@ import httpx
 from ..shared import Example, SecretSpiceSimulationInput, SecretSpiceSimulationOutput
 from ..shared.git import GitInfo
 
+
 # Load the .env file
 env = dotenv_values()
 
