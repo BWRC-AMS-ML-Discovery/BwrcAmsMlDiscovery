@@ -8,7 +8,6 @@ import httpx
 
 
 # Local Imports
-from . import _maps
 from discovery.client import env, THE_SERVER_URL
 from discovery.shared.auth import AuthKey, AuthenticatedInput, AuthenticatedOutput
 
