@@ -23,14 +23,14 @@ def authenticated_request(
     *,
     server_url: str = THE_SERVER_URL,
 ):
-    inp_auth = _path_to_types_maps.inp_auth_types[path](
-        inp=inp,
-        auth_key=AuthKey(_token),
-    )
+    inp_auth = {
+        "inp": asdict(inp) if inp else None,
+        "auth_key": asdict(AuthKey(_token)),
+    }
 
     resp = httpx_request_type(
         f"http://{server_url}/{path}",
-        json=asdict(inp_auth),
+        json=inp_auth,
     )
 
     return _path_to_types_maps.out_types[path](
