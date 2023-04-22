@@ -10,7 +10,7 @@ import httpx
 # Local Imports
 from . import _maps
 from discovery.client import env, THE_SERVER_URL
-from discovery.shared.auth import AuthKey
+from discovery.shared.auth import AuthKey, AuthenticatedInput
 
 
 _token = env.get("DISCOVERY_AUTH_TOKEN", None)
@@ -23,9 +23,16 @@ def authenticated_request(
     *,
     server_url: str = THE_SERVER_URL,
 ):
+    inp_auth = AuthenticatedInput(
+        inp=inp,
+        auth_key=AuthKey(_token),
+    )
+
+    # Manually serialize
+    # This is because not every dataclass is JSON serializable.
     inp_auth = {
-        "inp": asdict(inp) if inp else None,
-        "auth_key": asdict(AuthKey(_token)),
+        "inp": asdict(inp_auth.inp),
+        "auth_key": asdict(inp_auth.auth_key),
     }
 
     resp = httpx_request_type(
