@@ -5,13 +5,14 @@ from fastapi import Body
 # Local Imports
 from . import app
 from ..shared.user import WhoAmIOutput
+from ..shared.auth import AuthenticatedInput
 
 from .auth.provider import verify_auth_key
 
 
 @app.post("/whoami")
 async def whoami(
-    inp: WhoAmIInputAuth = Body(...),
+    inp: AuthenticatedInput = Body(...),
 ) -> None:
     user = verify_auth_key(inp.auth_key)
 
