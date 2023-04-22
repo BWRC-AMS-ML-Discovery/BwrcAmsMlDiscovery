@@ -1,5 +1,5 @@
 # Std-Lib Imports
-from typing import Callable, Type, List
+from typing import Callable, Type, Dict
 
 # Local Imports
 from .dataclasses import dataclass

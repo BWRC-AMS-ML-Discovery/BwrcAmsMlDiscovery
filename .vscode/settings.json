@@ -17,6 +17,7 @@
     "paramclass",
     "protobuf",
     "pydantic",
+    "rpcs",
     "tfall",
     "trise",
     "Vlsir",
