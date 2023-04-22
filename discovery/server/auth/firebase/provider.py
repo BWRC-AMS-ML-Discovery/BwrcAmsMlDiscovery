@@ -3,7 +3,7 @@ from firebase_admin import auth
 
 
 # Local Imports
-from ..provider import User
+from ..user import User
 from discovery.shared.auth import AuthKey
 
 
