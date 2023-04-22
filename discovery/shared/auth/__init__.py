@@ -17,5 +17,5 @@ class AuthKey:
 
 @dataclass
 class AuthenticatedInput:
-    inp: Any | None  # TODO type hint a dataclass
+    inp: Any | None  # TODO type hint a JSON serializable DataclassInstance
     auth_key: AuthKey
