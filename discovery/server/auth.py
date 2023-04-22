@@ -6,10 +6,13 @@ from fastapi import Body
 from . import app
 from ..shared.auth import WhoAmIOutput
 from .auth.inputs import WhoAmIInputAuth
+from .auth.provider import verify_auth_key
 
 
 @app.post("/whoami")
 async def whoami(
-    _inp: WhoAmIInputAuth = Body(...),
+    inp: WhoAmIInputAuth = Body(...),
 ) -> None:
-    return WhoAmIOutput(current_user="me")
+    user = verify_auth_key(inp.auth_key)
+
+    return WhoAmIOutput(username=user.username)
