@@ -2,6 +2,6 @@ from discovery.shared.auth import inputs
 from discovery.shared import user
 
 
-out_types = {
+path_to_out_types = {
     "whoami": user.WhoAmIOutput,
 }

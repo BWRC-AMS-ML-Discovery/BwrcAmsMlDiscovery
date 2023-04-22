@@ -33,6 +33,6 @@ def authenticated_request(
         json=inp_auth,
     )
 
-    return _maps.out_types[path](
+    return _maps.path_to_out_types[path](
         **resp.json(),
     )
