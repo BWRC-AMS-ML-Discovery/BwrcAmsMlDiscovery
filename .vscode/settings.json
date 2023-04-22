@@ -6,6 +6,7 @@
   "cSpell.words": [
     "bwrc",
     "dotenv",
+    "dtype",
     "fastapi",
     "fritchman",
     "httpx",
@@ -13,6 +14,7 @@
     "Nmos",
     "npar",
     "opamp",
+    "paramclass",
     "protobuf",
     "pydantic",
     "tfall",
