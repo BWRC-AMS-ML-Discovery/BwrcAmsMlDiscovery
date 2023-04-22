@@ -3,5 +3,15 @@
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter"
   },
-  "cSpell.words": ["opamp", "bwrc", "dotenv", "fastapi", "httpx"]
+  "cSpell.words": [
+    "bwrc",
+    "dotenv",
+    "fastapi",
+    "httpx",
+    "Nmos",
+    "npar",
+    "opamp",
+    "protobuf",
+    "Vlsir"
+  ]
 }
