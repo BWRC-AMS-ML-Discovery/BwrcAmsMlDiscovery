@@ -5,7 +5,6 @@ from fastapi import Body
 # Local Imports
 from . import app
 from ..shared.user import WhoAmIOutput
-from ..shared.auth.inputs import WhoAmIInputAuth
 
 from .auth.provider import verify_auth_key
 
