@@ -9,7 +9,7 @@ import httpx
 
 # Local Imports
 from . import _path_to_types_maps
-from discovery.server import env, THE_SERVER_URL
+from discovery.client import env, THE_SERVER_URL
 from discovery.shared.auth import AuthKey
 
 

@@ -1,5 +1,5 @@
 from discovery.shared.auth import inputs
-from discovery import shared
+from discovery.shared import user
 
 
 inp_auth_types = {
@@ -7,5 +7,5 @@ inp_auth_types = {
 }
 
 out_types = {
-    "whoami": shared.user.WhoAmIOutput,
+    "whoami": user.WhoAmIOutput,
 }
