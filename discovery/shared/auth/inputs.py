@@ -1,6 +1,6 @@
 """
 # Authenticated Inputs
-TODO Figure out a better way to do this
+TODO Create an InputAuth type for every input type is tedious.
 """
 
 
