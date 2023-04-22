@@ -11,4 +11,4 @@ from discovery.shared.auth import AuthKey
 
 @dataclass
 class WhoAmIInputAuth:
-    AuthKey: AuthKey
+    auth_key: AuthKey

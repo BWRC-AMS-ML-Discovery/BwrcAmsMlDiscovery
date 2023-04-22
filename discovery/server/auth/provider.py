@@ -1,2 +1,2 @@
-def check_auth_key() -> bool:
+def verify_auth_key() -> bool:
     return True
