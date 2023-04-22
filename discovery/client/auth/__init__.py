@@ -8,7 +8,7 @@ import httpx
 
 
 # Local Imports
-from . import _path_to_types_maps
+from . import _maps
 from discovery.client import env, THE_SERVER_URL
 from discovery.shared.auth import AuthKey
 
@@ -33,6 +33,6 @@ def authenticated_request(
         json=inp_auth,
     )
 
-    return _path_to_types_maps.out_types[path](
+    return _maps.out_types[path](
         **resp.json(),
     )
