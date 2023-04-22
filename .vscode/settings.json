@@ -7,12 +7,17 @@
     "bwrc",
     "dotenv",
     "fastapi",
+    "fritchman",
     "httpx",
+    "NGSPICE",
     "Nmos",
     "npar",
     "opamp",
     "protobuf",
     "pydantic",
-    "Vlsir"
+    "tfall",
+    "trise",
+    "Vlsir",
+    "vlsirtools"
   ]
 }
