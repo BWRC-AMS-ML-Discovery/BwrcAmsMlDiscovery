@@ -28,16 +28,9 @@ def authenticated_request(
         auth_key=AuthKey(_token),
     )
 
-    # Manually serialize
-    # This is because not every dataclass is JSON serializable.
-    inp_auth = {
-        "inp": asdict(inp_auth.inp),
-        "auth_key": asdict(inp_auth.auth_key),
-    }
-
     resp = httpx_request_type(
         f"http://{server_url}/{path}",
-        json=inp_auth,
+        json=asdict(inp_auth),
     )
 
     return _maps.path_to_out_types[path](
