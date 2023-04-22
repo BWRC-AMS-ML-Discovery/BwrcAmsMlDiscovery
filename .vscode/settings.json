@@ -12,6 +12,7 @@
     "npar",
     "opamp",
     "protobuf",
+    "pydantic",
     "Vlsir"
   ]
 }
