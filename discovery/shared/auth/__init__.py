@@ -19,3 +19,8 @@ class AuthKey:
 class AuthenticatedInput:
     inp: Any | None  # TODO type hint a JSON serializable DataclassInstance
     auth_key: AuthKey
+
+
+@dataclass
+class AuthError:
+    err: str
