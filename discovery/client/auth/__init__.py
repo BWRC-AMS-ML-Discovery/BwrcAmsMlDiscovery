@@ -8,8 +8,8 @@ import httpx
 
 
 # Local Imports
-from . import env, THE_SERVER_URL
 from . import _path_to_types_maps
+from discovery.server import env, THE_SERVER_URL
 from discovery.shared.auth import AuthKey
 
 
