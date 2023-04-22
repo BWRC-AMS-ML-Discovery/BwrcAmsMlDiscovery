@@ -4,7 +4,7 @@ from fastapi import Body
 
 # Local Imports
 from . import app
-from ..shared.auth import WhoAmIOutput
+from ..shared.user import WhoAmIOutput
 from .auth.inputs import WhoAmIInputAuth
 from .auth.provider import verify_auth_key
 

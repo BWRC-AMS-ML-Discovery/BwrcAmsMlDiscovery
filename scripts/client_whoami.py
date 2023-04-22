@@ -6,8 +6,10 @@
 from discovery.client import (
     alive,
     version,
-    whoami,
 )
+
+
+from discovery.client.user import whoami
 
 
 # No authentication needed
