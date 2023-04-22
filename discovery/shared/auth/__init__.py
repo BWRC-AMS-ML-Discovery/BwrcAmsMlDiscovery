@@ -24,3 +24,9 @@ class AuthenticatedInput:
 @dataclass
 class AuthError:
     err: str
+
+
+@dataclass
+class AuthenticatedOutput:
+    out: Any | None  # TODO type hint a JSON serializable DataclassInstance
+    auth_err: AuthError | None
