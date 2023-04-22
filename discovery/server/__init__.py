@@ -29,6 +29,13 @@ app = FastAPI(
 )
 
 
+# Modules
+from .user import *
+
+
+# TODO modularize
+
+
 @app.get("/")
 async def alive() -> str:
     """# The root entry point
