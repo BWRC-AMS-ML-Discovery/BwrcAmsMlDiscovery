@@ -8,7 +8,7 @@ import httpx
 
 
 # Local Imports
-from . import env
+from . import env, THE_SERVER_URL
 from . import _path_to_types_maps
 from discovery.shared.auth import AuthKey
 
@@ -18,9 +18,10 @@ _token = env.get("DISCOVERY_AUTH_TOKEN", None)
 
 def authenticated_request(
     httpx_request_type: Callable[..., httpx.Response],
-    server_url: str,
     path: str,
     inp=None,
+    *,
+    server_url: str = THE_SERVER_URL,
 ):
     inp_auth = _path_to_types_maps.inp_auth_types[path](
         inp=inp,
