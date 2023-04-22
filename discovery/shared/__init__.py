@@ -50,7 +50,8 @@ class InverterBetaRatioOutput:
 
 
 # TODO Ask Dan if he made changes to these
-# because I manually copied them from a previous commit
+# Because these were lost due to a merge conflict,
+# and I manually copied them from a previous commit.
 class VlsirProtoBufKind(Enum):
     """# VLSIR ProtoBuf Kind
     Enumerated types for `VlsirProtoBufBinary` data."""
