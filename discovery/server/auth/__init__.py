@@ -20,7 +20,7 @@ def authenticated_service(
     path: str,
     **kwargs,
 ):
-    def decorator(func):
+    def decorator(func_taking_inp_and_user):
         @fastapi_request_type(path, **kwargs)
         async def authenticated_func(
             inp_auth: AuthenticatedInput = Body(...),
@@ -41,7 +41,7 @@ def authenticated_service(
 
             # output
             return AuthenticatedOutput(
-                out=func(inp, user=user),
+                out=func_taking_inp_and_user(inp=inp, user=user),
                 auth_err=None,
             )
 
