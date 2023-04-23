@@ -22,7 +22,7 @@ def verify_auth_key(auth_key: AuthKey) -> User:
         return check_token(auth_key, time_days_constraint)
 
     try:
-        current_user = auth.verify_id_token(auth_key.api_key)
+        current_user = auth.verify_id_token(auth_key.token)
         date_string = current_user["exp"]
         regex_pattern = r"^\w{3}, (\d{2}) (\w{3}) (\d{4}) (\d{2}):(\d{2}):(\d{2}) GMT$"
         match = re.match(regex_pattern, date_string)
