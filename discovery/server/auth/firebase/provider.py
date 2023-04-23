@@ -1,7 +1,7 @@
 # Local Imports
-from firebase_admin import InvalidTokenError
+from jwt import InvalidTokenError
 from discovery.shared.auth import AuthKey
-from user import User
+from ..user import User
 
 
 # Current implementation uses Firebase
