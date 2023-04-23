@@ -1,3 +1,7 @@
+# stblib
+from typing import Any, Callable
+
+
 # FastAPI Imports
 from fastapi import Body
 
@@ -15,16 +19,36 @@ from discovery.server.auth.provider import verify_auth_key
 
 
 def authenticated_service(
-    fastapi_request_type,
-    *args,
+    fastapi_request_type: Callable[
+        ..., Callable[[Callable[..., Any]], Callable[..., Any]]
+    ],
+    path: str,
     **kwargs,
 ):
     def decorator(func):
-        @fastapi_request_type(*args, **kwargs)
+        @fastapi_request_type(path, **kwargs)
         async def authenticated_func(
-            inp: AuthenticatedInput = Body(...),
+            inp_auth: AuthenticatedInput = Body(...),
         ) -> AuthenticatedOutput:
-            return func(inp)
+            # User auth
+            try:
+                user = verify_auth_key(inp_auth.auth_key)
+            except Exception as e:
+                return AuthenticatedOutput(
+                    out=None,
+                    auth_err=AuthError(err=str(e)),
+                )
+
+            # input
+            inp = path_to_inp_types["/mock/inverter_beta_ratio"](
+                **inp_auth.inp,
+            )
+
+            # output
+            return AuthenticatedOutput(
+                out=func(inp),
+                auth_err=None,
+            )
 
         return authenticated_func
 
@@ -44,26 +68,4 @@ def f(
     return MockInverterBetaRatioOutput(
         trise=output / 2,
         tfall=output / 2,
-    )
-
-
-@app.post("/mock/inverter_beta_ratio")
-async def mock_inverter_beta_ratio(
-    inp_auth: AuthenticatedInput = Body(...),
-) -> AuthenticatedOutput:
-    try:
-        user = verify_auth_key(inp_auth.auth_key)
-    except Exception as e:
-        return AuthenticatedOutput(
-            out=None,
-            auth_err=AuthError(err=str(e)),
-        )
-
-    inp = path_to_inp_types["/mock/inverter_beta_ratio"](
-        **inp_auth.inp,
-    )
-
-    return AuthenticatedOutput(
-        out=f(inp),
-        auth_err=None,
     )
