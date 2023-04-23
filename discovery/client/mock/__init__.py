@@ -15,6 +15,6 @@ def mock_inverter_beta_ratio(
 ) -> MockInverterBetaRatioOutput:
     return authenticated_request(
         httpx.post,
-        "mock/inverter_beta_ratio",
+        "/mock/inverter_beta_ratio",
         inp,
     )
