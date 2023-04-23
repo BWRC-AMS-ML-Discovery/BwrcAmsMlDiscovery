@@ -10,9 +10,6 @@ import hdl21 as h
 from dotenv import dotenv_values
 import httpx
 
-import firebase_auth as auth
-
-TIME_CONSTRAINT = 1
 # Local Imports
 from ..shared import (
     Example,
@@ -34,43 +31,32 @@ THE_SERVER_URL = env.get("THE_SERVER_URL", None)
 if not THE_SERVER_URL:
     raise ValueError("THE_SERVER_URL not set in .env file")
 
-def check_token_then_f(f):
-    def inside(token, *args, **kwargs):
-        if check(token):
-            f(*args, **kwargs)
-        else:
-            return None
-    return inside
 
-def check(token):
-    return auth.check_token(token, TIME_CONSTRAINT)
-
-@check_token_then_f
 def alive() -> str:
     """Server aliveness check"""
     resp = httpx.get(f"http://{THE_SERVER_URL}/")
     return resp.text
 
-@check_token_then_f
+
 def version() -> GitInfo:
     """Server version"""
     resp = httpx.get(f"http://{THE_SERVER_URL}/version")
     print(resp)
     return GitInfo(**resp.json())
 
-@check_token_then_f
+
 def example(example: Example) -> Example:
     """Example POST endpoint"""
     resp = httpx.post(f"http://{THE_SERVER_URL}/example", json=asdict(example))
     return Example(**resp.json())
 
-@check_token_then_f
+
 def secret_spice_sim(inp: SecretSpiceSimulationInput) -> SecretSpiceSimulationOutput:
     """Invoke a (very secret) SPICE simulation"""
     resp = httpx.post(f"http://{THE_SERVER_URL}/secret_spice_sim", json=asdict(inp))
     return SecretSpiceSimulationOutput(**resp.json())
 
-@check_token_then_f
+
 def simulate_that_opamp(params: OpAmpParams) -> h.sim.SimResultProto:
     """# Run the `ThatOpAmp` generator and simulate it, all on the server"""
 
@@ -86,7 +72,7 @@ def simulate_that_opamp(params: OpAmpParams) -> h.sim.SimResultProto:
     print(sim_result)
     return sim_result
 
-@check_token_then_f
+
 def elaborate_that_opamp_here_and_simulate_on_the_server(
     params: OpAmpParams,
 ) -> h.sim.SimResultProto:
@@ -133,7 +119,7 @@ def elaborate_that_opamp_here_and_simulate_on_the_server(
     print(sim_result)
     return sim_result
 
-@check_token_then_f
+
 def inverter_beta_ratio(inp: InverterBetaRatioInput) -> InverterBetaRatioOutput:
     """Invoke a (very secret) SPICE simulation"""
     resp = httpx.post(f"http://{THE_SERVER_URL}/inverter_beta_ratio", json=asdict(inp))
