@@ -1,7 +1,7 @@
 # Local Imports
 from jwt import InvalidTokenError
 from discovery.shared.auth import AuthKey
-from auth import User
+from user import User
 
 
 # Current implementation uses Firebase
@@ -32,12 +32,13 @@ def verify_auth_key(auth_key: AuthKey) -> User:
             date += timedelta(days=time_days_constraint)
             new_date_string = date.strftime('%a, %d %b %Y %H:%M:%S GMT')
             current_user['exp'] = new_date_string
+            ret = User(current_user['user'], current_user['email'], current_user['exp'])
             
     except InvalidTokenError:
         pass
     
     if current_user:
-        ret = db.collection('users').document(auth_key.api_key).set(current_user)
+        db.collection('users').document(auth_key.api_key).set(current_user)
 
     return ret
 

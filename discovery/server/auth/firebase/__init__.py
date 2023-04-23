@@ -1,6 +1,7 @@
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
+from user import User
 
 _cred = credentials.Certificate("./env/firebase_admin_sdk.json")
 firebase_admin.initialize_app(_cred)
@@ -19,5 +20,6 @@ def check_token(inp, time_days_constraint):
         user_exp = datetime.strptime(user_info['exp'], '%a, %d %b %Y %H:%M:%S GMT')
         current_time = datetime.utcnow()
         if current_time - user_exp <= timedelta(days=time_days_constraint):
-            return user_doc
+            ret = User(user_doc['user'], user_doc['email'], user_doc['exp'])
+            return ret
     return None
