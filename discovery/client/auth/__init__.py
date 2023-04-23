@@ -8,7 +8,9 @@ import httpx
 
 
 # Local Imports
+from . import _maps
 from discovery.client import env, THE_SERVER_URL
+from discovery.client.auth.errors import DiscoveryAuthError
 from discovery.shared.auth import AuthKey, AuthenticatedInput, AuthenticatedOutput
 
 
@@ -21,7 +23,7 @@ def authenticated_request(
     inp: Any | None = None,  # TODO type hint a JSON serializable DataclassInstance
     *,
     server_url: str = THE_SERVER_URL,
-) -> AuthenticatedOutput:
+):
     inp_auth = AuthenticatedInput(
         inp=inp,
         auth_key=AuthKey(_token),
@@ -32,6 +34,11 @@ def authenticated_request(
         json=asdict(inp_auth),
     )
 
-    return AuthenticatedOutput(
+    out_or_err = AuthenticatedOutput(
         **resp.json(),
     )
+
+    if out_or_err.auth_err:
+        raise DiscoveryAuthError(out_or_err.auth_err.err)
+
+    return _maps.path_to_out_types[path](out_or_err.out)
