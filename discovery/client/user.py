@@ -11,5 +11,5 @@ def whoami() -> WhoAmIOutput:
     """Pass in an ID token"""
     return authenticated_request(
         httpx.post,
-        "whoami",
+        "/whoami",
     )

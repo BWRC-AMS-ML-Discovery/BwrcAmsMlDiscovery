@@ -30,7 +30,7 @@ def authenticated_request(
     )
 
     resp = httpx_request_type(
-        f"http://{server_url}/{path}",
+        f"http://{server_url}{path}",
         json=asdict(inp_auth),
     )
 
