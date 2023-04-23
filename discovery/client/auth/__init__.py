@@ -41,5 +41,8 @@ def authenticated_request(
     if out_or_auth_err.auth_err:
         raise DiscoveryAuthError(out_or_auth_err.auth_err.err)
 
-    out = _maps.path_to_out_types[path](out_or_auth_err.out)
+    out = _maps.path_to_out_types[path](
+        **out_or_auth_err.out,
+    )
+
     return out
