@@ -9,6 +9,7 @@
     "dtype",
     "fastapi",
     "fritchman",
+    "hexsha",
     "httpx",
     "NGSPICE",
     "Nmos",

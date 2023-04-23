@@ -1,7 +1,3 @@
-# Std-Lib Imports
-from dataclasses import asdict
-
-
 # PyPI Imports
 import httpx
 
@@ -15,5 +11,5 @@ def whoami() -> WhoAmIOutput:
     """Pass in an ID token"""
     return authenticated_request(
         httpx.post,
-        "whoami",
+        "/whoami",
     )

@@ -30,6 +30,7 @@ app = FastAPI(
 
 
 # Modules
+from .mock import *
 from .user import *
 
 
