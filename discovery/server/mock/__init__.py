@@ -1,6 +1,7 @@
 # Local Imports
 from discovery.server import app
 from discovery.server.auth import authenticated_service
+from discovery.server.auth.user import User
 from discovery.shared.mock import (
     MockInverterBetaRatioInput,
     MockInverterBetaRatioOutput,
@@ -8,8 +9,8 @@ from discovery.shared.mock import (
 
 
 @authenticated_service(app.post, "/mock/inverter_beta_ratio")
-def f(
-    inp: MockInverterBetaRatioInput,
+def mock_inverter_beta_ratio(
+    inp: MockInverterBetaRatioInput, user: User
 ) -> MockInverterBetaRatioOutput:
     """# Super-elaborate inverter beta ratio simulation"""
     wp = inp.wp

@@ -41,7 +41,7 @@ def authenticated_service(
 
             # output
             return AuthenticatedOutput(
-                out=func(inp),
+                out=func(inp, user=user),
                 auth_err=None,
             )
 
