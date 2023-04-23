@@ -23,7 +23,7 @@ def verify_auth_key(auth_key: AuthKey) -> User:
 
     try:
         current_user = auth.verify_id_token(auth_key.token)
-        date_string = str(current_user["exp"])
+        date_string = str(datetime.fromtimestamp(current_user["exp"]))
         regex_pattern = r"^\w{3}, (\d{2}) (\w{3}) (\d{4}) (\d{2}):(\d{2}):(\d{2}) GMT$"
         match = re.match(regex_pattern, date_string)
         if match:
