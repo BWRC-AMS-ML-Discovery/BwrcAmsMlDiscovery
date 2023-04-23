@@ -17,7 +17,9 @@ def check_token(inp, time_days_constraint):
 
     # user info exist, if current real time - registered time is within 1 day, then just return stored user doc, else proceed to generate new one
     if user_info:
-        user_exp = datetime.strptime(user_info['exp'], '%a, %d %b %Y %H:%M:%S GMT')
+        pattern = r"(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})"
+
+        user_exp = datetime.strptime(user_info['exp'], '%Y-%m-%d %H:%M:%S')
         current_time = datetime.utcnow()
         if current_time - user_exp <= timedelta(days=time_days_constraint):
             ret = User(user_doc['user'], user_doc['email'], user_doc['exp'])

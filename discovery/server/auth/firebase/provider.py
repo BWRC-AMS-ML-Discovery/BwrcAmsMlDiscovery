@@ -23,13 +23,19 @@ def verify_auth_key(auth_key: AuthKey) -> User:
 
     try:
         current_user = auth.verify_id_token(auth_key.token)
-        date_string = current_user['exp']
-        regex_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
-        match = re.match(regex_pattern, date_string)
+        date_string = str(current_user['exp'])
+        regex_pattern = r"(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})"
+        match = re.search(regex_pattern, date_string)
         if match:
-            date = datetime.fromisoformat(date_string)
-            date += timedelta(days=time_days_constraint)
-            new_date_string = date.strftime('%a, %d %b %Y %H:%M:%S')
+            year = int(match.group(1))
+            month = int(match.group(2))
+            day = int(match.group(3))
+            hour = int(match.group(4))
+            minute = int(match.group(5))
+            second = int(match.group(6))
+            
+            day += time_days_constraint
+            new_date_string = str(datetime(year, month, day, hour, minute, second))
             current_user['exp'] = new_date_string
             ret = User(current_user['user'], current_user['email'], current_user['exp'])
             
