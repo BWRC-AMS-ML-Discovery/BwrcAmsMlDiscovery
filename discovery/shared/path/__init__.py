@@ -7,4 +7,5 @@ path_to_inp_types = {
 
 path_to_out_types = {
     "/whoami": user.WhoAmIOutput,
+    "/mock/inverter_beta_ratio": mock.MockInverterBetaRatioOutput,
 }
