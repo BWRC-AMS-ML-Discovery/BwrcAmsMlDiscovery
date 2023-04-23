@@ -8,6 +8,7 @@
     "dotenv",
     "dtype",
     "fastapi",
+    "firestore",
     "fritchman",
     "hexsha",
     "httpx",
