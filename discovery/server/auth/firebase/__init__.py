@@ -11,7 +11,7 @@ def check_token(inp, time_days_constraint):
     db = firestore.client()
     
     # access database, if input user exist, return stored info as a dict from the database
-    user_doc = db.collection('user').document(inp.api_key).get()
+    user_doc = db.collection('user').document(inp.token).get()
     if user_doc:
         user_info = user_doc.to_dict()
 
