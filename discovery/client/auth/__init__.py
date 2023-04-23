@@ -34,11 +34,12 @@ def authenticated_request(
         json=asdict(inp_auth),
     )
 
-    out_or_err = AuthenticatedOutput(
+    out_or_auth_err = AuthenticatedOutput(
         **resp.json(),
     )
 
-    if out_or_err.auth_err:
-        raise DiscoveryAuthError(out_or_err.auth_err.err)
+    if out_or_auth_err.auth_err:
+        raise DiscoveryAuthError(out_or_auth_err.auth_err.err)
 
-    return _maps.path_to_out_types[path](out_or_err.out)
+    out = _maps.path_to_out_types[path](out_or_auth_err.out)
+    return out
