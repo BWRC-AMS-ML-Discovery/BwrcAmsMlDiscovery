@@ -29,6 +29,13 @@ app = FastAPI(
 )
 
 
+# Modules
+from .user import *
+
+
+# TODO modularize
+
+
 @app.get("/")
 async def alive() -> str:
     """# The root entry point
@@ -111,7 +118,8 @@ async def simulate_on_the_server(
     inp: VlsirProtoBufBinary = Body(...),
 ) -> VlsirProtoBufBinary:
     """# Simulate a circuit on the server
-    Decodes a `SimInput` VLSIR protobuf from `inp`, simulates it, and returns a `SimResult` VLSIR protobuf."""
+    Decodes a `SimInput` VLSIR protobuf from `inp`, simulates it, and returns a `SimResult` VLSIR protobuf.
+    """
 
     if inp.kind != VlsirProtoBufKind.SIM_INPUT:
         raise ValueError(f"Expected a simulation input, not {inp.kind}")
@@ -148,8 +156,8 @@ async def inverter_beta_ratio(
     the_ratio = 1.2
 
     # TODO implement
-    # Mock a paraboloid
 
+    # Mock a paraboloid
     output = (wp - 3) ** 2 + (wn - 4) ** 2
     return InverterBetaRatioOutput(
         trise=output / 2,

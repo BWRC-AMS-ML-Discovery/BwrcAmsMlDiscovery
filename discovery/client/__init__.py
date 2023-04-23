@@ -67,7 +67,7 @@ def simulate_that_opamp(params: OpAmpParams) -> h.sim.SimResultProto:
     print(resp.text)
     resp = VlsirProtoBufBinary(**resp.json())
 
-    # Got some data back! Decode it from protobut into a `SimResultProto`.
+    # Got some data back! Decode it from protobuf into a `SimResultProto`.
     sim_result = h.sim.SimResultProto.ParseFromString(resp.proto_bytes)
     print(sim_result)
     return sim_result
@@ -114,7 +114,7 @@ def elaborate_that_opamp_here_and_simulate_on_the_server(
         json=asdict(send_me_to_server),
     )
 
-    # Got some data back! Decode it from protobut into a `SimResultProto`.
+    # Got some data back! Decode it from protobuf into a `SimResultProto`.
     sim_result = h.sim.SimResultProto.ParseFromString(from_the_server.proto_bytes)
     print(sim_result)
     return sim_result

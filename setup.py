@@ -33,6 +33,7 @@ setup(
         "httpx>=0.23.3",
         "GitPython>=3.1.31",
         "uvicorn >= 0.20.0",
+        "firebase_admin",
     ],
     extras_require={
         "dev": [

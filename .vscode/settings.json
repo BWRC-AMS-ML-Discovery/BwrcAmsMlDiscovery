@@ -1,3 +1,26 @@
 {
-  "python.formatting.provider": "black"
+  "python.formatting.provider": "none",
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "cSpell.words": [
+    "bwrc",
+    "dotenv",
+    "dtype",
+    "fastapi",
+    "fritchman",
+    "httpx",
+    "NGSPICE",
+    "Nmos",
+    "npar",
+    "opamp",
+    "paramclass",
+    "protobuf",
+    "pydantic",
+    "rpcs",
+    "tfall",
+    "trise",
+    "Vlsir",
+    "vlsirtools"
+  ]
 }
