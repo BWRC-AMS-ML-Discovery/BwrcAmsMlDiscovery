@@ -8,7 +8,7 @@ from fastapi import Body
 
 # Local Imports
 from discovery.shared.auth import AuthError, AuthenticatedInput, AuthenticatedOutput
-from discovery.shared.path import path_to_inp_types
+from discovery.shared.path import convert_inp_json_to_type, path_to_inp_types
 
 from discovery.server.auth.provider import verify_auth_key
 
@@ -35,8 +35,9 @@ def authenticated_service(
                 )
 
             # input
-            inp = path_to_inp_types[path](
-                **inp_auth.inp,
+            inp = convert_inp_json_to_type(
+                path_to_inp_types[path],
+                inp_auth.inp,
             )
 
             # output
