@@ -42,7 +42,7 @@ def authenticated_request(
         raise DiscoveryAuthError(out_or_auth_err.auth_err.err)
 
     out = path_to_out_types[path](
-        **out_or_auth_err.out,
+        **out_or_auth_err.out,  # Currently, this must be a dict-like object
     )
 
     return out
