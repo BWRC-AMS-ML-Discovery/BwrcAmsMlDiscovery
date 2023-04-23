@@ -14,6 +14,24 @@ from discovery.shared.path import path_to_inp_types
 from discovery.server.auth.provider import verify_auth_key
 
 
+def authenticated_service(
+    fastapi_request_type,
+    *args,
+    **kwargs,
+):
+    def decorator(func):
+        @fastapi_request_type(*args, **kwargs)
+        async def authenticated_func(
+            inp: AuthenticatedInput = Body(...),
+        ) -> AuthenticatedOutput:
+            return func(inp)
+
+        return authenticated_func
+
+    return decorator
+
+
+@authenticated_service(app.post, "/mock/inverter_beta_ratio")
 def f(
     inp: MockInverterBetaRatioInput,
 ) -> MockInverterBetaRatioOutput:
