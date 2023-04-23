@@ -35,7 +35,7 @@ def authenticated_service(
                 )
 
             # input
-            inp = path_to_inp_types["/mock/inverter_beta_ratio"](
+            inp = path_to_inp_types[path](
                 **inp_auth.inp,
             )
 
