@@ -1,7 +1,3 @@
-# Std-Lib Imports
-from dataclasses import asdict
-
-
 # PyPI Imports
 import httpx
 
