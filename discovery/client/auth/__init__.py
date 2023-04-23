@@ -8,10 +8,10 @@ import httpx
 
 
 # Local Imports
-from . import _maps
 from discovery.client import env, THE_SERVER_URL
 from discovery.client.auth.errors import DiscoveryAuthError
 from discovery.shared.auth import AuthKey, AuthenticatedInput, AuthenticatedOutput
+from discovery.shared.path import path_to_out_types
 
 
 _token = env.get("DISCOVERY_AUTH_TOKEN", None)
@@ -41,7 +41,7 @@ def authenticated_request(
     if out_or_auth_err.auth_err:
         raise DiscoveryAuthError(out_or_auth_err.auth_err.err)
 
-    out = _maps.path_to_out_types[path](
+    out = path_to_out_types[path](
         **out_or_auth_err.out,
     )
 
