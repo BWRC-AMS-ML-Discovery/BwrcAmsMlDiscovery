@@ -11,6 +11,7 @@ from discovery.shared.auth import AuthError, AuthenticatedInput, AuthenticatedOu
 from discovery.shared.types import convert_inp_json_to_type, path_to_inp_types
 
 from discovery.server.auth.provider import verify_auth_key
+from firebase_admin import firestore
 
 
 def authenticated_service(
