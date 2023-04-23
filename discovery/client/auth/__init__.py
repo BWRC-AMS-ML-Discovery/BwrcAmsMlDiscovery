@@ -11,7 +11,7 @@ import httpx
 from discovery.client import env, THE_SERVER_URL
 from discovery.client.auth.errors import DiscoveryAuthError
 from discovery.shared.auth import AuthKey, AuthenticatedInput, AuthenticatedOutput
-from discovery.shared.path import convert_out_json_to_type, path_to_out_types
+from discovery.shared.types import convert_out_json_to_type, path_to_out_types
 
 
 _token = env.get("DISCOVERY_AUTH_TOKEN", None)
