@@ -11,9 +11,10 @@ from discovery.shared.auth import AuthError, AuthenticatedInput, AuthenticatedOu
 from discovery.shared.types import convert_inp_json_to_type, path_to_inp_types
 
 from discovery.server.auth.provider import verify_auth_key
-from firebase_admin import firestore
 
 
+# TODO Actually, raising the error instead of
+# sending an AuthError is better for debugging purposes.
 def authenticated_service(
     fastapi_request_type: Callable[
         ..., Callable[[Callable[..., Any]], Callable[..., Any]]
