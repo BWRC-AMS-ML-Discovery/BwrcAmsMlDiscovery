@@ -37,7 +37,11 @@ def verify_auth_key(auth_key: AuthKey) -> User:
             day += time_days_constraint
             new_date_string = str(datetime(year, month, day, hour, minute, second))
             current_user["exp"] = new_date_string
-            ret = User(current_user["user"], current_user["email"], current_user["exp"])
+            ret = User(
+                name=current_user["name"],
+                email=current_user["email"],
+                exp=current_user["exp"],
+            )
 
     except InvalidTokenError:
         pass

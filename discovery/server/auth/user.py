@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 import datetime
 
+
 @dataclass
 class User:
-    user: str
+    name: str
     email: str
     exp: datetime
