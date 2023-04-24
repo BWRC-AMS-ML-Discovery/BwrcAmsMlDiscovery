@@ -12,6 +12,6 @@ from ..server.auth.user import User
 @authenticated_service(app.post, "/whoami")
 def whoami(inp: None, user: User) -> WhoAmIOutput:
     return WhoAmIOutput(
-        username=user.username,
+        username=user.name,
         email=user.email,
     )
