@@ -120,12 +120,6 @@ def elaborate_that_opamp_here_and_simulate_on_the_server(
     return sim_result
 
 
-def inverter_beta_ratio(inp: InverterBetaRatioInput) -> InverterBetaRatioOutput:
-    """Invoke a (very secret) SPICE simulation"""
-    resp = httpx.post(f"http://{THE_SERVER_URL}/inverter_beta_ratio", json=asdict(inp))
-    return InverterBetaRatioOutput(**resp.json())
-
-
 def local_inverter_beta_ratio(inp: InverterBetaRatioInput):
     wp = inp.wp
     wn = inp.wn

@@ -146,22 +146,3 @@ async def simulate_on_the_server(
         kind=VlsirProtoBufKind.SIM_RESULT,
         proto_bytes=sim_result.SerializeToString(),
     )
-
-
-@authenticated_service(app.post, "/inverter_beta_ratio")
-async def inverter_beta_ratio(
-    inp: InverterBetaRatioInput = Body(...),
-) -> InverterBetaRatioOutput:
-    """# Super-elaborate inverter beta ratio simulation"""
-    wp = inp.wp
-    wn = inp.wn
-    the_ratio = 1.2
-
-    # TODO implement
-
-    # Mock a paraboloid
-    output = (wp - 3) ** 2 + (wn - 4) ** 2
-    return InverterBetaRatioOutput(
-        trise=output / 2,
-        tfall=output / 2,
-    )

@@ -8,6 +8,10 @@ from ...shared.mock import (
     MockInverterBetaRatioInput,
     MockInverterBetaRatioOutput,
 )
+from ...shared import (
+    InverterBetaRatioInput,
+    InverterBetaRatioOutput,
+)
 
 
 def mock_inverter_beta_ratio(
@@ -16,5 +20,15 @@ def mock_inverter_beta_ratio(
     return authenticated_request(
         httpx.post,
         "/mock/inverter_beta_ratio",
+        inp,
+    )
+
+
+def inverter_beta_ratio(
+    inp: InverterBetaRatioInput,
+) -> InverterBetaRatioOutput:
+    return authenticated_request(
+        httpx.post,
+        "/inverter_beta_ratio",
         inp,
     )
