@@ -3,7 +3,7 @@
 """
 
 
-from typing import Any
+from typing import Any, Union
 
 
 # Local Imports
@@ -17,7 +17,7 @@ class AuthKey:
 
 @dataclass
 class AuthenticatedInput:
-    inp: Any | None  # TODO type hint a JSON serializable DataclassInstance
+    inp: Union[Any, None]  # TODO type hint a JSON serializable DataclassInstance
     auth_key: AuthKey
 
 
@@ -28,5 +28,5 @@ class AuthError:
 
 @dataclass
 class AuthenticatedOutput:
-    out: Any | None  # TODO type hint a JSON serializable DataclassInstance
-    auth_err: AuthError | None
+    out: Union[Any, None]  # TODO type hint a JSON serializable DataclassInstance
+    auth_err: Union[AuthError, None]

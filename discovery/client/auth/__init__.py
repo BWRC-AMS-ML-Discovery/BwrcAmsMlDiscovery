@@ -1,6 +1,6 @@
 # Std-Lib Imports
 from dataclasses import asdict
-from typing import Callable, Any
+from typing import Callable, Any, Union
 
 
 # PyPI Imports
@@ -20,7 +20,8 @@ _token = env.get("DISCOVERY_AUTH_TOKEN", None)
 def authenticated_request(
     httpx_request_type: Callable[..., httpx.Response],
     path: str,
-    inp: Any | None = None,  # TODO type hint a JSON serializable DataclassInstance
+    # TODO type hint a JSON serializable DataclassInstance
+    inp: Union[Any, None] = None,
     *,
     server_url: str = THE_SERVER_URL,
 ):
