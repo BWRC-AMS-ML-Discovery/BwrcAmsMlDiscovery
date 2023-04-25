@@ -8,7 +8,6 @@ import vlsirtools.spice as vsp
 from fastapi import FastAPI, Body
 
 # Local Imports
-from .auth import authenticated_service
 from ..shared import (
     Example,
     SecretSpiceSimulationInput,
@@ -148,7 +147,7 @@ async def simulate_on_the_server(
     )
 
 
-@authenticated_service(app.post, "/inverter_beta_ratio")
+@app.post("/inverter_beta_ratio")
 async def inverter_beta_ratio(
     inp: InverterBetaRatioInput = Body(...),
 ) -> InverterBetaRatioOutput:
