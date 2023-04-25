@@ -3,7 +3,7 @@
 ## Installation
 
 Recommend using a virtual environment
-python version <= 3.10
+GCP Debian python version == 3.9
 
 ```
 pip install -e ".[dev]"
