@@ -1,4 +1,4 @@
-from discovery.shared import user, mock
+from .. import user, mock
 
 
 path_to_inp_types = {

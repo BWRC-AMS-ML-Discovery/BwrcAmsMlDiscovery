@@ -4,7 +4,7 @@ import httpx
 
 # Local Imports
 from ..auth import authenticated_request
-from discovery.shared.mock import (
+from ...shared.mock import (
     MockInverterBetaRatioInput,
     MockInverterBetaRatioOutput,
 )

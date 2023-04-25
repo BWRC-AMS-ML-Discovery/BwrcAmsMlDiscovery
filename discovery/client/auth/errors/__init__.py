@@ -1,4 +1,4 @@
-from discovery.client.errors import DiscoveryError
+from ...errors import DiscoveryError
 
 
 class DiscoveryAuthError(DiscoveryError):
