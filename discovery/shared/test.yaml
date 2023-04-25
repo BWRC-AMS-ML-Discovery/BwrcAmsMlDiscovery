@@ -1,0 +1,14 @@
+---
+id: "123"
+generator_type: "HDL"
+circuit_type: "op-amp"
+step_size: 0.5
+hyperparameters:
+  alpha: 0.7
+  discount_factor: 0.618
+  max_epsilon: 1
+  min_epsilon: 0.01
+  decay: 0.1
+  train_episodes: 500
+  steps_per_episode: 100
+...
