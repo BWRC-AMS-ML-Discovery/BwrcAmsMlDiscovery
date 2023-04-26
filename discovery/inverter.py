@@ -1,12 +1,11 @@
 from dataclasses import dataclass
+from textwrap import dedent
 
 import hdl21 as h
+from hdl21.prefix import f, MILLI
 import vlsirtools.spice as vsp
 import sky130
 import sitepdks as _
-from hdl21.prefix import f, MILLI
-
-FIXME = None
 
 
 @h.paramclass
@@ -73,20 +72,32 @@ def sim(params: TbParams) -> h.sim.SimResult:
     class InvSim:
         """# Inverter Simulation Input"""
 
+        # These painful settings for ngspice
+        ng = h.sim.Literal(
+            dedent(
+                """
+            .control
+            set ngbehavior=hsa
+            set ng_nomodcheck
+            .endc
+        """
+            )
+        )
+        # Sky130 Model Library
+        models = h.sim.Lib(path=sky130.install.model_lib, section="tt")
+
         # Testbench
         tb = Tb(params)
 
         # Stimulus
         op = h.sim.Op()
+        ## FIXME: after id,sat sims and tests work, add some transient!
         # tran = h.sim.Tran(tstop=1*h.prefix.PICO)
-        models = h.sim.Lib(path=sky130.install.model_lib, section="tt")
-
-        # These painful settings for ngspice
-        l1 = h.sim.Literal("set ngbehavior=hsa")
-        l2 = h.sim.Literal("set ng_nomodcheck")
 
     sim_options = vsp.SimOptions(
-        simulator=vsp.SupportedSimulators.NGSPICE, rundir="./scratch/"
+        simulator=vsp.SupportedSimulators.NGSPICE, 
+        fmt=vsp.ResultFormat.SIM_DATA, #
+        rundir="./scratch/"
     )
 
     # Run the simulation!!
@@ -102,7 +113,11 @@ class Result:
 
 
 def inverter(params: InvParams) -> Result:
-    """# Inverter top-level entrypoint"""
+    """
+    # Inverter top-level entrypoint
+    FIXME TODO: this is the primary thing to write and do! 
+    And then hook it up to the stuff in `server`. 
+    """
 
     # Run the nmos-on sim
     result0 = sim(SomeValueOfParams())
@@ -122,4 +137,7 @@ def inverter(params: InvParams) -> Result:
 
 # Test run (remove me plz!)
 # inverter(InvParams(wp=1000, wn=1000))
-sim(TbParams(inv=InvParams(wp=1000, wn=1000), vdd=1000, vin=1000))
+params = TbParams(inv=InvParams(wp=1000, wn=1000), vdd=1000, vin=1000)
+print(f"`sim`'ing {params}")
+res = sim(params)
+print(res)
