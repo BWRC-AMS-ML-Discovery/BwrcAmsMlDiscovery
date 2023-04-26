@@ -21,16 +21,17 @@ class InvParams:
 def Inv(params: InvParams) -> h.Module:
     """# Sky130 Inverter"""
 
-    # Get some shorthand names for our key devices
-    nfet = sky130.modules.sky130_fd_pr__nfet_01v8
-    pfet = sky130.modules.sky130_fd_pr__pfet_01v8
+    # Apply our size parameters
+    # Reminder: our `InvParams` are integer *nanometers*, and the Sky PDK wants *microns*!
+    nfet = sky130.modules.sky130_fd_pr__nfet_01v8(w=params.wn * MILLI)
+    pfet = sky130.modules.sky130_fd_pr__pfet_01v8(w=params.wp * MILLI)
 
     @h.module
     class Inv:
         inp, VDD, VSS = h.Inputs(3)
         out = h.Output()
-        p = pfet(w=params.wp * FIXME)(d=out, g=inp, s=VDD, b=VDD)
-        n = nfet(w=params.wn * FIXME)(d=out, g=inp, s=VSS, b=VSS)
+        p = pfet(d=out, g=inp, s=VDD, b=VDD)
+        n = nfet(d=out, g=inp, s=VSS, b=VSS)
 
     return Inv
 
@@ -65,7 +66,9 @@ def Tb(params: TbParams) -> h.Module:
     return Tb
 
 
-def sim(params: TbParams) -> h.sim.Result:
+def sim(params: TbParams) -> h.sim.SimResult:
+    """ # Simulate a testbench with `TbParams`, returning its `SimResults` """
+
     @h.sim.sim
     class InvSim:
         """# Inverter Simulation Input"""
@@ -86,15 +89,8 @@ def sim(params: TbParams) -> h.sim.Result:
         simulator=vsp.SupportedSimulators.NGSPICE, rundir="./scratch/"
     )
 
-    # Finally! Run the simulation!!
-    sim_result = InvSim.run(sim_options)
-
-    # sim_result = await vsp.spice.sim_async(h.sim.to_proto(InvSim), sim_options)
-    # ## FIXME: same "double await" as above
-    # sim_result = await sim_result
-
-    print(sim_result)
-    return sim_result
+    # Run the simulation!!
+    return InvSim.run(sim_options)
 
 
 @dataclass
@@ -116,7 +112,7 @@ def inverter(params: InvParams) -> Result:
     # Run the pmos-on sim
     result1 = sim(SomeValueOtherParams())
     # Extract its id,sat
-    idsatn = something(result1)
+    idsatp = something(result1)
 
     return Result(
         idsatp=idsatp,
@@ -124,5 +120,5 @@ def inverter(params: InvParams) -> Result:
     )
 
 
-# Test run (remove me plz)
-inverter(InvParams(wp=1 * µ, wn=1 * µ))
+# Test run (remove me plz!)
+# inverter(InvParams(wp=1 * µ, wn=1 * µ))
