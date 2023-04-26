@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from textwrap import dedent
 
 import hdl21 as h
-from hdl21.prefix import f, MILLI
+from hdl21.prefix import MILLI
 import vlsirtools.spice as vsp
 import sky130
 import sitepdks as _
@@ -41,26 +41,30 @@ class TbParams:
 
     inv = h.Param(dtype=InvParams, desc="Inverter Parameters")
     vdd = h.Param(dtype=int, desc="Supply Voltage (mV)")
-    vin = h.Param(dtype=int, desc="Input Voltage (mV)")
+    inp = h.Param(dtype=bool, desc="Input Logic Level (Boolean)")
 
 
 @h.generator
 def Tb(params: TbParams) -> h.Module:
-    """# Sky130 Inverter Testbench"""
+    """# Sky130 Inverter Id,sat Testbench"""
+
+    # Extract voltages for stimulus sources
+    vvdd = params.vdd * MILLI # Convert to volts
+    vvin = vvdd if params.inp else 0
 
     @h.module
     class Tb:
         # The sole testbench port: VSS
         VSS = h.Port()
-        # Internal signals: input, output, supple
-        inp, out, VDD = h.Signals(3)
+        # Internal signals: input/output, supply
+        io, VDD = h.Signals(2)
+        
         # The DUT Inverter
-        inv = Inv(params.inv)(inp=inp, out=out, VDD=VDD, VSS=VSS)
-        # Stimulus Sources: VDD and VIN
-        vdd = h.Vdc(dc=params.vdd * MILLI)(p=VDD, n=VSS)
-        vin = h.Vdc(dc=params.vin * MILLI)(p=inp, n=VSS)
-        # Load Cap
-        cl = h.Cap(c=10 * f)(p=out, n=VSS)
+        inv = Inv(params.inv)(inp=io, out=io, VDD=VDD, VSS=VSS)
+        
+        # Stimulus Sources: VDD, VIN, VOUT
+        vdd = h.Vdc(dc=vvdd)(p=VDD, n=VSS)
+        vio = h.Vdc(dc=vvin)(p=io, n=VSS)
 
     return Tb
 
@@ -137,7 +141,7 @@ def inverter(params: InvParams) -> Result:
 
 # Test run (remove me plz!)
 # inverter(InvParams(wp=1000, wn=1000))
-params = TbParams(inv=InvParams(wp=1000, wn=1000), vdd=1000, vin=1000)
+params = TbParams(inv=InvParams(wp=1000, wn=1000), vdd=1800, inp=False)
 print(f"`sim`'ing {params}")
 res = sim(params)
 print(res)
