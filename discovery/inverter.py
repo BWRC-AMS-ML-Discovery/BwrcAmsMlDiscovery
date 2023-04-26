@@ -4,7 +4,7 @@ import hdl21 as h
 import vlsirtools.spice as vsp
 import sky130
 import sitepdks as _
-from hdl21.prefix import µ, f, MILLI
+from hdl21.prefix import f, MILLI
 
 FIXME = None
 
@@ -67,7 +67,7 @@ def Tb(params: TbParams) -> h.Module:
 
 
 def sim(params: TbParams) -> h.sim.SimResult:
-    """ # Simulate a testbench with `TbParams`, returning its `SimResults` """
+    """# Simulate a testbench with `TbParams`, returning its `SimResults`"""
 
     @h.sim.sim
     class InvSim:
@@ -121,4 +121,5 @@ def inverter(params: InvParams) -> Result:
 
 
 # Test run (remove me plz!)
-# inverter(InvParams(wp=1 * µ, wn=1 * µ))
+# inverter(InvParams(wp=1000, wn=1000))
+sim(TbParams(inv=InvParams(wp=1000, wn=1000), vdd=1000, vin=1000))
