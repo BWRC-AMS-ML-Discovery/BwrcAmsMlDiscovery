@@ -1,0 +1,1 @@
+sudo nohup discovery_venv/bin/uvicorn --host 0.0.0.0 --port 80 discovery.server:app --reload
