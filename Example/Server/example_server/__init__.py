@@ -1,14 +1,14 @@
 """
-# Discovery Server
+# Example Server
 """
 
 # PyPi Imports
 import hdl21 as h
 import vlsirtools.spice as vsp
-from fastapi import FastAPI, Body
+from fastapi import Body
 
 # Local Imports
-from ..shared import (
+from example_shared import (
     Example,
     SecretSpiceSimulationInput,
     SecretSpiceSimulationOutput,
@@ -18,38 +18,6 @@ from ..shared import (
     InverterBetaRatioInput,
     InverterBetaRatioOutput,
 )
-from ..shared.git import GitInfo
-
-
-app = FastAPI(
-    debug=False,
-    title="BWRC AMS ML CktGym",
-    description="BWRC AMS ML CktGym",
-    version="0.0.1",
-)
-
-
-# Modules
-from .mock import *
-from .user import *
-
-
-# TODO modularize
-
-
-@app.get("/")
-async def alive() -> str:
-    """# The root entry point
-    Just an indication that the server is alive and can be reached."""
-
-    return "bwrc_ams_ml_discovery_server_alive"
-
-
-@app.get("/version")
-async def version() -> GitInfo:
-    """# Get the server git version info"""
-
-    return GitInfo.get()
 
 
 @app.post("/example")
@@ -164,3 +132,4 @@ async def inverter_beta_ratio(
         trise=output / 2,
         tfall=output / 2,
     )
+

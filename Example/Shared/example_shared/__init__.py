@@ -1,17 +1,17 @@
 """
-# Discovery 
+# Example Discovery App
 Shared server-client code
 """
 
 # Std-Lib Imports
 from enum import Enum
+from typing import Optional
 
 # PyPi Imports
 import hdl21 as h
 
-# Local Imports
-from .dataclasses import dataclass
-from typing import Optional
+# Workspace Imports
+from discovery_shared.dataclasses import dataclass
 
 
 @dataclass
