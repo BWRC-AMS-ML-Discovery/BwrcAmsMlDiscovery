@@ -6,7 +6,7 @@
 import hdl21 as h
 import vlsirtools.spice as vsp
 
-# Local Imports
+# Workspace Imports
 from example_shared import (
     example,
     Example,
