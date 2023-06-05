@@ -1,30 +1,67 @@
 """
 # RPC 
 
-Generate client-server pairs via an `@rpc` decorator applied to a "core" server-side "action function". 
-Example: 
+Generate client-server pairs. 
+RPC definitions include: 
+
+* A function name
+* An input type
+* A return type
+
+All defined RPCs are stored in a global registry which can be accessed by name.  
+The Discovery client library transforms each into a callable client-side function.  
+Server-side code can decorate an implementation function with `@{rpc}.impl` to register it as the implementation of an RPC.
+
+Example:
 
 ```python
-@rpc
-def my_server_side_stuff(inp: Input) -> Output: 
-    # Do the actual stuff you want the server to do
-    something = do_sims_and_stuff(inp)
-    return Output(**something)
+# Example / Shared
+
+@dataclass
+class Input:
+    ...
+
+@dataclass
+class Output:
+    ...
+
+my_rpc = Rpc(
+    name="my_rpc",
+    input_type=Input,
+    return_type=Output,
+    docstring="My RPC",
+)
 ```
 
-Generates: 
+```python
+# Example / Server
 
-* The endpoint `my_server_side_stuff`
-  * Using `Input` as its argument-type and `Output` as its return-type
-* The server-side wrapper 
-* The client-side wrapper 
+from example_shared import my_rpc, Input, Output
+
+# Define the server-side implementation of `my_rpc`
+@my_rpc.impl
+def my_function(inp: Input) -> Output:
+    ... # Do the actual server-side stuff
+    return Output(...)
+```
+
+```python
+# Example / Client
+
+from example_shared import my_rpc, Input, Output
+
+# "Do nothing"; just start calling `my_rpc` as if it were a client-defined function.
+input = Input(...)
+output = my_rpc(input) # Returns an `Output` object
+
+```
 
 """
 
 # Std-Lib Imports
-import inspect, functools
-from dataclasses import is_dataclass, asdict
-from typing import Callable, Type, Dict, Tuple
+import inspect
+from dataclasses import is_dataclass
+from typing import Callable, Type, Dict
 
 # Local Imports
 from .dataclasses import dataclass
@@ -38,16 +75,29 @@ class Rpc:
     """
 
     name: str  # RPC name. Serves as the endpoint name.
-    func: Callable  # Core Inner Function
     input_type: Type  # Input type
     return_type: Type  # Return type
+
+    docstring: str = ""  # Docstring
+    # Inner Function
+    # An http POST in the client, and a function call in the server
+    func: Callable | None = None
 
     def __call__(self, *args, **kwargs) -> "self.return_type":
         """# Call our RPC function
         Dispatches to the inner callable.
         This would only be invoked if directly importing from the shared version, but should remain handy.
         Our return-type annotation here is pseudo-code, but you get the point."""
-        return self.f(*args, **kwargs)
+        return self.func(*args, **kwargs)
+
+    def impl(self, f: Callable) -> "Rpc":
+        """# Implement our RPC function
+        Set the inner callable to `f`."""
+        if self.func is not None:
+            raise RuntimeError(f"RPC {self.name} already has a function defined")
+        # FIXME: probably add checks on the signature of `f` here
+        self.func = f
+        return self
 
 
 # All the "registered" RPC functions
@@ -56,7 +106,8 @@ rpcs: Dict[str, Rpc] = dict()
 
 def rpc(f: Callable) -> Rpc:
     """# RPC Decorator
-    Wrap function `f` in an `Rpc` which can be interpreted by both client-side and server-side code."""
+    Wrap function `f` in an `Rpc` which can be interpreted by both client-side and server-side code.
+    """
 
     # Assert that our argument is a callable
     if not callable(f):
@@ -89,50 +140,3 @@ def rpc(f: Callable) -> Rpc:
     rpc = Rpc(name=f.__name__, func=f, input_type=input_type, return_type=return_type)
     rpcs[f.__name__] = rpc
     return rpc
-
-
-#
-# Now, each of `client` and `server` can do something like:
-#
-
-
-def _do_this_in_client():
-    # Import the list of RPCs
-    from ..shared.rpc import rpcs
-
-    def create_client_rpc(rpc: Rpc):
-        """# Create the client function for `rpc`."""
-        ## import httpx # This stuff, and the server URL, will be in the client module
-
-        # The functools "function wrapper" will apply the docstring etc from `rpc.func`
-        @functools.wraps(rpc.func)
-        def client_wrapper(inp: rpc.input_type) -> rpc.return_type:
-            url = f"http://{THE_SERVER_URL}/{rpc.name}"
-            resp = httpx.post(url, json=asdict(inp))
-            return rpc.return_type(**resp.json())
-
-        return client_wrapper
-
-    # Create one of those for each RPC
-    for rpc in rpcs.values():
-        create_client_rpc(rpc)
-
-
-def _do_this_in_server():
-    # And do something similar on the server
-    for rpc in rpcs.values():
-        create_server_rpc(rpc)
-
-
-@dataclass
-class ExampleMlInputs:
-    """
-    # Example ML Optimizer Inputs
-    Now you can have inputs to your ML thing like so:
-    """
-
-    input_range: Tuple[int, int]
-    initial_value_of_something: float
-
-    # The point here: the objective function can be an `Rpc`
-    the_objective_function: Rpc

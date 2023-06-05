@@ -5,41 +5,40 @@
 # PyPi Imports
 import hdl21 as h
 import vlsirtools.spice as vsp
-from fastapi import Body
 
 # Local Imports
 from example_shared import (
+    example,
     Example,
+    secret_spice,
     SecretSpiceSimulationInput,
     SecretSpiceSimulationOutput,
+    simulate_that_opamp,
     OpAmpParams,
     VlsirProtoBufKind,
     VlsirProtoBufBinary,
+    inverter_beta_ratio,
     InverterBetaRatioInput,
     InverterBetaRatioOutput,
 )
 
 
-@app.post("/example")
-async def example(example: Example = Body(...)) -> Example:
-    """# Example POST RPC endpoint"""
+@example.impl
+def example_func(example: Example) -> Example:
+    """# Example RPC"""
 
     return Example(txt=example.txt * example.num, num=1)
 
 
-@app.post("/secret_spice_sim")
-async def secret_spice_sim(
-    _inp: SecretSpiceSimulationInput = Body(...),
-) -> SecretSpiceSimulationOutput:
+@secret_spice.impl
+def secret_spice_sim(inp: SecretSpiceSimulationInput) -> SecretSpiceSimulationOutput:
     """# Super-secret SPICE simulation"""
 
     return SecretSpiceSimulationOutput(id=5e-6)
 
 
-@app.post("/simulate_that_opamp")
-async def simulate_that_opamp(
-    params: OpAmpParams = Body(...),
-) -> VlsirProtoBufBinary:
+@simulate_that_opamp.impl
+async def simulate_that_opamp(params: OpAmpParams) -> VlsirProtoBufBinary:
     """# Some op-amp simulation"""
 
     @h.generator
@@ -83,9 +82,7 @@ async def simulate_that_opamp(
 
 
 @app.post("/simulate_on_the_server")
-async def simulate_on_the_server(
-    inp: VlsirProtoBufBinary = Body(...),
-) -> VlsirProtoBufBinary:
+async def simulate_on_the_server(inp: VlsirProtoBufBinary) -> VlsirProtoBufBinary:
     """# Simulate a circuit on the server
     Decodes a `SimInput` VLSIR protobuf from `inp`, simulates it, and returns a `SimResult` VLSIR protobuf.
     """
@@ -115,10 +112,8 @@ async def simulate_on_the_server(
     )
 
 
-@app.post("/inverter_beta_ratio")
-async def inverter_beta_ratio(
-    inp: InverterBetaRatioInput = Body(...),
-) -> InverterBetaRatioOutput:
+@inverter_beta_ratio.impl
+async def inverter_beta_ratio(inp: InverterBetaRatioInput) -> InverterBetaRatioOutput:
     """# Super-elaborate inverter beta ratio simulation"""
     wp = inp.wp
     wn = inp.wn
@@ -132,4 +127,3 @@ async def inverter_beta_ratio(
         trise=output / 2,
         tfall=output / 2,
     )
-
