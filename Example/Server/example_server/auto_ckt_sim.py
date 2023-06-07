@@ -9,16 +9,35 @@ import numpy as np
 import scipy.interpolate as interp
 import scipy.optimize as sciopt
 
+# Workspace Imports
+from example_shared import (
+    AutoCktInput,
+    AutoCktOutput,
+)
 
-def create_design(self, state, new_fname):
-    design_folder = os.path.join(self.gen_dir, new_fname) + str(
-        random.randint(0, 10000)
-    )
-    os.makedirs(design_folder, exist_ok=True)
 
-    fpath = os.path.join(design_folder, new_fname + ".cir")
+# TODO replace ...
+_raw_file = open("...", "r")
+_tmp_lines = _raw_file.readlines()
+_raw_file.close()
 
-    lines = copy.deepcopy(self.tmp_lines)
+
+def _mkdir():
+    while True:
+        try:
+            design_folder = "/tmp/ckt_da_new/" + str(random.randint(0, 1_000_000))
+            os.makedirs(design_folder)
+            return design_folder
+        except OSError:
+            pass
+
+
+def create_design(state: AutoCktInput):
+    design_folder = _mkdir()
+
+    fpath = os.path.join(design_folder, ".cir")
+
+    lines = copy.deepcopy(_tmp_lines)
     for line_num, line in enumerate(lines):
         if ".include" in line:
             regex = re.compile('\.include\s*"(.*?)"')
@@ -52,13 +71,13 @@ def create_design(self, state, new_fname):
     return design_folder, fpath
 
 
-def simulate(self, fpath):
+def simulate(fpath):
     info = 0  # this means no error occurred
     command = "ngspice -b %s >/dev/null 2>&1" % fpath
     exit_code = os.system(command)
-    if debug:
-        print(command)
-        print(fpath)
+    # if debug:
+    #     print(command)
+    #     print(fpath)
 
     if exit_code % 256:
         # raise RuntimeError('program {} failed!'.format(command))
@@ -66,7 +85,7 @@ def simulate(self, fpath):
     return info
 
 
-def translate_result(self, output_path):
+def translate_result(output_path):
     """
 
     :param output_path:
@@ -75,17 +94,22 @@ def translate_result(self, output_path):
     """
 
     # use parse output here
-    freq, vout, ibias = self.parse_output(output_path)
-    gain = self.find_dc_gain(vout)
-    ugbw = self.find_ugbw(freq, vout)
-    phm = self.find_phm(freq, vout)
+    freq, vout, ibias = parse_output(output_path)
+    gain = find_dc_gain(vout)
+    ugbw = find_ugbw(freq, vout)
+    phm = find_phm(freq, vout)
 
-    spec = dict(ugbw=ugbw, gain=gain, phm=phm, ibias=ibias)
+    spec = AutoCktOutput(
+        ugbw=ugbw,
+        gain=gain,
+        phm=phm,
+        ibias=ibias,
+    )
 
     return spec
 
 
-def parse_output(self, output_path):
+def parse_output(output_path):
     ac_fname = os.path.join(output_path, "ac.csv")
     dc_fname = os.path.join(output_path, "dc.csv")
 
@@ -103,20 +127,20 @@ def parse_output(self, output_path):
     return freq, vout, ibias
 
 
-def find_dc_gain(self, vout):
+def find_dc_gain(vout):
     return np.abs(vout)[0]
 
 
-def find_ugbw(self, freq, vout):
+def find_ugbw(freq, vout):
     gain = np.abs(vout)
-    ugbw, valid = self._get_best_crossing(freq, gain, val=1)
+    ugbw, valid = _get_best_crossing(freq, gain, val=1)
     if valid:
         return ugbw
     else:
         return freq[0]
 
 
-def find_phm(self, freq, vout):
+def find_phm(freq, vout):
     gain = np.abs(vout)
     phase = np.angle(vout, deg=False)
     phase = np.unwrap(phase)  # unwrap the discontinuity
@@ -128,7 +152,7 @@ def find_phm(self, freq, vout):
     # plt.plot(np.log10(freq[:200]), phase)
 
     phase_fun = interp.interp1d(freq, phase, kind="quadratic")
-    ugbw, valid = self._get_best_crossing(freq, gain, val=1)
+    ugbw, valid = _get_best_crossing(freq, gain, val=1)
     if valid:
         if phase_fun(ugbw) > 0:
             return -180 + phase_fun(ugbw)
@@ -138,7 +162,7 @@ def find_phm(self, freq, vout):
         return -180
 
 
-def _get_best_crossing(cls, xvec, yvec, val):
+def _get_best_crossing(xvec, yvec, val):
     interp_fun = interp.InterpolatedUnivariateSpline(xvec, yvec)
 
     def fzero(x):
