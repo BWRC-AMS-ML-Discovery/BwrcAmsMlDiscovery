@@ -4,6 +4,11 @@ import re
 import random
 import copy
 
+# PyPi Imports
+import numpy as np
+import scipy.interpolate as interp
+import scipy.optimize as sciopt
+
 
 def create_design(self, state, new_fname):
     design_folder = os.path.join(self.gen_dir, new_fname) + str(
