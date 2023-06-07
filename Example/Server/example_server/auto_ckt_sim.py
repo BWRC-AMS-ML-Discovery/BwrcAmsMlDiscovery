@@ -16,8 +16,11 @@ from example_shared import (
 )
 
 
-# TODO replace ...
-_raw_file = open("...", "r")
+# TODO maybe don't need to save files at all
+IO_BASE_DIR = "/tmp/ckt_da_new/"
+
+
+_raw_file = open(IO_BASE_DIR + "in/" + "two_stage_opamp.cir", "r")
 _tmp_lines = _raw_file.readlines()
 _raw_file.close()
 
@@ -25,7 +28,7 @@ _raw_file.close()
 def _mkdir():
     while True:
         try:
-            design_folder = "/tmp/ckt_da_new/" + str(random.randint(0, 1_000_000))
+            design_folder = IO_BASE_DIR + "out/" + str(random.randint(0, 1_000_000))
             os.makedirs(design_folder)
             return design_folder
         except OSError:
