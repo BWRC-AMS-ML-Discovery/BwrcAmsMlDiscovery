@@ -170,4 +170,9 @@ class AutoCktInput:
     phm: float 
     ibias: float
 
-
+AutoCktSim = Rpc(
+    name="AutoCktSim",
+    input_type=AutoCktInput,
+    return_type=AutoCktOutput,
+    docstring="Simulation on the Server",
+)
