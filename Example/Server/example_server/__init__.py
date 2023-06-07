@@ -20,6 +20,9 @@ from example_shared import (
     inverter_beta_ratio,
     InverterBetaRatioInput,
     InverterBetaRatioOutput,
+    auto_ckt_sim,
+    AutoCktInput,
+    AutoCktOutput,
 )
 
 
@@ -127,3 +130,11 @@ async def inverter_beta_ratio(inp: InverterBetaRatioInput) -> InverterBetaRatioO
         trise=output / 2,
         tfall=output / 2,
     )
+
+
+@auto_ckt_sim.impl
+async def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
+    """
+    TODO
+    """
+    pass
