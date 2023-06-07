@@ -148,9 +148,9 @@ simulate_on_the_server = Rpc(
 )
 
 @dataclass
-class AutoCktOutput:
+class AutoCktInput:
     """
-    Output type for AutoCkt library, a state of result
+    Input type for AutoCkt library, a state of result
     """
     mp1: int #width of pmos transistor 
     mn1: int #width of nmos transistor
@@ -161,9 +161,9 @@ class AutoCktOutput:
     cc: float # Or maybe `str`, or the Hdl21/ VLSIR `Prefixed` fixed-point type
 
 @dataclass
-class AutoCktInput:
+class AutoCktOutput:
     """
-    Input type for AutoCkt library, a spec of circuit design
+    Output type for AutoCkt library, a spec of circuit design
     """
     ugbw: float
     gain: float
