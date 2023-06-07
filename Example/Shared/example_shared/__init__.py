@@ -147,31 +147,36 @@ simulate_on_the_server = Rpc(
     docstring="Simulation on the Server",
 )
 
+
 @dataclass
 class AutoCktInput:
     """
     Input type for AutoCkt library, a state of result
     """
-    mp1: int #width of pmos transistor 
-    mn1: int #width of nmos transistor
-    mp3: int #width of pmos transistor
-    mn3: int #width of nmos transistor
-    mn4: int #width of nmos transistor
-    mn5: int #width of nmos transistor
-    cc: float # Or maybe `str`, or the Hdl21/ VLSIR `Prefixed` fixed-point type
+
+    mp1: int  # width of pmos transistor
+    mn1: int  # width of nmos transistor
+    mp3: int  # width of pmos transistor
+    mn3: int  # width of nmos transistor
+    mn4: int  # width of nmos transistor
+    mn5: int  # width of nmos transistor
+    cc: float  # Or maybe `str`, or the Hdl21/ VLSIR `Prefixed` fixed-point type
+
 
 @dataclass
 class AutoCktOutput:
     """
     Output type for AutoCkt library, a spec of circuit design
     """
+
     ugbw: float
     gain: float
-    phm: float 
+    phm: float
     ibias: float
 
-AutoCktSim = Rpc(
-    name="AutoCktSim",
+
+auto_ckt_sim = Rpc(
+    name="auto_ckt_sim",
     input_type=AutoCktInput,
     return_type=AutoCktOutput,
     docstring="Simulation on the Server",
