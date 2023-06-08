@@ -21,6 +21,14 @@ from example_shared import (
     InverterBetaRatioOutput,
     simulate_on_the_server,
 )
+from example_shared import (
+    AutoCktInput,
+    AutoCktOutput,
+)
+
+from example_server import (
+    auto_ckt_sim,
+)
 
 # Importing the client library will create client stubs for all defined RPCs, including all those functions above.
 import discovery_client as _
@@ -29,7 +37,11 @@ import discovery_client as _
 """
 Now we can just call the RPCs as though they were implemented locally.
 """
-
+def test_auto_ckt():
+    """testing auto ckt rpcs """
+    to_test = AutoCktInput(3, 3, 3, 3, 3, 3, 1e-12)
+    test = auto_ckt_sim(to_test)
+    return test
 
 def do_example_stuff():
     """# Call a few example RPCs"""

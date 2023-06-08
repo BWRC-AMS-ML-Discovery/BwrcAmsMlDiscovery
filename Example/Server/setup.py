@@ -31,6 +31,7 @@ setup(
         "scipy==1.10.1",
         "python-dotenv==1.0.0",
         "discovery_server==0.0.1",
+        "scipy",
         "example_shared==0.0.1",
     ],
     extras_require={
