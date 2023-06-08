@@ -2,7 +2,9 @@ from example_client import test_auto_ckt
 
 
 def main():
-    test_auto_ckt()
+    result = test_auto_ckt()
+
+    print(f"{result=}")
 
 
 if __name__ == "__main__":
