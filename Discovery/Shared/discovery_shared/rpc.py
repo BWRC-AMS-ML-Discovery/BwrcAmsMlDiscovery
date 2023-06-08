@@ -81,7 +81,7 @@ class Rpc:
     docstring: str = ""  # Docstring
     # Inner Function
     # An http POST in the client, and a function call in the server
-    func: Callable | None = None
+    func: Callable or None = None
 
     def __call__(self, *args, **kwargs) -> "self.return_type":
         """# Call our RPC function
@@ -98,6 +98,10 @@ class Rpc:
         # FIXME: probably add checks on the signature of `f` here
         self.func = f
         return self
+    
+    def __post_init__(self):
+        if self.name not in rpcs:
+            rpcs[self.name] = self
 
 
 # All the "registered" RPC functions
@@ -107,6 +111,8 @@ rpcs: Dict[str, Rpc] = dict()
 def rpc(f: Callable) -> Rpc:
     """# RPC Decorator
     Wrap function `f` in an `Rpc` which can be interpreted by both client-side and server-side code.
+
+    FIXME: Not being used.
     """
 
     # Assert that our argument is a callable
