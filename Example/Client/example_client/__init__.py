@@ -26,9 +26,11 @@ from example_shared import (
     AutoCktOutput,
 )
 
+# FIXME Use example_shared instead
 from example_server import (
     auto_ckt_sim,
 )
+
 
 # Importing the client library will create client stubs for all defined RPCs, including all those functions above.
 import discovery_client as _
