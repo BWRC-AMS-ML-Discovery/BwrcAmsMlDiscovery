@@ -7,6 +7,7 @@ Shared server-client code
 from enum import Enum
 from typing import Optional, Tuple
 
+
 # PyPi Imports
 import hdl21 as h
 
@@ -143,5 +144,40 @@ simulate_on_the_server = Rpc(
     name="simulate_on_the_server",
     input_type=VlsirProtoBufBinary,
     return_type=VlsirProtoBufBinary,
+    docstring="Simulation on the Server",
+)
+
+
+@dataclass
+class AutoCktInput:
+    """
+    Input type for AutoCkt library, a state of result
+    """
+
+    mp1: int  # width of pmos transistor
+    mn1: int  # width of nmos transistor
+    mp3: int  # width of pmos transistor
+    mn3: int  # width of nmos transistor
+    mn4: int  # width of nmos transistor
+    mn5: int  # width of nmos transistor
+    cc: float  # Or maybe `str`, or the Hdl21/ VLSIR `Prefixed` fixed-point type
+
+
+@dataclass
+class AutoCktOutput:
+    """
+    Output type for AutoCkt library, a spec of circuit design
+    """
+
+    ugbw: float
+    gain: float
+    phm: float
+    ibias: float
+
+
+auto_ckt_sim = Rpc(
+    name="auto_ckt_sim",
+    input_type=AutoCktInput,
+    return_type=AutoCktOutput,
     docstring="Simulation on the Server",
 )

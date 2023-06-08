@@ -20,6 +20,14 @@ from example_shared import (
     inverter_beta_ratio,
     InverterBetaRatioInput,
     InverterBetaRatioOutput,
+    auto_ckt_sim,
+    AutoCktInput,
+    AutoCktOutput,
+)
+from .auto_ckt_sim import (
+    create_design,
+    simulate,
+    translate_result,
 )
 
 
@@ -127,3 +135,19 @@ async def inverter_beta_ratio(inp: InverterBetaRatioInput) -> InverterBetaRatioO
         trise=output / 2,
         tfall=output / 2,
     )
+
+
+@auto_ckt_sim.impl
+async def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
+    """
+    AutoCkt Simulation
+    """
+
+    design_folder, fpath = create_design(inp)
+
+    # Error return?
+    info = simulate(fpath)
+
+    specs = translate_result(design_folder)
+
+    return specs
