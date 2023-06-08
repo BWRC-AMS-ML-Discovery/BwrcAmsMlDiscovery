@@ -1,9 +1,9 @@
 set -eo
 
-pip install -e \
-    ./Discovery/Shared \
-    ./Discovery/Server \
-    ./Discovery/Client \
-    ./Example/Shared \
-    ./Example/Server \
-    ./Example/Client
+pip install \
+    -e ./Discovery/Shared \
+    -e ./Discovery/Server \
+    -e ./Discovery/Client \
+    -e ./Example/Shared \
+    -e ./Example/Server \
+    -e ./Example/Client
