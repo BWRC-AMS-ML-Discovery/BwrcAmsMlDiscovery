@@ -1,9 +1,14 @@
 # BWRC AMS ML Discovery
 
-## Installation
+## Installation New
 
-Recommend using a virtual environment
-GCP Debian python version == 3.9
+Currently requires Python <= 3.10
+
+```
+sh scripts/install.sh
+```
+
+## Installation
 
 ```
 pip install -e ".[dev]"
