@@ -20,16 +20,16 @@ from example_shared import (
     InverterBetaRatioInput,
     InverterBetaRatioOutput,
     simulate_on_the_server,
+    auto_ckt_sim,
 )
 from example_shared import (
     AutoCktInput,
     AutoCktOutput,
 )
 
-# FIXME Use example_shared instead
-from example_server import (
-    auto_ckt_sim,
-)
+
+# FIXME We don't want this
+import example_server as _
 
 
 # Importing the client library will create client stubs for all defined RPCs, including all those functions above.
