@@ -3,6 +3,7 @@ import os
 import re
 import random
 import copy
+from dataclasses import asdict
 
 # PyPi Imports
 import numpy as np
@@ -53,7 +54,7 @@ def create_design(state: AutoCktInput):
                 # lines[line_num] = lines[line_num].replace(found.group(1), path_to_model)
                 pass  # do not change the model path
         if ".param" in line:
-            for key, value in state.items():
+            for key, value in asdict(state).items():
                 regex = re.compile("%s=(\S+)" % (key))
                 found = regex.search(line)
                 if found:

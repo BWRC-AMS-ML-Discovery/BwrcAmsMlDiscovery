@@ -28,6 +28,7 @@ setup(
     python_requires=">=3.7, <4",
     install_requires=[
         "hdl21>=3.0.1",
+        "scipy==1.10.1",
         "python-dotenv==1.0.0",
         "discovery_server==0.0.1",
         "example_shared==0.0.1",
