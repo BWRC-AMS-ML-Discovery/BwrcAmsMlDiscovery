@@ -81,7 +81,7 @@ class Rpc:
     docstring: str = ""  # Docstring
     # Inner Function
     # An http POST in the client, and a function call in the server
-    func: Callable or None = None
+    func: Callable | None = None
 
     def __call__(self, *args, **kwargs) -> "self.return_type":
         """# Call our RPC function
