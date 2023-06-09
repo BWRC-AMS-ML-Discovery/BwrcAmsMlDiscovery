@@ -8,6 +8,9 @@ from fastapi import FastAPI, Body
 # Workspace Imports
 from discovery_shared.git import GitInfo
 
+options = {
+    "temp_setting" : 10
+}
 
 app = FastAPI(
     debug=False,
@@ -20,6 +23,13 @@ app = FastAPI(
 from .mock import *
 from .user import *
 
+
+def configure(self, **kwargs):
+    for key, value in kwargs.items():
+        if key in self.options:
+            self.options[key] = value
+        else:
+            print("ignoring unknown option")
 
 """
 # Built-In Endpoints
