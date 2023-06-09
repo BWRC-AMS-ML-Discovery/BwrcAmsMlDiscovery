@@ -53,7 +53,7 @@ def _setup_server_rpcs():
 
         # Create the server endpoint
         async def f(arg: rpc.input_type = Body(...)) -> rpc.return_type:
-            return rpc.func(arg)
+            return await rpc.func(arg)
 
         # Give it the server-function's metadata
         f.__name__ = rpc.name

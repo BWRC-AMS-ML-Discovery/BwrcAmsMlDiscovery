@@ -154,12 +154,12 @@ class AutoCktInput:
     Input type for AutoCkt library, a state of result
     """
 
-    mp1: int  # width of pmos transistor
-    mn1: int  # width of nmos transistor
-    mp3: int  # width of pmos transistor
-    mn3: int  # width of nmos transistor
-    mn4: int  # width of nmos transistor
-    mn5: int  # width of nmos transistor
+    mp1: int  # number of units of specific pmos transistor
+    mn1: int  # number of units of specific nmos transistor
+    mp3: int  # number of units of specific pmos transistor
+    mn3: int  # number of units of specific nmos transistor
+    mn4: int  # number of units of specific nmos transistor
+    mn5: int  # number of units of specific nmos transistor
     cc: float  # Or maybe `str`, or the Hdl21/ VLSIR `Prefixed` fixed-point type
 
 
