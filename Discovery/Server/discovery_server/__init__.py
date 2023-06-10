@@ -4,12 +4,13 @@
 
 # PyPi Imports
 from fastapi import FastAPI, Body
+import uvicorn
 
 # Workspace Imports
 from discovery_shared.git import GitInfo
 
 options = {
-    "temp_setting" : 10
+    "example_setting" : 10
 }
 
 app = FastAPI(
@@ -24,17 +25,22 @@ from .mock import *
 from .user import *
 
 
-def configure(self, **kwargs):
+
+
+def configure(**kwargs):
     for key, value in kwargs.items():
-        if key in self.options:
-            self.options[key] = value
+        if key in options:
+            options[key] = value
         else:
             print("ignoring unknown option")
+
+# uvicorn --port 8001 discovery.server:app --reload
+def start_server():
+    unvicorn.run(app, port="8001", reload=True)
 
 """
 # Built-In Endpoints
 """
-
 
 @app.get("/")
 async def alive() -> str:
