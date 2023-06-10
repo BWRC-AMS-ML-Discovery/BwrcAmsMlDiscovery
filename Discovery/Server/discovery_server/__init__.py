@@ -43,7 +43,7 @@ async def version() -> GitInfo:
 
 def _setup_server_rpcs():
     """# Set up server RPCs"""
-    from discovery_shared.rpc import rpcs
+    from Discovery.Shared.discovery_shared.rpc import rpcs
 
     for rpc in rpcs.values():
         if rpc.func is None:
