@@ -20,13 +20,13 @@ from example_shared import (
     InverterBetaRatioInput,
     InverterBetaRatioOutput,
     simulate_on_the_server,
-    auto_ckt_sim,
 )
 from example_shared import (
     AutoCktInput,
     AutoCktOutput,
 )
 
+from example_shared.rpc_declaration import auto_ckt_sim
 
 # FIXME We don't want this
 import example_server as _

@@ -21,22 +21,26 @@ from example_shared import (
     inverter_beta_ratio,
     InverterBetaRatioInput,
     InverterBetaRatioOutput,
-    auto_ckt_sim,
     AutoCktInput,
     AutoCktOutput,
 )
+
+from example_shared.rpc_declaration import auto_ckt_sim
+from .implementation import auto_ckt_sim_implementation
+auto_ckt_sim.func = auto_ckt_sim_implementation
+
 from .auto_ckt_sim_lib import (
     create_design,
     simulate,
     translate_result,
 )
 
-app = FastAPI(
-    debug=False,
-    title="BWRC AMS Example CktGym",
-    description="BWRC AMS Example CktGym",
-    version="0.0.1",
-)
+# app = FastAPI(
+#     debug=False,
+#     title="BWRC AMS Example CktGym",
+#     description="BWRC AMS Example CktGym",
+#     version="0.0.1",
+# )
 
 @example.impl
 def example_func(example: Example) -> Example:
@@ -145,19 +149,19 @@ async def inverter_beta_ratio(inp: InverterBetaRatioInput) -> InverterBetaRatioO
         tfall=output / 2,
     )
 
+# # FIXME should be async
+# @auto_ckt_sim.impl
+# async def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
+#     """
+#     AutoCkt Simulation
+#     """
 
-# FIXME should be async
-@auto_ckt_sim.impl
-async def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
-    """
-    AutoCkt Simulation
-    """
+#     design_folder, fpath = create_design(inp)
 
-    design_folder, fpath = create_design(inp)
+#     # Error return?
+#     info = simulate(fpath)
 
-    # Error return?
-    info = simulate(fpath)
+#     specs = translate_result(design_folder)
 
-    specs = translate_result(design_folder)
+#     return specs
 
-    return specs
