@@ -5,6 +5,7 @@
 # PyPi Imports
 import hdl21 as h
 import vlsirtools.spice as vsp
+from fastapi import FastAPI
 
 # Workspace Imports
 from example_shared import (
@@ -30,6 +31,12 @@ from .auto_ckt_sim_lib import (
     translate_result,
 )
 
+app = FastAPI(
+    debug=False,
+    title="BWRC AMS Example CktGym",
+    description="BWRC AMS Example CktGym",
+    version="0.0.1",
+)
 
 @example.impl
 def example_func(example: Example) -> Example:

@@ -149,7 +149,7 @@ simulate_on_the_server = Rpc(
 
 
 @dataclass
-class AutoCktInput:
+class AutoCktInput():
     """
     Input type for AutoCkt library, a state of result
     """
@@ -179,5 +179,5 @@ auto_ckt_sim = Rpc(
     name="auto_ckt_sim",
     input_type=AutoCktInput,
     return_type=AutoCktOutput,
-    docstring="Simulation on the Server",
+    docstring="AutoCkt OpAmp",
 )

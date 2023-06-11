@@ -11,8 +11,8 @@ from discovery_shared.git import GitInfo
 
 app = FastAPI(
     debug=False,
-    title="BWRC AMS ML CktGym",
-    description="BWRC AMS ML CktGym",
+    title="BWRC AMS Discovery CktGym",
+    description="BWRC AMS Discovery CktGym",
     version="0.0.1",
 )
 
