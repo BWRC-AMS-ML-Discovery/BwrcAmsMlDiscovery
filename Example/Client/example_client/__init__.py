@@ -26,7 +26,8 @@ from example_shared import (
 )
 
 
-# FIXME We don't want this
+# Implement server functions
+# Short-circuiting by directly calling server functions
 import example_server as _
 
 

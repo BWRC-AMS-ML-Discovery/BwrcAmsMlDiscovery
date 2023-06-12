@@ -97,6 +97,10 @@ class Rpc:
             raise RuntimeError(f"RPC {self.name} already has a function defined")
         # FIXME: probably add checks on the signature of `f` here
         self.func = f
+
+        # Register to dictionary
+        rpcs[f.__name__] = self
+
         return self
 
 

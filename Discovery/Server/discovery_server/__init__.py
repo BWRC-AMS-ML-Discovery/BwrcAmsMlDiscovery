@@ -10,6 +10,10 @@ import uvicorn
 from discovery_shared.git import GitInfo
 
 
+# Needed to get server functions
+import example_server as _
+
+
 app = FastAPI(
     debug=False,
     title="BWRC AMS ML Discovery CktGym",

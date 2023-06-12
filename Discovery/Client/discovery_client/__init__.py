@@ -52,7 +52,9 @@ def _setup_client_rpcs():
     for rpc in rpcs.values():
         if rpc.func is not None:
             msg = f"RPC {rpc.name} already has a function defined, cannot be set up as a client"
-            raise RuntimeError(msg)
+
+            # Not raising, because we're overriding rpc.func
+            # raise RuntimeError(msg)
 
         # Create the client function
         def f(inp: rpc.input_type) -> rpc.return_type:
