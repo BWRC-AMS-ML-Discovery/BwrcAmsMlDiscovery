@@ -139,7 +139,7 @@ async def inverter_beta_ratio(inp: InverterBetaRatioInput) -> InverterBetaRatioO
     )
 
 
-# FIXME should be async
+# FIXME should be async?
 @auto_ckt_sim.impl
 def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
     """
