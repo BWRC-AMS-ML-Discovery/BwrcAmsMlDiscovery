@@ -4,6 +4,7 @@
 
 # PyPi Imports
 from fastapi import FastAPI, Body
+import uvicorn
 
 # Workspace Imports
 from discovery_shared.git import GitInfo
@@ -25,6 +26,9 @@ from .user import *
 # Built-In Endpoints
 """
 
+def start_server():
+    uvicorn.run(app, port=8002, host="127.0.0.1")
+
 
 @app.get("/")
 async def alive() -> str:
@@ -43,7 +47,7 @@ async def version() -> GitInfo:
 
 def _setup_server_rpcs():
     """# Set up server RPCs"""
-    from Discovery.Shared.discovery_shared.rpc import rpcs
+    from discovery_shared.rpc import rpcs
 
     for rpc in rpcs.values():
         if rpc.func is None:
