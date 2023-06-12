@@ -1,6 +1,6 @@
 # Local Imports
 from jwt import InvalidTokenError
-from discovery.shared.auth import AuthKey
+from discovery_shared.auth import AuthKey
 from ..user import User
 
 
