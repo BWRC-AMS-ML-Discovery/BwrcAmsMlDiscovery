@@ -25,9 +25,6 @@ from example_shared import (
     AutoCktOutput,
 )
 
-from example_shared.rpc_declaration import auto_ckt_sim
-from .implementation import auto_ckt_sim_implementation
-auto_ckt_sim.func = auto_ckt_sim_implementation
 
 from .auto_ckt_sim_lib import (
     create_design,
@@ -41,6 +38,15 @@ from .auto_ckt_sim_lib import (
 #     description="BWRC AMS Example CktGym",
 #     version="0.0.1",
 # )
+
+from example_shared.rpc_declaration import auto_ckt_sim
+from .implementation import auto_ckt_sim_implementation
+
+@auto_ckt_sim.impl
+async def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
+    spec = await auto_ckt_sim_implementation(inp)
+    return spec
+
 
 @example.impl
 def example_func(example: Example) -> Example:

@@ -26,7 +26,7 @@ from example_shared import (
     AutoCktOutput,
 )
 
-from example_shared.rpc_declaration import auto_ckt_sim
+from example_server import auto_ckt_sim
 
 # FIXME We don't want this
 import example_server as _
