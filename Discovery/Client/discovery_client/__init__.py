@@ -19,6 +19,23 @@ env = dotenv_values()
 THE_SERVER_URL = env.get("THE_SERVER_URL", None)
 if not THE_SERVER_URL:
     raise ValueError("THE_SERVER_URL not set in .env file")
+"""
+#Client Config
+"""
+
+#put all client config variables in here
+options = {
+    'THE_SERVER_URL': THE_SERVER_URL,
+}
+
+def configure(**kwargs):
+    #searchs for corresponding key in optiions dict and updates if it exists
+    for key, value in kwargs.items():
+        if key in options:
+            options[key] = value
+        else:
+            print(f"ignoring unknown option: {key}")
+
 
 """
 # Built-In Endpoints
@@ -27,13 +44,13 @@ if not THE_SERVER_URL:
 
 def alive() -> str:
     """Server aliveness check"""
-    resp = httpx.get(f"http://{THE_SERVER_URL}/")
+    resp = httpx.get(f"http://{options['THE_SERVER_URL']}/")
     return resp.text
 
 
 def version() -> GitInfo:
     """Server version"""
-    resp = httpx.get(f"http://{THE_SERVER_URL}/version")
+    resp = httpx.get(f"http://{options['THE_SERVER_URL']}/version")
     return GitInfo(**resp.json())
 
 
@@ -56,7 +73,7 @@ def _setup_client_rpcs():
 
         # Create the client function
         def f(inp: rpc.input_type) -> rpc.return_type:
-            url = f"http://{THE_SERVER_URL}/{rpc.name}"
+            url = f"http://{options['THE_SERVER_URL']}/{rpc.name}"
             resp = httpx.post(url, json=asdict(inp))
             return rpc.return_type(**resp.json())
 

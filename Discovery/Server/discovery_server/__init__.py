@@ -21,14 +21,27 @@ app = FastAPI(
 from .mock import *
 from .user import *
 
+"""
+#Config and Server Start 
+"""
+options = {
+    "temp_config" : 0,
+}
 
-"""
-# Built-In Endpoints
-"""
+def configure(**kwargs):
+    for key, value in kwargs.items():
+        if key in options:
+            options[key] = value
+        else:
+            print("ignoring unknown option")
 
 def start_server():
     uvicorn.run(app, port=8002, host="127.0.0.1")
 
+
+"""
+# Built-In Endpoints
+"""
 
 @app.get("/")
 async def alive() -> str:
