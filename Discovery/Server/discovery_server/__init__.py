@@ -4,6 +4,7 @@
 
 # PyPi Imports
 from fastapi import FastAPI, Body
+import uvicorn
 
 # Workspace Imports
 from discovery_shared.git import GitInfo
@@ -11,8 +12,8 @@ from discovery_shared.git import GitInfo
 
 app = FastAPI(
     debug=False,
-    title="BWRC AMS ML CktGym",
-    description="BWRC AMS ML CktGym",
+    title="BWRC AMS ML Discovery CktGym",
+    description="BWRC AMS ML Discovery CktGym",
     version="0.0.1",
 )
 
@@ -24,6 +25,10 @@ from .user import *
 """
 # Built-In Endpoints
 """
+
+
+def start_server():
+    uvicorn.run(app, port=8002, host="127.0.0.1")
 
 
 @app.get("/")

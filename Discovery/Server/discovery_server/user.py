@@ -4,9 +4,9 @@ from fastapi import Body
 
 # Local Imports
 from . import app
-from ..shared.user import WhoAmIOutput
-from ..server.auth import authenticated_service
-from ..server.auth.user import User
+from discovery_shared.user import WhoAmIOutput
+from discovery_server.auth import authenticated_service
+from discovery_server.auth.user import User
 
 
 @authenticated_service(app.post, "/whoami")
