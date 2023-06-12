@@ -23,10 +23,7 @@ from .auto_ckt_sim_lib import (
     simulate,
     translate_result,
 )
-from example_shared.rpc_declaration import auto_ckt_sim
 
-
-@auto_ckt_sim.impl
 async def auto_ckt_sim_implementation(inp: AutoCktInput) -> AutoCktOutput:
     """
     AutoCkt Simulation
