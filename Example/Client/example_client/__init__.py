@@ -50,6 +50,11 @@ def test_auto_ckt():
     return test
 
 
+def do_simple_example():
+    example_resp = example(Example(txt="Hello", num=3))
+    return example_resp
+
+
 def do_example_stuff():
     """# Call a few example RPCs"""
     example_resp = example(Example(txt="Hello", num=3))
