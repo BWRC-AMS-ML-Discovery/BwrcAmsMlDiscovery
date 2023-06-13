@@ -1,3 +1,1 @@
-
-uvicorn --port 8001 discovery.server:app --reload
-
+uvicorn --port 8001 discovery_server:app --reload

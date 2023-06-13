@@ -1,0 +1,4 @@
+
+Checking parameters for BSIM 4.5 model nmos
+Warning: ckappas = 0.01 is too small.
+Warning: ckappad = 0.01 is too small.

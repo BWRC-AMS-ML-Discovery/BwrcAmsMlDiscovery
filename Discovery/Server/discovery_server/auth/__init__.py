@@ -7,10 +7,9 @@ from fastapi import Body
 
 
 # Local Imports
-from discovery.shared.auth import AuthError, AuthenticatedInput, AuthenticatedOutput
-from discovery.shared.types import convert_inp_json_to_type, path_to_inp_types
-
-from discovery.server.auth.provider import verify_auth_key
+from discovery_shared.auth import AuthError, AuthenticatedInput, AuthenticatedOutput
+from discovery_shared.types import convert_inp_json_to_type, path_to_inp_types
+from discovery_server.auth.provider import verify_auth_key
 
 
 # TODO Actually, raising the error instead of

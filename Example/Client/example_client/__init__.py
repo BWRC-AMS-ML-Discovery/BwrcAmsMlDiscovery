@@ -26,12 +26,16 @@ from example_shared import (
 )
 
 
-# FIXME We don't want this
-import example_server as _
+# FIXME Maybe put this variable somewhere else?
+ENABLE_HTTP = True
 
 
-# Importing the client library will create client stubs for all defined RPCs, including all those functions above.
-import discovery_client as _
+if ENABLE_HTTP:
+    # Importing the client library will create client stubs for all defined RPCs, including all those functions above.
+    import discovery_client as _
+else:
+    # Short-circuiting by directly calling server functions
+    import example_server as _
 
 
 """
@@ -58,6 +62,7 @@ def do_example_stuff():
     print(simulate_that_opamp_resp)
 
 
+# FIXME needs renaming to avoid the same name
 def simulate_that_opamp(params: OpAmpParams) -> h.sim.SimResultProto:
     """# Run the `ThatOpAmp` generator and simulate it, all on the server"""
 

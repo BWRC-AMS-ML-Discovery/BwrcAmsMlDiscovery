@@ -4,19 +4,26 @@
 
 # PyPi Imports
 from fastapi import FastAPI, Body
+import uvicorn
 
 # Workspace Imports
 from discovery_shared.git import GitInfo
 
 
+# Needed to get server functions
+import example_server as _
+
+
 app = FastAPI(
     debug=False,
-    title="BWRC AMS ML CktGym",
-    description="BWRC AMS ML CktGym",
+    title="BWRC AMS ML Discovery CktGym",
+    description="BWRC AMS ML Discovery CktGym",
     version="0.0.1",
 )
 
+
 # Local Imports
+# FIXME Can rewrite using RPC
 from .mock import *
 from .user import *
 
@@ -24,6 +31,11 @@ from .user import *
 """
 # Built-In Endpoints
 """
+
+
+# FIXME Should use environment variables
+def start_server():
+    uvicorn.run(app, port=8002, host="127.0.0.1")
 
 
 @app.get("/")
@@ -52,7 +64,9 @@ def _setup_server_rpcs():
             raise RuntimeError(msg)
 
         # Create the server endpoint
-        async def f(arg: rpc.input_type = Body(...)) -> rpc.return_type:
+        # FIXME type annotations incorrect, can use a function generator to fix.
+        # rpc needs to be evaluated at create time not run time.
+        async def f(arg: rpc.input_type = Body(...), *, rpc=rpc) -> rpc.return_type:
             return rpc.func(arg)
 
         # Give it the server-function's metadata
