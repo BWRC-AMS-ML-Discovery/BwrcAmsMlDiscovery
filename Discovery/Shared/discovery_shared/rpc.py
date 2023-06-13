@@ -108,7 +108,7 @@ class Rpc:
 rpcs: Dict[str, Rpc] = dict()
 
 
-def rpc(f: Callable) -> Rpc:
+def _rpc(f: Callable) -> Rpc:
     """# RPC Decorator
     Wrap function `f` in an `Rpc` which can be interpreted by both client-side and server-side code.
     """
