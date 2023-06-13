@@ -64,7 +64,9 @@ def _setup_server_rpcs():
             raise RuntimeError(msg)
 
         # Create the server endpoint
-        async def f(arg: rpc.input_type = Body(...)) -> rpc.return_type:
+        # FIXME type annotations incorrect, can use a function generator to fix.
+        # rpc needs to be evaluated at create time not run time.
+        async def f(arg: rpc.input_type = Body(...), *, rpc=rpc) -> rpc.return_type:
             return rpc.func(arg)
 
         # Give it the server-function's metadata
