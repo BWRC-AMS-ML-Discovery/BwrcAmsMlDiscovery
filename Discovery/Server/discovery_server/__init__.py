@@ -11,6 +11,7 @@ from discovery_shared.git import GitInfo
 
 
 # Needed to get server functions
+# FIXME Inverse dependency
 import example_server as _
 
 
