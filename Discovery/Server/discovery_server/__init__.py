@@ -31,6 +31,7 @@ from .user import *
 """
 
 
+# FIXME Should use environment variables
 def start_server():
     uvicorn.run(app, port=8002, host="127.0.0.1")
 
