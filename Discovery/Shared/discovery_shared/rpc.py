@@ -83,6 +83,10 @@ class Rpc:
     # An http POST in the client, and a function call in the server
     func: Callable | None = None
 
+    def __post_init__(self) -> "Rpc":
+        # Register to dictionary
+        rpcs[self.name] = self
+
     def __call__(self, *args, **kwargs) -> "self.return_type":
         """# Call our RPC function
         Dispatches to the inner callable.
@@ -97,10 +101,6 @@ class Rpc:
             raise RuntimeError(f"RPC {self.name} already has a function defined")
         # FIXME: probably add checks on the signature of `f` here
         self.func = f
-
-        # Register to dictionary
-        rpcs[f.__name__] = self
-
         return self
 
 
