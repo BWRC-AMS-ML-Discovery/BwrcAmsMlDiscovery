@@ -62,6 +62,7 @@ def do_example_stuff():
     print(simulate_that_opamp_resp)
 
 
+# FIXME needs renaming to avoid the same name
 def simulate_that_opamp(params: OpAmpParams) -> h.sim.SimResultProto:
     """# Run the `ThatOpAmp` generator and simulate it, all on the server"""
 
