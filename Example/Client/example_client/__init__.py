@@ -26,13 +26,16 @@ from example_shared import (
 )
 
 
-# Implement server functions
-# Short-circuiting by directly calling server functions
-import example_server as _
+# FIXME Maybe put this variable somewhere else?
+ENABLE_HTTP = True
 
 
-# Importing the client library will create client stubs for all defined RPCs, including all those functions above.
-import discovery_client as _
+if ENABLE_HTTP:
+    # Importing the client library will create client stubs for all defined RPCs, including all those functions above.
+    import discovery_client as _
+else:
+    # Short-circuiting by directly calling server functions
+    import example_server as _
 
 
 """
