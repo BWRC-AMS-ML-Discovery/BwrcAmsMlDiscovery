@@ -29,7 +29,7 @@ class NgSpiceWrapper(object):
         with open(yaml_path, "r") as f:
             yaml_data = yaml.load(f)
         design_netlist = yaml_data["dsn_netlist"]
-        design_netlist = path + "/" + design_netlist
+        # design_netlist = path + "/" + design_netlist
 
         _, dsg_netlist_fname = os.path.split(design_netlist)
         self.base_design_name = os.path.splitext(dsg_netlist_fname)[0]
