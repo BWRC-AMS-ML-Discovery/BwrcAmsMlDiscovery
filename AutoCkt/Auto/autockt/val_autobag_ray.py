@@ -35,7 +35,7 @@ config_train = {
 #If checkpoint fails for any reason, training can be restored 
 if not args.checkpoint_dir:
     trials = tune.run_experiments({
-        "train_45nm_ngspice": {
+        "45nm_bulk.txt": {
         "checkpoint_freq":1,
         "run": "PPO",
         "env": TwoStageAmp,
