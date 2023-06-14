@@ -32,7 +32,7 @@ ENABLE_HTTP = True
 
 if ENABLE_HTTP:
     # Importing the client library will create client stubs for all defined RPCs, including all those functions above.
-    import discovery_client as _
+    import discovery_client as dc
 else:
     # Short-circuiting by directly calling server functions
     import example_server as _
@@ -42,6 +42,9 @@ else:
 Now we can just call the RPCs as though they were implemented locally.
 """
 
+def example_client_start():
+    dc.configure(dc.Config(server_url = "localhost:8002"))
+    dc.client_start()
 
 def test_auto_ckt():
     """testing auto ckt rpcs"""

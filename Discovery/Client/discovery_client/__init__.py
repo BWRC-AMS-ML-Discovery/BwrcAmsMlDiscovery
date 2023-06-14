@@ -11,29 +11,39 @@ import httpx
 
 # Workspace Imports
 from discovery_shared.git import GitInfo
+from pydantic.dataclasses import dataclass
 
-# Load the .env file
-env = dotenv_values()
+@dataclass
+class Config:
+    """# Server Configuration"""
 
-# And get the server URL
-THE_SERVER_URL = env.get("THE_SERVER_URL", None)
-if not THE_SERVER_URL:
-    raise ValueError("THE_SERVER_URL not set in .env file")
+    server_url: str = "localhost:8002"
+
+
+# Create the module-scope configuration
+config = Config()
+
+
+def configure(cfg: Config) -> None:
+    """Set the module-scope `Config`."""
+    global config
+    config = cfg
 
 """
 # Built-In Endpoints
 """
-
+def client_start():
+    _setup_client_rpcs()
 
 def alive() -> str:
     """Server aliveness check"""
-    resp = httpx.get(f"http://{THE_SERVER_URL}/")
+    resp = httpx.get(f"http://{config.server_url}/")
     return resp.text
 
 
 def version() -> GitInfo:
     """Server version"""
-    resp = httpx.get(f"http://{THE_SERVER_URL}/version")
+    resp = httpx.get(f"http://{config.server_url}/version")
     return GitInfo(**resp.json())
 
 
@@ -58,7 +68,7 @@ def _setup_client_rpcs():
         # FIXME type annotations incorrect, can use a function generator to fix.
         # rpc needs to be evaluated at create time not run time.
         def f(inp: rpc.input_type, *, rpc=rpc) -> rpc.return_type:
-            url = f"http://{THE_SERVER_URL}/{rpc.name}"
+            url = f"http://{config.server_url}/{rpc.name}"
             resp = httpx.post(url, json=asdict(inp))
             return rpc.return_type(**resp.json())
 
@@ -69,4 +79,4 @@ def _setup_client_rpcs():
         rpc.func = f
 
 
-_setup_client_rpcs()
+
