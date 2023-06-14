@@ -7,6 +7,6 @@ pip install \
     -e ./Example/Shared \
     -e ./Example/Server \
     -e ./Example/Client \
-    -e "./AutoCkt/Auto[dev]" \
-    -e "./AutoCkt/Ckt[dev]" \
     -e "./AutoCkt/Shared[dev]" \
+    -e "./AutoCkt/Ckt[dev]" \
+    -e "./AutoCkt/Auto[dev]" \
