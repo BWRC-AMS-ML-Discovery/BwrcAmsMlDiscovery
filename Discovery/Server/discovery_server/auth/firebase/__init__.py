@@ -3,8 +3,8 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 from ..user import User
 
-_cred = credentials.Certificate("./env/firebase_admin_sdk.json")
-firebase_admin.initialize_app(_cred)
+# _cred = credentials.Certificate("../env/firebase_admin_sdk.json")
+firebase_admin.initialize_app()
 
 
 def check_token(inp, time_days_constraint):

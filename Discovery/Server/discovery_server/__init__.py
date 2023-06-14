@@ -4,6 +4,7 @@
 
 # PyPi Imports
 from fastapi import FastAPI, Body
+
 import uvicorn
 
 # Workspace Imports
@@ -27,15 +28,60 @@ app = FastAPI(
 from .mock import *
 from .user import *
 
+from pydantic.dataclasses import dataclass
+
+
+@dataclass
+class Config:
+    """# Server Configuration"""
+
+    port: int = 8000
+    host: str = "127.0.0.1"
+
+
+# Create the module-scope configuration
+config = Config()
+
+
+def configure(cfg: Config) -> None:
+    """Set the module-scope `Config`."""
+    global config
+    config = cfg
+
+
+# The end
+
+"""
+Example use case
+```python
+import discovery_server as ds 
+
+# ... 
+# Define all my RPCs etc
+# ... 
+
+ds.configure(ds.Config(port=8002, host="www.whatever.com")
+ds.start_server()
+
+```
+"""
+
+
+
+"""
+#Config and Server Start 
+"""
+
+
+def start_server():
+    # Load the .env file
+    _setup_server_rpcs()
+    uvicorn.run(app, port=config.port, host=config.host) 
+
 
 """
 # Built-In Endpoints
 """
-
-
-# FIXME Should use environment variables
-def start_server():
-    uvicorn.run(app, port=8002, host="127.0.0.1")
 
 
 @app.get("/")
@@ -64,6 +110,7 @@ def _setup_server_rpcs():
             raise RuntimeError(msg)
 
         # Create the server endpoint
+
         # FIXME type annotations incorrect, can use a function generator to fix.
         # rpc needs to be evaluated at create time not run time.
         async def f(arg: rpc.input_type = Body(...), *, rpc=rpc) -> rpc.return_type:
@@ -78,4 +125,3 @@ def _setup_server_rpcs():
         decorator(f)
 
 
-_setup_server_rpcs()

@@ -24,6 +24,16 @@ from example_shared import (
     AutoCktInput,
     AutoCktOutput,
 )
+from example_shared import (
+    AutoCktInput,
+    AutoCktOutput,
+)
+
+# from example_server import auto_ckt_sim
+
+# # FIXME We don't want this
+# import example_server as _
+
 
 
 # FIXME Maybe put this variable somewhere else?

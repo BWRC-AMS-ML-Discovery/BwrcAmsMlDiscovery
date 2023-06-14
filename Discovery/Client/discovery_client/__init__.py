@@ -20,6 +20,33 @@ THE_SERVER_URL = env.get("THE_SERVER_URL", None)
 if not THE_SERVER_URL:
     raise ValueError("THE_SERVER_URL not set in .env file")
 
+THE_SERVER_PORT = env.get("THE_SERVER_PORT", None)
+if not THE_SERVER_PORT:
+    raise ValueError("THE_SERVER_PORT not set in .env file")
+
+THE_SERVER_HOST = env.get("THE_SERVER_HOST", None)
+if not THE_SERVER_HOST:
+    raise ValueError("THE_SERVER_HOST not set in .env file")
+"""
+#Client Config
+"""
+
+#put all client config variables in here
+options = {
+    'THE_SERVER_URL': THE_SERVER_URL,
+    'THE_SERVER_PORT': THE_SERVER_PORT,
+    'THE_SERVER_HOST': THE_SERVER_HOST,
+}
+
+def configure(**kwargs):
+    #searchs for corresponding key in optiions dict and updates if it exists
+    for key, value in kwargs.items():
+        if key in options:
+            options[key] = value
+        else:
+            print(f"ignoring unknown option: {key}")
+
+
 """
 # Built-In Endpoints
 """
@@ -27,13 +54,13 @@ if not THE_SERVER_URL:
 
 def alive() -> str:
     """Server aliveness check"""
-    resp = httpx.get(f"http://{THE_SERVER_URL}/")
+    resp = httpx.get(f"http://{options['THE_SERVER_URL']}/")
     return resp.text
 
 
 def version() -> GitInfo:
     """Server version"""
-    resp = httpx.get(f"http://{THE_SERVER_URL}/version")
+    resp = httpx.get(f"http://{options['THE_SERVER_URL']}/version")
     return GitInfo(**resp.json())
 
 
@@ -55,6 +82,7 @@ def _setup_client_rpcs():
             raise RuntimeError(msg)
 
         # Create the client function
+
         # FIXME type annotations incorrect, can use a function generator to fix.
         # rpc needs to be evaluated at create time not run time.
         def f(inp: rpc.input_type, *, rpc=rpc) -> rpc.return_type:

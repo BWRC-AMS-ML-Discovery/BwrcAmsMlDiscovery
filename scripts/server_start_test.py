@@ -1,5 +1,6 @@
-from discovery_server import (
-    start_server,
+from example_server import (
+    example_server_start,
 )
 
-start_server()
+example_server_start()
+

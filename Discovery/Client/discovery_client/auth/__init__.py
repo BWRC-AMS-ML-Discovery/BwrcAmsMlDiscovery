@@ -10,6 +10,7 @@ import httpx
 # Local Imports
 from .. import env, THE_SERVER_URL
 from .errors import DiscoveryAuthError
+
 from discovery_shared.auth import AuthKey, AuthenticatedInput, AuthenticatedOutput
 from discovery_shared.types import convert_out_json_to_type, path_to_out_types
 

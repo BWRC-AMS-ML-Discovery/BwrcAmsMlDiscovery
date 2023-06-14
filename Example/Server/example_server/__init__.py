@@ -6,6 +6,8 @@
 import hdl21 as h
 import vlsirtools.spice as vsp
 
+import discovery_server as ds
+
 # Workspace Imports
 from example_shared import (
     example,
@@ -21,7 +23,6 @@ from example_shared import (
     inverter_beta_ratio,
     InverterBetaRatioInput,
     InverterBetaRatioOutput,
-    auto_ckt_sim,
     AutoCktInput,
     AutoCktOutput,
 )
@@ -30,6 +31,19 @@ from .auto_ckt_sim_lib import (
     simulate,
     translate_result,
 )
+
+from example_shared.rpc_declaration import auto_ckt_sim
+from .implementation import auto_ckt_sim_implementation
+
+#TODO: load config .env file specific to this server
+def example_server_start():
+    ds.configure(ds.Config(port=8002, host="127.0.0.1"))
+    ds.start_server()
+
+@auto_ckt_sim.impl
+async def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
+    spec = await auto_ckt_sim_implementation(inp)
+    return spec
 
 
 @example.impl
@@ -96,29 +110,35 @@ async def simulate_on_the_server(inp: VlsirProtoBufBinary) -> VlsirProtoBufBinar
     Decodes a `SimInput` VLSIR protobuf from `inp`, simulates it, and returns a `SimResult` VLSIR protobuf.
     """
 
-    if inp.kind != VlsirProtoBufKind.SIM_INPUT:
-        raise ValueError(f"Expected a simulation input, not {inp.kind}")
+    @app.post("/simulate_on_the_server")
+    async def simulate_on_the_server(inp: VlsirProtoBufBinary) -> VlsirProtoBufBinary:
+        """# Simulate a circuit on the server
+        Decodes a `SimInput` VLSIR protobuf from `inp`, simulates it, and returns a `SimResult` VLSIR protobuf.
+        """
 
-    # Got what should be a `SimInput`. First deserialize it from bytes.
-    sim_input = vsp.SimInput.ParseFromString(inp.proto_bytes)
-    if not isinstance(sim_input, vsp.SimInput):
-        raise ValueError(f"Expected a `SimInput`, not {sim_input}")
+        if inp.kind != VlsirProtoBufKind.SIM_INPUT:
+            raise ValueError(f"Expected a simulation input, not {inp.kind}")
 
-    sim_options = vsp.SimOptions(
-        simulator=vsp.SupportedSimulators.NGSPICE,  ## or your favorite simulator. or make this part of the input?
-        fmt=vsp.ResultFormat.VLSIR_PROTO,
-    )
+        # Got what should be a `SimInput`. First deserialize it from bytes.
+        sim_input = vsp.SimInput.ParseFromString(inp.proto_bytes)
+        if not isinstance(sim_input, vsp.SimInput):
+            raise ValueError(f"Expected a `SimInput`, not {sim_input}")
 
-    # Finally! Run the simulation!!
-    sim_result = await vsp.spice.sim(sim_input, sim_options)
-    ## FIXME: same "double await" as above
-    sim_result = await sim_result
+        sim_options = vsp.SimOptions(
+            simulator=vsp.SupportedSimulators.NGSPICE,  ## or your favorite simulator. or make this part of the input?
+            fmt=vsp.ResultFormat.VLSIR_PROTO,
+        )
 
-    # And bundle it up into our return type
-    return VlsirProtoBufBinary(
-        kind=VlsirProtoBufKind.SIM_RESULT,
-        proto_bytes=sim_result.SerializeToString(),
-    )
+        # Finally! Run the simulation!!
+        sim_result = await vsp.spice.sim(sim_input, sim_options)
+        ## FIXME: same "double await" as above
+        sim_result = await sim_result
+
+        # And bundle it up into our return type
+        return VlsirProtoBufBinary(
+            kind=VlsirProtoBufKind.SIM_RESULT,
+            proto_bytes=sim_result.SerializeToString(),
+        )
 
 
 @inverter_beta_ratio.impl
@@ -137,6 +157,13 @@ async def inverter_beta_ratio(inp: InverterBetaRatioInput) -> InverterBetaRatioO
         tfall=output / 2,
     )
 
+# # FIXME should be async
+# @auto_ckt_sim.impl
+# async def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
+#     """
+#     AutoCkt Simulation
+#     """
+
 
 # FIXME should be async? FastAPI says both are ok.
 @auto_ckt_sim.impl
@@ -145,11 +172,10 @@ def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
     AutoCkt Simulation
     """
 
-    design_folder, fpath = create_design(inp)
+#     # Error return?
+#     info = simulate(fpath)
 
-    # Error return?
-    info = simulate(fpath)
+#     specs = translate_result(design_folder)
 
-    specs = translate_result(design_folder)
+#     return specs
 
-    return specs
