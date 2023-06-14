@@ -25,11 +25,11 @@ setup(
     author="The Regents of the University of California",
     author_email="FIXME",
     packages=find_packages(),
-    python_requires=">=3.7, <3.8", ## FIXME: require 3.7, maybe more, after dependencies upgrades
+    python_requires=">=3.9", ## FIXME: require 3.7, maybe more, after dependencies upgrades
     install_requires=[  ##
         ## FIXME: can we ease up on the version requirements?
         ## Maybe, but it's nice for intra-workspace consistency. 
-        "numpy==1.16.4",
+        "numpy==1.21.5",
     ],
     # extras_require={
     #     "dev": [
