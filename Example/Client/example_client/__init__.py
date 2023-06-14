@@ -43,6 +43,7 @@ Now we can just call the RPCs as though they were implemented locally.
 """
 
 def example_client_start():
+    """configures discovery_client configs and starts the client"""
     dc.configure(dc.Config(server_url = "localhost:8002"))
     dc.client_start()
 

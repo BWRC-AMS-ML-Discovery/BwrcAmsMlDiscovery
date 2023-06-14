@@ -32,7 +32,9 @@ def configure(cfg: Config) -> None:
 """
 # Built-In Endpoints
 """
+
 def client_start():
+    """loads local rpcs and perform other on client start functions"""
     _setup_client_rpcs()
 
 def alive() -> str:
