@@ -5,7 +5,8 @@
 # PyPi Imports
 import hdl21 as h
 import vlsirtools.spice as vsp
-from fastapi import FastAPI
+
+import discovery_server as ds
 
 # Workspace Imports
 from example_shared import (
@@ -32,15 +33,13 @@ from .auto_ckt_sim_lib import (
     translate_result,
 )
 
-# app = FastAPI(
-#     debug=False,
-#     title="BWRC AMS Example CktGym",
-#     description="BWRC AMS Example CktGym",
-#     version="0.0.1",
-# )
-
 from example_shared.rpc_declaration import auto_ckt_sim
 from .implementation import auto_ckt_sim_implementation
+
+#TODO: load config .env file specific to this server
+def example_server_start():
+    ds.configure(ds.Config(port=8002, host="127.0.0.1"))
+    ds.start_server()
 
 @auto_ckt_sim.impl
 async def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:

@@ -26,10 +26,10 @@ from example_shared import (
     AutoCktOutput,
 )
 
-from example_server import auto_ckt_sim
+# from example_server import auto_ckt_sim
 
-# FIXME We don't want this
-import example_server as _
+# # FIXME We don't want this
+# import example_server as _
 
 
 # Importing the client library will create client stubs for all defined RPCs, including all those functions above.

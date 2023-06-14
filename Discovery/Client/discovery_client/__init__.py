@@ -19,6 +19,14 @@ env = dotenv_values()
 THE_SERVER_URL = env.get("THE_SERVER_URL", None)
 if not THE_SERVER_URL:
     raise ValueError("THE_SERVER_URL not set in .env file")
+
+THE_SERVER_PORT = env.get("THE_SERVER_PORT", None)
+if not THE_SERVER_PORT:
+    raise ValueError("THE_SERVER_PORT not set in .env file")
+
+THE_SERVER_HOST = env.get("THE_SERVER_HOST", None)
+if not THE_SERVER_HOST:
+    raise ValueError("THE_SERVER_HOST not set in .env file")
 """
 #Client Config
 """
@@ -26,6 +34,8 @@ if not THE_SERVER_URL:
 #put all client config variables in here
 options = {
     'THE_SERVER_URL': THE_SERVER_URL,
+    'THE_SERVER_PORT': THE_SERVER_PORT,
+    'THE_SERVER_HOST': THE_SERVER_HOST,
 }
 
 def configure(**kwargs):

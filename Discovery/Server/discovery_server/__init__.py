@@ -4,6 +4,7 @@
 
 # PyPi Imports
 from fastapi import FastAPI, Body
+from dotenv import dotenv_values
 import uvicorn
 
 # Workspace Imports
@@ -21,22 +22,56 @@ app = FastAPI(
 from .mock import *
 from .user import *
 
+from pydantic.dataclasses import dataclass
+
+
+@dataclass
+class Config:
+    """# Server Configuration"""
+
+    port: int = 8000
+    host: str = "127.0.0.1"
+
+
+# Create the module-scope configuration
+config = Config()
+
+
+def configure(cfg: Config) -> None:
+    """Set the module-scope `Config`."""
+    global config
+    config = cfg
+
+
+# The end
+
+"""
+Example use case
+```python
+import discovery_server as ds 
+
+# ... 
+# Define all my RPCs etc
+# ... 
+
+ds.configure(ds.Config(port=8002, host="www.whatever.com")
+ds.start_server()
+
+```
+"""
+
+
+
+
 """
 #Config and Server Start 
 """
-options = {
-    "temp_config" : 0,
-}
 
-def configure(**kwargs):
-    for key, value in kwargs.items():
-        if key in options:
-            options[key] = value
-        else:
-            print("ignoring unknown option")
 
 def start_server():
-    uvicorn.run(app, port=8002, host="127.0.0.1")
+    # Load the .env file
+    _setup_server_rpcs()
+    uvicorn.run(app, port=config.port, host=config.host) 
 
 
 """
@@ -81,4 +116,3 @@ def _setup_server_rpcs():
         decorator(f)
 
 
-_setup_server_rpcs()
