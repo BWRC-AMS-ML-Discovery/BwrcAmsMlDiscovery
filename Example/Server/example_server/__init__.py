@@ -6,6 +6,8 @@
 import hdl21 as h
 import vlsirtools.spice as vsp
 
+import discovery_server as ds
+
 # Workspace Imports
 from example_shared import (
     example,
@@ -31,6 +33,9 @@ from .auto_ckt_sim_lib import (
     translate_result,
 )
 
+def example_server_start():
+    ds.configure(ds.Config(port=8002, host="127.0.0.1"))
+    ds.start_server()
 
 @example.impl
 def example_func(example: Example) -> Example:

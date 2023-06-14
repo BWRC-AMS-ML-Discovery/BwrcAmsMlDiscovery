@@ -27,6 +27,43 @@ app = FastAPI(
 from .mock import *
 from .user import *
 
+from pydantic.dataclasses import dataclass
+
+
+@dataclass
+class Config:
+    """# Server Configuration"""
+
+    port: int = 8000
+    host: str = "127.0.0.1"
+
+
+# Create the module-scope configuration
+config = Config()
+
+
+def configure(cfg: Config) -> None:
+    """Set the module-scope `Config`."""
+    global config
+    config = cfg
+
+
+# The end
+
+"""
+Example use case
+```python
+import discovery_server as ds 
+
+# ... 
+# Define all my RPCs etc
+# ... 
+
+ds.configure(ds.Config(port=8002, host="www.whatever.com")
+ds.start_server()
+
+```
+"""
 
 """
 # Built-In Endpoints
@@ -35,7 +72,8 @@ from .user import *
 
 # FIXME Should use environment variables
 def start_server():
-    uvicorn.run(app, port=8002, host="127.0.0.1")
+    _setup_server_rpcs()
+    uvicorn.run(app, port=config.port, host=config.host)
 
 
 @app.get("/")
@@ -78,4 +116,3 @@ def _setup_server_rpcs():
         decorator(f)
 
 
-_setup_server_rpcs()
