@@ -19,7 +19,7 @@ from eval_engines.ngspice.TwoStageClass import *
 
 
 # FIXME Avoid storing files?
-SPECS_DIR = "/tmp/ckt_da_new/specs/in/"
+SPECS_DIR = "/tmp/ckt_da_new/specs/"
 
 
 # way of ordering the way a yaml file is read
@@ -67,7 +67,7 @@ class TwoStageAmp(gym.Env):
 
     # obtains yaml file
     path = os.getcwd()
-    CIR_YAML = SPECS_DIR + "two_stage_opamp.yaml"
+    CIR_YAML = SPECS_DIR + "in/two_stage_opamp.yaml"
 
     def __init__(self, env_config):
         self.multi_goal = env_config.get("multi_goal", False)
@@ -87,7 +87,7 @@ class TwoStageAmp(gym.Env):
             load_specs_path = (
                 # TwoStageAmp.path +
                 SPECS_DIR
-                + "ngspice_specs_gen_two_stage_opamp"
+                + "out/ngspice_specs_gen_two_stage_opamp"
             )
             with open(load_specs_path, "rb") as f:
                 specs = pickle.load(f)

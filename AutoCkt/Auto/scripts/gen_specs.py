@@ -7,7 +7,7 @@ import yaml
 
 
 # FIXME Avoid storing files?
-SPECS_DIR = "/tmp/ckt_da_new/specs/in/"
+SPECS_DIR = "/tmp/ckt_da_new/specs/"
 
 
 # way of ordering the way a yaml file is read
@@ -70,7 +70,7 @@ def gen_data(CIR_YAML, env, num_specs):
     for key, value in specs_range.items():
         specs_range[key] = specs_valid[i]
         i += 1
-    with open(SPECS_DIR + "ngspice_specs_gen_" + env, "wb") as f:
+    with open(SPECS_DIR + "out/ngspice_specs_gen_" + env, "wb") as f:
         pickle.dump(specs_range, f)
 
 
@@ -78,7 +78,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--num_specs", type=str)
     args = parser.parse_args()
-    CIR_YAML = SPECS_DIR + "two_stage_opamp.yaml"
+    CIR_YAML = SPECS_DIR + "in/two_stage_opamp.yaml"
 
     gen_data(CIR_YAML, "two_stage_opamp", int(args.num_specs))
 
