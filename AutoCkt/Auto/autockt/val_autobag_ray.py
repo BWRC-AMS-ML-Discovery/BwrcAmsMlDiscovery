@@ -3,8 +3,14 @@
 FIXME: description here! 
 """
 
+import gym
+import ray
+from ray.rllib.agents.ppo import PPOTrainer
+
+
 import ray
 import ray.tune as tune
+
 
 # Workspace Imports
 from autockt.envs.ngspice_vanilla_opamp import TwoStageAmp
@@ -13,7 +19,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--checkpoint_dir', '-cpd', type=str)
 args = parser.parse_args()
-ray.init()
+# ray.init()
 
 #configures training of the agent with associated hyperparameters
 #See Ray documentation for details on each parameter
@@ -36,7 +42,7 @@ config_train = {
 if not args.checkpoint_dir:
     trials = tune.run_experiments({
         "train_45nm_ngspice": {
-        "checkpoint_freq":1,
+        # "checkpoint_freq":1,
         "run": "PPO",
         "env": TwoStageAmp,
         "stop": {"episode_reward_mean": -0.02},
