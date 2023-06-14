@@ -4,21 +4,27 @@
 
 # PyPi Imports
 from fastapi import FastAPI, Body
-from dotenv import dotenv_values
+
 import uvicorn
 
 # Workspace Imports
 from discovery_shared.git import GitInfo
 
 
+# Needed to get server functions
+import example_server as _
+
+
 app = FastAPI(
     debug=False,
-    title="BWRC AMS Discovery CktGym",
-    description="BWRC AMS Discovery CktGym",
+    title="BWRC AMS ML Discovery CktGym",
+    description="BWRC AMS ML Discovery CktGym",
     version="0.0.1",
 )
 
+
 # Local Imports
+# FIXME Can rewrite using RPC
 from .mock import *
 from .user import *
 
@@ -62,7 +68,6 @@ ds.start_server()
 
 
 
-
 """
 #Config and Server Start 
 """
@@ -77,6 +82,7 @@ def start_server():
 """
 # Built-In Endpoints
 """
+
 
 @app.get("/")
 async def alive() -> str:
@@ -104,8 +110,11 @@ def _setup_server_rpcs():
             raise RuntimeError(msg)
 
         # Create the server endpoint
-        async def f(arg: rpc.input_type = Body(...)) -> rpc.return_type:
-            return await rpc.func(arg)
+
+        # FIXME type annotations incorrect, can use a function generator to fix.
+        # rpc needs to be evaluated at create time not run time.
+        async def f(arg: rpc.input_type = Body(...), *, rpc=rpc) -> rpc.return_type:
+            return rpc.func(arg)
 
         # Give it the server-function's metadata
         f.__name__ = rpc.name

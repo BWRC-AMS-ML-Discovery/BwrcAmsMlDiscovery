@@ -20,6 +20,9 @@ from example_shared import (
     InverterBetaRatioInput,
     InverterBetaRatioOutput,
     simulate_on_the_server,
+    auto_ckt_sim,
+    AutoCktInput,
+    AutoCktOutput,
 )
 from example_shared import (
     AutoCktInput,
@@ -32,8 +35,17 @@ from example_shared import (
 # import example_server as _
 
 
-# Importing the client library will create client stubs for all defined RPCs, including all those functions above.
-import discovery_client as _
+
+# FIXME Maybe put this variable somewhere else?
+ENABLE_HTTP = True
+
+
+if ENABLE_HTTP:
+    # Importing the client library will create client stubs for all defined RPCs, including all those functions above.
+    import discovery_client as _
+else:
+    # Short-circuiting by directly calling server functions
+    import example_server as _
 
 
 """
@@ -43,12 +55,10 @@ Now we can just call the RPCs as though they were implemented locally.
 
 def test_auto_ckt():
     """testing auto ckt rpcs"""
-    test = auto_ckt_sim(AutoCktInput(1, 1, 1, 1, 1, 1, 1e-12))
+    to_test = AutoCktInput(3, 3, 3, 3, 3, 3, 1e-12)
+    test = auto_ckt_sim(to_test)
     return test
 
-def do_simple_example():
-    example_resp = example(Example(txt="Hello", num=3))
-    return example_resp
 
 def do_example_stuff():
     """# Call a few example RPCs"""
@@ -62,6 +72,7 @@ def do_example_stuff():
     print(simulate_that_opamp_resp)
 
 
+# FIXME needs renaming to avoid the same name
 def simulate_that_opamp(params: OpAmpParams) -> h.sim.SimResultProto:
     """# Run the `ThatOpAmp` generator and simulate it, all on the server"""
 

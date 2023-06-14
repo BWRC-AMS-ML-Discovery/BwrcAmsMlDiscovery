@@ -82,8 +82,11 @@ def _setup_client_rpcs():
             raise RuntimeError(msg)
 
         # Create the client function
-        def f(inp: rpc.input_type) -> rpc.return_type:
-            url = f"http://{options['THE_SERVER_URL']}/{rpc.name}"
+
+        # FIXME type annotations incorrect, can use a function generator to fix.
+        # rpc needs to be evaluated at create time not run time.
+        def f(inp: rpc.input_type, *, rpc=rpc) -> rpc.return_type:
+            url = f"http://{THE_SERVER_URL}/{rpc.name}"
             resp = httpx.post(url, json=asdict(inp))
             return rpc.return_type(**resp.json())
 

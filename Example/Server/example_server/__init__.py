@@ -16,6 +16,7 @@ from example_shared import (
     SecretSpiceSimulationInput,
     SecretSpiceSimulationOutput,
     simulate_that_opamp,
+    simulate_on_the_server,
     OpAmpParams,
     VlsirProtoBufKind,
     VlsirProtoBufBinary,
@@ -25,8 +26,6 @@ from example_shared import (
     AutoCktInput,
     AutoCktOutput,
 )
-
-
 from .auto_ckt_sim_lib import (
     create_design,
     simulate,
@@ -105,7 +104,11 @@ async def simulate_that_opamp(params: OpAmpParams) -> VlsirProtoBufBinary:
     )
 
 
-if False:
+@simulate_on_the_server.impl
+async def simulate_on_the_server(inp: VlsirProtoBufBinary) -> VlsirProtoBufBinary:
+    """# Simulate a circuit on the server
+    Decodes a `SimInput` VLSIR protobuf from `inp`, simulates it, and returns a `SimResult` VLSIR protobuf.
+    """
 
     @app.post("/simulate_on_the_server")
     async def simulate_on_the_server(inp: VlsirProtoBufBinary) -> VlsirProtoBufBinary:
@@ -161,7 +164,13 @@ async def inverter_beta_ratio(inp: InverterBetaRatioInput) -> InverterBetaRatioO
 #     AutoCkt Simulation
 #     """
 
-#     design_folder, fpath = create_design(inp)
+
+# FIXME should be async? FastAPI says both are ok.
+@auto_ckt_sim.impl
+def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
+    """
+    AutoCkt Simulation
+    """
 
 #     # Error return?
 #     info = simulate(fpath)

@@ -83,6 +83,10 @@ class Rpc:
     # An http POST in the client, and a function call in the server
     func: Callable | None = None
 
+    def __post_init__(self) -> "Rpc":
+        # Register to dictionary
+        rpcs[self.name] = self
+
     def __call__(self, *args, **kwargs) -> "self.return_type":
         """# Call our RPC function
         Dispatches to the inner callable.
@@ -104,7 +108,7 @@ class Rpc:
 rpcs: Dict[str, Rpc] = dict()
 
 
-def rpc(f: Callable) -> Rpc:
+def _rpc(f: Callable) -> Rpc:
     """# RPC Decorator
     Wrap function `f` in an `Rpc` which can be interpreted by both client-side and server-side code.
     """
