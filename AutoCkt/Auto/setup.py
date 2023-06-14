@@ -30,16 +30,14 @@ setup(
         ## FIXME: can we ease up on the version requirements?
         ## Maybe, but it's nice for intra-workspace consistency.
         "numpy==1.21.5",
-        "scipy==1.10.1", 
+        "scipy==1.10.1",
         "gym==0.23",  # Core ML dependency: OpenAI Gym
-        "ray==2.0.0",  # Ray for RL, parallelization, training
+        "ray[rllib,tune]==2.0.0",  # Ray for RL, parallelization, training
         "tensorflow==2.8.0",  # "ray" needs these
         "protobuf==3.19.1",  # "ray" needs these
         "opencv-python==4.7.0.72",  # "ray" needs these
         "ipython==6.5.0",  # FIXME: probably dev only?
         "pyyaml==5.1.2",
-        "ray[rllib]",
-        "ray[tune]",
         "autockt_shared",  # Local "workspace" dependency
     ],
     # extras_require={
