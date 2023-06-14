@@ -38,7 +38,7 @@ setup(
         "opencv-python==4.7.0.72",  # "ray" needs these
         "ipython==6.5.0",  # FIXME: probably dev only?
         "pyyaml==5.1.2",
-        # "autockt_shared",  # Local "workspace" dependency
+        "autockt_shared",  # Local "workspace" dependency
     ],
     # extras_require={
     #     "dev": [
