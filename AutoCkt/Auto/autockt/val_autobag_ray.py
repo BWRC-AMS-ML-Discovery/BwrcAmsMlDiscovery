@@ -30,7 +30,10 @@ config_train = {
     "num_gpus": 0,
     "model": {"fcnet_hiddens": [64, 64]},
     "num_workers": 1,
-    "env_config": {"generalize": True, "run_valid": False},
+    "env_config": {
+        "generalize": True,
+        "run_valid": False,
+    },
 }
 
 # Runs training and saves the result in ~/ray_results/train_ngspice_45nm
