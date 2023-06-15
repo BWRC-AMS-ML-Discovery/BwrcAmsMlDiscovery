@@ -27,7 +27,8 @@ class NgSpiceWrapper(object):
             self.root_dir = root_dir
 
         with open(yaml_path, "r") as f:
-            yaml_data = yaml.load(f)
+            # yaml_data = yaml.load(f)
+            yaml_data = yaml.load(f, Loader=yaml.FullLoader)
         design_netlist = yaml_data["dsn_netlist"]
         # design_netlist = path + "/" + design_netlist
 

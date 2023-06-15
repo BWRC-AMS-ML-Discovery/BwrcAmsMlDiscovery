@@ -34,6 +34,7 @@ config_train = {
         "generalize": True,
         "run_valid": False,
     },
+    "disable_env_checking": True,
 }
 
 # Runs training and saves the result in ~/ray_results/train_ngspice_45nm

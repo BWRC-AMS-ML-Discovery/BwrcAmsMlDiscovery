@@ -13,6 +13,7 @@ from gym import spaces
 import yaml
 import yaml.constructor
 
+
 # Workspace Imports
 # from eval_engines.util.core import *
 from eval_engines.ngspice.TwoStageClass import *
@@ -93,6 +94,7 @@ class TwoStageAmp(gym.Env):
                 specs = pickle.load(f)
 
         self.specs = OrderedDict(sorted(specs.items(), key=lambda k: k[0]))
+
         if self.specs_save:
             with open(
                 "specs_" + str(num_valid) + str(random.randint(1, 100000)), "wb"
@@ -176,7 +178,10 @@ class TwoStageAmp(gym.Env):
         self.specs_ideal_norm = self.lookup(self.specs_ideal, self.global_g)
 
         # initialize current parameters
-        self.cur_params_idx = np.array([33, 33, 33, 33, 33, 14, 20])
+        ##FIXME why is this so big? what is it doing here? 
+        print("THIS IS THE IMPORTANT CUR PARA INDEX!!!!!!!!!!!")
+        print(self.cur_params_idx)
+        self.cur_params_idx = np.array([33, 33, 33, 33, 33, 14, 20]) 
         self.cur_specs = self.update(self.cur_params_idx)
         cur_spec_norm = self.lookup(self.cur_specs, self.global_g)
         reward = self.reward(self.cur_specs, self.specs_ideal)
@@ -185,9 +190,12 @@ class TwoStageAmp(gym.Env):
         self.ob = np.concatenate(
             [cur_spec_norm, self.specs_ideal_norm, self.cur_params_idx]
         )
+        print("this is reset")
+        print(self.ob)
         return self.ob
 
     def step(self, action):
+
         """
         :param action: is vector with elements between 0 and 1 mapped to the index of the corresponding parameter
         :return:
@@ -234,6 +242,13 @@ class TwoStageAmp(gym.Env):
     def lookup(self, spec, goal_spec):
         goal_spec = [float(e) for e in goal_spec]
         norm_spec = (spec - goal_spec) / (goal_spec + spec)
+        for idx, e in enumerate(norm_spec):
+            if e >= 0:
+                norm_spec[idx] = 0
+            if e <= -1:
+                norm_spec[idx] = -1
+            if idx >= 8:
+                norm[idx] = 1
         return norm_spec
 
     def reward(self, spec, goal_spec):
@@ -279,5 +294,9 @@ class TwoStageAmp(gym.Env):
             )
         )
         cur_specs = np.array(list(cur_specs.values()))
+        print("dis is update!!!!!!!!!!!!!!!!")
+        print(cur_specs)
 
         return cur_specs
+
+
