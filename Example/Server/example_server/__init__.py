@@ -7,6 +7,7 @@ import hdl21 as h
 import vlsirtools.spice as vsp
 
 import discovery_server as ds
+from dotenv import dotenv_values
 
 # Workspace Imports
 from example_shared import (
@@ -34,7 +35,17 @@ from .auto_ckt_sim_lib import (
 )
 
 def example_server_start():
-    ds.configure(ds.Config(port=8002, host="127.0.0.1"))
+    env = dotenv_values()
+
+    THE_SERVER_HOST = env.get("THE_SERVER_HOST", None)
+    if not THE_SERVER_HOST:
+        raise ValueError("THE_SERVER_HOST not set in .env file")
+    
+    THE_SERVER_PORT = env.get("THE_SERVER_PORT", None)
+    if not THE_SERVER_PORT:
+        raise ValueError("THE_SERVER_PORT not set in .env file")
+    
+    ds.configure(ds.Config(port=THE_SERVER_PORT, host=THE_SERVER_HOST))
     ds.start_server()
 
 @example.impl
