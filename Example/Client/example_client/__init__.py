@@ -44,7 +44,13 @@ Now we can just call the RPCs as though they were implemented locally.
 
 def example_client_start():
     """configures discovery_client configs and starts the client"""
-    dc.configure(dc.Config(server_url = "localhost:8002"))
+    env = dotenv_values()
+
+    THE_SERVER_URL = env.get("THE_SERVER_URL", None)
+    if not THE_SERVER_URL:
+        raise ValueError("THE_SERVER_URL not set in .env file")
+
+    dc.configure(dc.Config(server_url=THE_SERVER_URL))
     dc.client_start()
 
 def test_auto_ckt():
