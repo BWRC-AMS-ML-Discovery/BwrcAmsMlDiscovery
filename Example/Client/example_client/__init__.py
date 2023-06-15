@@ -39,6 +39,8 @@ else:
 
 
 def example_client_start():
+    """retrieve values from .env file then configure nad start the client"""
+
     # Load the .env file
     env = dotenv_values()
 
@@ -47,6 +49,7 @@ def example_client_start():
     if not THE_SERVER_URL:
         raise ValueError("THE_SERVER_URL not set in .env file")
     
+    #set server_url
     dc.configure(dc.Config(server_url=THE_SERVER_URL))
     dc.client_start()
 

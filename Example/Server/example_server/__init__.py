@@ -35,6 +35,8 @@ from .auto_ckt_sim_lib import (
 )
 
 def example_server_start():
+    """Retrieve values from .env and then configure and start the server"""
+    
     env = dotenv_values()
 
     THE_SERVER_HOST = env.get("THE_SERVER_HOST", None)

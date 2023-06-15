@@ -53,12 +53,12 @@ ds.start_server()
 """
 
 def client_start():
+    """sets up local client rpcs"""
     _setup_client_rpcs()
 
 """
 # Built-In Endpoints
 """
-
 
 def alive() -> str:
     """Server aliveness check"""

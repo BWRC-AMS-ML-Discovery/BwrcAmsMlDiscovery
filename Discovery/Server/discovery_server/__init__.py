@@ -10,10 +10,6 @@ import uvicorn
 from discovery_shared.git import GitInfo
 
 
-# Needed to get server functions
-import example_server as _
-
-
 app = FastAPI(
     debug=False,
     title="BWRC AMS ML Discovery CktGym",
@@ -69,9 +65,8 @@ ds.start_server()
 # Built-In Endpoints
 """
 
-
-# FIXME Should use environment variables
 def start_server():
+    """starts the server using the given config and sets up local rpcs"""
     _setup_server_rpcs()
     uvicorn.run(app, port=config.port, host=config.host)
 
