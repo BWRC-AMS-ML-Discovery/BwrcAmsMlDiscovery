@@ -2,7 +2,6 @@ from example_client import (
     do_simple_example,
 )
 from example_shared import (
-    example,
     Example,
 )
 
