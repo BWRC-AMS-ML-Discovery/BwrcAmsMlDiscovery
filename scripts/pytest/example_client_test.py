@@ -5,7 +5,7 @@ from example_shared import (
     Example,
 )
 
-
+#tests only succeed if HTML is false
 def test_example_client():
     res = do_simple_example()
     assert res == Example(txt="HelloHelloHello", num=1)
