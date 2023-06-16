@@ -12,6 +12,7 @@ import httpx
 # Workspace Imports
 from discovery_shared.git import GitInfo
 
+
 # Load the .env file
 env = dotenv_values()
 
@@ -45,11 +46,21 @@ Set up a client function for each defined `Rpc`.
 
 
 def _setup_client_rpcs():
-    # Import the list of RPCs
-    from discovery_shared.rpc import rpcs
+
+    #TODO: Find a better way to enable this? Very similar to ENABLE_HTTP
+    ENABLE_MOCK_RPC = False
+    rpcs_dict = None
+    if ENABLE_MOCK_RPC:
+        # enable mock rpcs to remove redundant rpcs that occur when importing both discovery_client and example_server in pytest
+        from .mock import mock_rpcs
+        rpcs_dict = mock_rpcs
+    else:
+        # Import the list of RPCs
+        from discovery_shared.rpc import rpcs
+        rpcs_dict = rpcs
 
     # And set up a client function for each
-    for rpc in rpcs.values():
+    for rpc in rpcs_dict.values():
         if rpc.func is not None:
             msg = f"RPC {rpc.name} already has a function defined, cannot be set up as a client"
             raise RuntimeError(msg)
