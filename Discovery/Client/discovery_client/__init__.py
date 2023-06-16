@@ -1,5 +1,18 @@
 """
 # Discovery Client
+
+Example use case
+```python
+import discovery_server as ds 
+
+# ... 
+# Define all my RPCs etc
+# ... 
+
+ds.configure(ds.Config(port=8002, host="www.whatever.com")
+ds.start_server()
+
+```
 """
 
 # Std-Lib Imports
@@ -19,11 +32,8 @@ class Config:
     """# Server Configuration"""
     server_url: str = "localhost:8000"
 
-
-
 # Create the module-scope configuration
 config = Config()
-
 
 def configure(cfg: Config) -> None:
     """Set the module-scope `Config`."""
@@ -31,29 +41,9 @@ def configure(cfg: Config) -> None:
     config = cfg
 
 
-# The end
-
-"""
-Example use case
-```python
-import discovery_server as ds 
-
-# ... 
-# Define all my RPCs etc
-# ... 
-
-ds.configure(ds.Config(port=8002, host="www.whatever.com")
-ds.start_server()
-
-```
-"""
-
-"""
-# Built-In Endpoints
-"""
-
 def client_start():
-    """sets up local client rpcs"""
+    """perform client start operations and sets up local client rpcs"""
+    #TODO: is there anything else to add here
     _setup_client_rpcs()
 
 """

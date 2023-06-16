@@ -1,5 +1,18 @@
 """
 # Discovery Server
+
+Example use case
+```python
+import discovery_server as ds 
+
+# ... 
+# Define all my RPCs etc
+# ... 
+
+ds.configure(ds.Config(port=8002, host="www.whatever.com")
+ds.start_server()
+
+```
 """
 
 # PyPi Imports
@@ -43,23 +56,6 @@ def configure(cfg: Config) -> None:
     global config
     config = cfg
 
-
-# The end
-
-"""
-Example use case
-```python
-import discovery_server as ds 
-
-# ... 
-# Define all my RPCs etc
-# ... 
-
-ds.configure(ds.Config(port=8002, host="www.whatever.com")
-ds.start_server()
-
-```
-"""
 
 """
 # Built-In Endpoints
