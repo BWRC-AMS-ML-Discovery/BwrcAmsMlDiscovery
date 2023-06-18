@@ -15,7 +15,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--checkpoint_dir", "-cpd", type=str)
 args = parser.parse_args()
-# ray.init()
+ray.init()
 
 # configures training of the agent with associated hyperparameters
 # See Ray documentation for details on each parameter

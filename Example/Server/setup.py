@@ -32,6 +32,7 @@ setup(
         "python-dotenv==1.0.0",
         "discovery_server==0.0.1",
         "example_shared==0.0.1",
+        "autockt==0.0.1"
     ],
     extras_require={
         "dev": [

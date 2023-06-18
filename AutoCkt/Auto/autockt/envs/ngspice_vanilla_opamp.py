@@ -4,7 +4,7 @@ A new ckt environment based on a new structure of MDP
 
 # Std-Lib Imports
 import os, pickle, random
-from collections import OrderedDict
+# from collections import OrderedDict
 
 # PyPi Imports
 import numpy as np
@@ -36,7 +36,7 @@ class OrderedDictYAMLLoader(yaml.Loader):
         self.add_constructor("tag:yaml.org,2002:omap", type(self).construct_yaml_map)
 
     def construct_yaml_map(self, node):
-        data = OrderedDict()
+        data = dict()
         yield data
         value = self.construct_mapping(node)
         data.update(value)
@@ -52,19 +52,21 @@ class OrderedDictYAMLLoader(yaml.Loader):
                 node.start_mark,
             )
 
-        mapping = OrderedDict()
+        mapping = dict()
         for key_node, value_node in node.value:
             key = self.construct_object(key_node, deep=deep)
             value = self.construct_object(value_node, deep=deep)
             mapping[key] = value
+
+        print(mapping)
         return mapping
 
 
 class TwoStageAmp(gym.Env):
     metadata = {"render.modes": ["human"]}
 
-    PERF_LOW = -1
-    PERF_HIGH = 0
+    PERF_LOW = -np.inf
+    PERF_HIGH = np.inf
 
     # obtains yaml file
     path = os.getcwd()
@@ -93,7 +95,7 @@ class TwoStageAmp(gym.Env):
             with open(load_specs_path, "rb") as f:
                 specs = pickle.load(f)
 
-        self.specs = OrderedDict(sorted(specs.items(), key=lambda k: k[0]))
+        self.specs = dict(sorted(specs.items(), key=lambda k: k[0]))
 
         if self.specs_save:
             with open(
@@ -127,11 +129,11 @@ class TwoStageAmp(gym.Env):
         self.observation_space = spaces.Box(
             low=np.array(
                 [TwoStageAmp.PERF_LOW] * 2 * len(self.specs_id)
-                + len(self.params_id) * [1]
+                + len(self.params_id) * [-np.inf]
             ),
             high=np.array(
                 [TwoStageAmp.PERF_HIGH] * 2 * len(self.specs_id)
-                + len(self.params_id) * [1]
+                + len(self.params_id) * [np.inf]
             ),
         )
 
@@ -148,6 +150,7 @@ class TwoStageAmp(gym.Env):
 
         # objective number (used for validation)
         self.obj_idx = 0
+
 
     def reset(self):
         # if multi-goal is selected, every time reset occurs, it will select a different design spec as objective
@@ -178,9 +181,10 @@ class TwoStageAmp(gym.Env):
         self.specs_ideal_norm = self.lookup(self.specs_ideal, self.global_g)
 
         # initialize current parameters
-        ##FIXME why is this so big? what is it doing here? 
+        ## FIXME why is this so big? what is it doing here? 
         print("THIS IS THE IMPORTANT CUR PARA INDEX!!!!!!!!!!!")
         print(self.cur_params_idx)
+        ## FIXME understand this 
         self.cur_params_idx = np.array([33, 33, 33, 33, 33, 14, 20]) 
         self.cur_specs = self.update(self.cur_params_idx)
         cur_spec_norm = self.lookup(self.cur_specs, self.global_g)
@@ -194,8 +198,8 @@ class TwoStageAmp(gym.Env):
         print(self.ob)
         return self.ob
 
-    def step(self, action):
 
+    def step(self, action):
         """
         :param action: is vector with elements between 0 and 1 mapped to the index of the corresponding parameter
         :return:
@@ -207,12 +211,13 @@ class TwoStageAmp(gym.Env):
             [self.action_meaning[a] for a in action]
         )
 
-        #        self.cur_params_idx = self.cur_params_idx + np.array(self.action_arr[int(action)])
+        #self.cur_params_idx = self.cur_params_idx + np.array(self.action_arr[int(action)])
         self.cur_params_idx = np.clip(
             self.cur_params_idx,
             [0] * len(self.params_id),
             [(len(param_vec) - 1) for param_vec in self.params],
         )
+
         # Get current specs and normalize
         self.cur_specs = self.update(self.cur_params_idx)
         cur_spec_norm = self.lookup(self.cur_specs, self.global_g)
@@ -237,24 +242,21 @@ class TwoStageAmp(gym.Env):
         # print('cur ob:' + str(self.cur_specs))
         # print('ideal spec:' + str(self.specs_ideal))
         # print(reward)
+
         return self.ob, reward, done, {}
+
 
     def lookup(self, spec, goal_spec):
         goal_spec = [float(e) for e in goal_spec]
         norm_spec = (spec - goal_spec) / (goal_spec + spec)
-        for idx, e in enumerate(norm_spec):
-            if e >= 0:
-                norm_spec[idx] = 0
-            if e <= -1:
-                norm_spec[idx] = -1
-            if idx >= 8:
-                norm[idx] = 1
         return norm_spec
+
 
     def reward(self, spec, goal_spec):
         """
         Reward: doesn't penalize for overshooting spec, is negative
         """
+
         rel_specs = self.lookup(spec, goal_spec)
         pos_val = []
         reward = 0.0
@@ -269,9 +271,9 @@ class TwoStageAmp(gym.Env):
 
         return reward if reward < -0.02 else 10
 
+
     def update(self, params_idx):
         """
-
         :param action: an int between 0 ... n-1
         :return:
         """
@@ -281,10 +283,10 @@ class TwoStageAmp(gym.Env):
         # impose constraint tail1 = in
         # params_idx[0] = params_idx[3]
         params = [self.params[i][params_idx[i]] for i in range(len(self.params_id))]
-        param_val = [OrderedDict(list(zip(self.params_id, params)))]
+        param_val = [dict(list(zip(self.params_id, params)))]
 
         # run param vals and simulate
-        cur_specs = OrderedDict(
+        cur_specs = dict(
             sorted(
                 #
                 # FIXME: this call here gotta get replaced!
@@ -293,10 +295,11 @@ class TwoStageAmp(gym.Env):
                 key=lambda k: k[0],
             )
         )
+
+        print(cur_specs)
         cur_specs = np.array(list(cur_specs.values()))
-        print("dis is update!!!!!!!!!!!!!!!!")
+        print("this is update!!!!!!!!!!!!!!!!")
         print(cur_specs)
 
         return cur_specs
-
 

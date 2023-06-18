@@ -181,3 +181,14 @@ auto_ckt_sim = Rpc(
     return_type=AutoCktOutput,
     docstring="Simulation on the Server",
 )
+
+# @dataclass
+# class AmsInput(
+#     'dsn_netlist': Optional str = '/tmp/ckt_da_new/in/two_stage_opamp.cir', 
+#     'num_process': Optional int = 1, 
+#     'params': Optional dict = {}, 
+#     'normalize': (350, 0.001, 60, 950000.0), 
+#     'target_specs': {}
+#     'mp1': (1, 100, 1), 'mn1': (1, 100, 1), 'mp3': (1, 100, 1), 'mn3': (1, 100, 1), 'mn4': (1, 100, 1), 'mn5': (1, 100, 1), 'cc': (1e-13, 1e-11, 1e-13)
+# 'gain_min': (200, 400), 'ugbw_min': (1000000.0, 25000000.0), 'phm_min': (60, 60.0000001), 'ibias_max': (0.0001, 0.01)
+# )
