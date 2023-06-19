@@ -29,8 +29,6 @@ setup(
     install_requires=[  ##
         ## FIXME: can we ease up on the version requirements?
         "numpy==1.21.5",
-        "scipy==1.10.1",
-        "pyyaml==5.1.2",
         "autockt_shared",  # Local "workspace" dependency
     ],
     # extras_require={
