@@ -43,6 +43,7 @@ config_train = {
         "generalize": True,
         "run_valid": False,
     },
+    "disable_env_checking": True,
 }
 
 
