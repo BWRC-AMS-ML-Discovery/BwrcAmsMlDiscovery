@@ -35,20 +35,20 @@ setup(
         "ray[rllib,tune]==2.0.0",  # Ray for RL, parallelization, training
         "tensorflow==2.8.0",  # "ray" needs these
         "protobuf==3.19.1",  # "ray" needs these
-        "ipython==6.5.0",  # FIXME: probably dev only?
         "pyyaml==5.1.2",
         "autockt_shared",  # Local "workspace" dependency
         "example_shared",  # Local "workspace" dependency
         "example_client",  # Local "workspace" dependency
     ],
-    # extras_require={
-    #     "dev": [
-    #         "pytest==7.1",
-    #         "coverage",
-    #         "pytest-cov",
-    #         "pre-commit==2.20",
-    #         "black==22.6",
-    #         "twine",
-    #     ]
-    # },
+    extras_require={
+        "dev": [
+            "ipython==6.5.0",
+            # "pytest==7.1",
+            # "coverage",
+            # "pytest-cov",
+            # "pre-commit==2.20",
+            # "black==22.6",
+            # "twine",
+        ]
+    },
 )
