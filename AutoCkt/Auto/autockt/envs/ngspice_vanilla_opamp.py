@@ -14,6 +14,7 @@ import yaml
 import yaml.constructor
 
 # Workspace Imports
+from .create_design_and_simulate_lib import create_design_and_simulate
 
 
 # FIXME Avoid storing files?
