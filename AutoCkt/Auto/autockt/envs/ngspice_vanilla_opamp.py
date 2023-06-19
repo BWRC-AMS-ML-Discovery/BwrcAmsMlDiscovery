@@ -301,11 +301,11 @@ class TwoStageAmp(gym.Env):
         self.observation_space = spaces.Box(
             low=np.array(
                 [TwoStageAmp.PERF_LOW] * 2 * len(self.specs_id)
-                + len(self.params_id) * [1]
+                + len(self.params_id) * [TwoStageAmp.PERF_LOW]
             ),
             high=np.array(
                 [TwoStageAmp.PERF_HIGH] * 2 * len(self.specs_id)
-                + len(self.params_id) * [1]
+                + len(self.params_id) * [TwoStageAmp.PERF_HIGH]
             ),
         )
 
