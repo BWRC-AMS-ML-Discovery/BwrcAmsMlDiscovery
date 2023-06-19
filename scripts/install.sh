@@ -10,3 +10,4 @@ pip install \
     -e "./AutoCkt/Shared[dev]" \
     -e "./AutoCkt/Ckt[dev]" \
     -e "./AutoCkt/Auto[dev]" \
+    -e "./CktRL/Auto[dev]" \

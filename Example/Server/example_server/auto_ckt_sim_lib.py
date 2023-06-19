@@ -32,7 +32,6 @@ def _mkdir():
         try:
             design_folder = IO_BASE_DIR + "out/" + str(random.randint(0, 1_000_000))
             os.makedirs(design_folder)
-            os.chdir(design_folder)
             return design_folder
         except OSError:
             pass
@@ -79,7 +78,7 @@ def create_design(state: AutoCktInput):
 
 def simulate(fpath):
     info = 0  # this means no error occurred
-    command = 'ipython val_autobag_ray.py %s' % fpath
+    command = "ngspice -b %s >/dev/null 2>&1" % fpath
     exit_code = os.system(command)
     # if debug:
     #     print(command)

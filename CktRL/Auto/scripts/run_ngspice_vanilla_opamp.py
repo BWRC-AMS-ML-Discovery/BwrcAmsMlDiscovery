@@ -1,11 +1,10 @@
 if __name__ != "__main__":
     raise Exception("This is a SCRIPT and should be run as __main__!")
 
-from ckt_rl.envs.ngspice_vanilla_opamp import TwoStageAmp
+from cktrl.envs.ngspice_vanilla_opamp import TwoStageAmp
 import IPython
 import argparse
-from ckt_rl.gen_specs import gen_data
-from ckt_rl import val_autobag_ray
+from cktrl.gen_specs import gen_data
 
 SPECS_DIR = "/tmp/ckt_da_new/specs/"
 
@@ -20,8 +19,11 @@ def main():
     # Use user input in the function
     gen_data(CIR_YAML, "two_stage_opamp", int(num_specs))
 
-
-    IPython.get_ipython().magic('run ckt_rl/val_autobag_ray.py')
+    env_config = {"generalize": True, "valid": True}
+    env = TwoStageAmp(env_config)
+    env.reset()
+    env.step([2, 2, 2, 2, 2, 2, 2])
+    IPython.embed()
 
 
 main()
