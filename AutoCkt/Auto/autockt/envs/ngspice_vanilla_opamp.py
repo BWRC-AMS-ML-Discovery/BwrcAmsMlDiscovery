@@ -63,8 +63,8 @@ class TwoStageAmp(gym.Env):
         "render.modes": ["human"],
     }
 
-    PERF_LOW = -1
-    PERF_HIGH = 0
+    PERF_LOW = -np.inf
+    PERF_HIGH = np.inf
 
     # obtains yaml file
     CIR_YAML = SPECS_DIR + "in/two_stage_opamp.yaml"
