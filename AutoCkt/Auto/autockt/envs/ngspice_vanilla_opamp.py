@@ -203,7 +203,7 @@ class TwoStageAmp(gym.Env):
         # [34, 34, 34, 34, 34, 15, 2.1e-12]
         params = [self.params[i][params_idx[i]] for i in range(len(self.params_id))]
 
-        # [OrderedDict([('mp1', 34), ('mn1', 34), ('mp3', 34), ('mn3', 34), ('mn4', 34), ('mn5', 15), ('cc', 2.1e-12)])]
+        # OrderedDict([('mp1', 34), ('mn1', 34), ('mp3', 34), ('mn3', 34), ('mn4', 34), ('mn5', 15), ('cc', 2.1e-12)])
         param_val = OrderedDict(list(zip(self.params_id, params)))
 
         # run param vals and simulate
