@@ -25,12 +25,10 @@ setup(
     author="The Regents of the University of California",
     author_email="FIXME",
     packages=find_packages(),
-    python_requires=">=3.10", ## FIXME: require 3.7, maybe more, after dependencies upgrades
+    python_requires=">=3.7, <4",  ## FIXME: require 3.7, maybe more, after dependencies upgrades
     install_requires=[  ##
         ## FIXME: can we ease up on the version requirements?
         "numpy==1.21.5",
-        "scipy==1.10.1",
-        "pyyaml==5.1.2",
         "autockt_shared",  # Local "workspace" dependency
     ],
     # extras_require={

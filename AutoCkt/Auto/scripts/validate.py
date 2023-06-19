@@ -1,12 +1,12 @@
 """
-# Rollout 
+# Used to be: Rollout 
 FIXME: description here! 
 """
 
-# FIXME: we really need these future stuff? Python2 is long dead man!
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+
+if __name__ != "__main__":
+    raise Exception("This is a SCRIPT and should be run as __main__!")
+
 
 # Std-Lib Imports
 import os
@@ -22,7 +22,7 @@ from ray.rllib.agents.registry import get_agent_class
 from ray.tune.registry import register_env
 
 # Workspace Imports
-from autockt.envs.spectre_vanilla_opamp import TwoStageAmp
+from autockt.envs.ngspice_vanilla_opamp import TwoStageAmp
 
 
 EXAMPLE_USAGE = """
@@ -51,7 +51,10 @@ def create_parser(parser_creator=None):
     parser.add_argument(
         "checkpoint", type=str, help="Checkpoint from which to roll out."
     )
-    required_named = parser.add_argument_group("required named arguments")
+
+    required_named = parser.add_argument_group(
+        "required named arguments",
+    )
     required_named.add_argument(
         "--run",
         type=str,
@@ -61,7 +64,12 @@ def create_parser(parser_creator=None):
         "user-defined trainable function or class registered in the "
         "tune registry.",
     )
-    required_named.add_argument("--env", type=str, help="The gym environment to use.")
+    required_named.add_argument(
+        "--env",
+        type=str,
+        help="The gym environment to use.",
+    )
+
     parser.add_argument(
         "--no-render",
         default=False,
@@ -69,8 +77,16 @@ def create_parser(parser_creator=None):
         const=True,
         help="Surpress rendering of the environment.",
     )
-    parser.add_argument("--steps", default=10000, help="Number of steps to roll out.")
-    parser.add_argument("--out", default=None, help="Output filename.")
+    parser.add_argument(
+        "--steps",
+        default=10000,
+        help="Number of steps to roll out.",
+    )
+    parser.add_argument(
+        "--out",
+        default=None,
+        help="Output filename.",
+    )
     parser.add_argument(
         "--config",
         default="{}",
