@@ -4,6 +4,8 @@ Shared code
 """
 
 # Std-Lib Imports
+import pickle
+import random
 from typing import Optional
 
 # Workspace Imports
@@ -62,7 +64,19 @@ class ParamManager:
     input and output and other mechanism inside RL script
     """
 
-    def load_spec(params: list, target: list, norm: list) -> CktInput:
+    def __init__(self):
+        self.spec = Spec(0.0, 0.0, 0.0, 0.0)
+        self.params = Params(
+            [1, 100, 1],
+            [1, 100, 1],
+            [1, 100, 1],
+            [1, 100, 1],
+            [1, 100, 1],
+            [1, 100, 1],
+            [1, 100, 1],
+        )
+
+    def load_spec(self, params: list, target: list, norm: list) -> CktInput:
         """
         params: parameters range, n# of ranges with step sizes, n * 3 for each [min, max, step]
         target: ideal spec range, n# of ranges without step sizes, n * 2 for each [min, max]
@@ -88,4 +102,16 @@ class ParamManager:
         }
         ckt = CktInput(params_values, normalize_values, target_values)
 
+        self.params = params_values
+
         return ckt
+
+    def get_spec(self) -> Spec:
+        return self.spec
+
+    def save_spec(self):
+        with open("specs_" + str(random.randint(1, 100000)), "wb") as f:
+            pickle.dump(self.get_spec, f)
+
+    def get_param(self) -> Params:
+        return self.params
