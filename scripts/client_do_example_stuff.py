@@ -7,7 +7,11 @@ from example_client import (
 def main():
     example_client_start()
 
-    do_example_stuff()
+    try:
+        do_example_stuff()
+    except RecursionError:
+        print("RecursionError: needs renaming to avoid the same function name")
+        pass
 
 
 if __name__ == "__main__":
