@@ -27,7 +27,7 @@ from example_shared import (
 
 
 # FIXME Maybe put this variable somewhere else?
-ENABLE_HTTP = True
+ENABLE_HTTP = False
 
 
 if ENABLE_HTTP:
