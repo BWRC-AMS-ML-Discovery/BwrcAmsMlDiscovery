@@ -1,7 +1,7 @@
 from os import path
 
 
-from .Parameters.parameters import Parameters
+from .parameters import Parameters
 
 
 # Get the path to this file
