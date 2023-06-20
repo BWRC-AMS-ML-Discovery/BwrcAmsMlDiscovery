@@ -62,7 +62,7 @@ class ParamManager:
     input and output and other mechanism inside RL script
     """
 
-    def input_spec(params: list, target: list, norm: list) -> CktInput:
+    def load_spec(params: list, target: list, norm: list) -> CktInput:
         """
         params: parameters range, n# of ranges with step sizes, n * 3 for each [min, max, step]
         target: ideal spec range, n# of ranges without step sizes, n * 2 for each [min, max]
@@ -74,26 +74,18 @@ class ParamManager:
         normalize_field_names = [f.name for f in fields(Normalize)]
 
         params_values = {
-            name: {
-                "min": param[0],
-                "max": param[1],
-                "step": param[2] if len(param) == 3 else None,
-            }
+            name: [param[0], param[1], param[2] if len(param) == 3 else None]
             for name, param in zip(params_field_names, params)
         }
 
         target_values = {
-            name: {
-                "min": param[0],
-                "max": param[1],
-            }
+            name: [param[0], param[1]]
             for name, param in zip(target_field_names, target)
         }
 
         normalize_values = {
             name: value for name, value in zip(normalize_field_names, norm)
         }
-
         ckt = CktInput(params_values, normalize_values, target_values)
 
         return ckt

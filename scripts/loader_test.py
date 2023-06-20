@@ -19,7 +19,7 @@ def main():
         [0.0001, 0.01],
     ]
 
-    print(ParamManager.input_spec(params, target, norm))
+    print(ParamManager.load_spec(params, target, norm))
 
 
 if __name__ == "__main__":
