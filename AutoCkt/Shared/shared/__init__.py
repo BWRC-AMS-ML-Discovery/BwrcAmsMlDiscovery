@@ -27,43 +27,33 @@ class Normalize(Spec):
 class Range:
     min: float | int
     max: float | int
-
-
-@dataclass
-class StepSize:
-    step: float | int
-
-
-@dataclass
-class ParamRange:
-    range: Range
-    step: Optional[StepSize]
+    step: Optional[float | int] = None
 
 
 @dataclass
 class Params:
-    mp1: ParamRange
-    mp3: ParamRange
-    mn1: ParamRange
-    mn3: ParamRange
-    mn4: ParamRange
-    mn5: ParamRange
-    cc: ParamRange
+    mp1: Range
+    mp3: Range
+    mn1: Range
+    mn3: Range
+    mn4: Range
+    mn5: Range
+    cc: Range
 
 
 @dataclass
 class TargetSpecs:
-    gain_min: ParamRange
-    ibias_max: ParamRange
-    phm_min: ParamRange
-    ugbw_min: ParamRange
+    gain_min: Range
+    ibias_max: Range
+    phm_min: Range
+    ugbw_min: Range
 
 
 @dataclass
 class CktInput:
-    params: Params
-    normalize: Normalize
-    target_specs: TargetSpecs
+    params: dict[str, Range]
+    normalize: dict[str, float]
+    target_specs: dict[str, Range]
 
 
 class ParamManager:
@@ -81,22 +71,29 @@ class ParamManager:
 
         params_field_names = [f.name for f in fields(Params)]
         target_field_names = [f.name for f in fields(TargetSpecs)]
+        normalize_field_names = [f.name for f in fields(Normalize)]
 
         params_values = {
-            name: ParamRange(
-                Range(param["range"][0], param["range"][1]),
-                StepSize(param["step"]) if "step" in param else 1,
-            )
+            name: {
+                "min": param[0],
+                "max": param[1],
+                "step": param[2] if len(param) == 3 else None,
+            }
             for name, param in zip(params_field_names, params)
         }
 
         target_values = {
-            name: ParamRange(Range(param["range"][0], param["range"][1]))
+            name: {
+                "min": param[0],
+                "max": param[1],
+            }
             for name, param in zip(target_field_names, target)
         }
 
-        ckt = CktInput(
-            Params(**params_values), Normalize(*norm), TargetSpecs(**target_values)
-        )
+        normalize_values = {
+            name: value for name, value in zip(normalize_field_names, norm)
+        }
+
+        ckt = CktInput(params_values, normalize_values, target_values)
 
         return ckt
