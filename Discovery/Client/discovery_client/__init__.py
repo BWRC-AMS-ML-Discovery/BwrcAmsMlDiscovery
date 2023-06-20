@@ -30,10 +30,13 @@ from pydantic.dataclasses import dataclass
 @dataclass
 class Config:
     """# Server Configuration"""
+
     server_url: str = "localhost:8000"
+
 
 # Create the module-scope configuration
 config = Config()
+
 
 def configure(cfg: Config) -> None:
     """Set the module-scope `Config`."""
@@ -43,12 +46,33 @@ def configure(cfg: Config) -> None:
 
 def client_start():
     """perform client start operations and sets up local client rpcs"""
-    #TODO: is there anything else to add here
+    # TODO: is there anything else to add here
     _setup_client_rpcs()
+
+
+"""
+#Client Config
+"""
+
+# put all client config variables in here
+options = {
+    "THE_SERVER_URL": THE_SERVER_URL,
+}
+
+
+def configure(**kwargs):
+    # searchs for corresponding key in optiions dict and updates if it exists
+    for key, value in kwargs.items():
+        if key in options:
+            options[key] = value
+        else:
+            print(f"ignoring unknown option: {key}")
+
 
 """
 # Built-In Endpoints
 """
+
 
 def alive() -> str:
     """Server aliveness check"""
@@ -92,5 +116,3 @@ def _setup_client_rpcs():
         f.__doc__ = rpc.docstring
         # Set it as the function for the RPC
         rpc.func = f
-
-

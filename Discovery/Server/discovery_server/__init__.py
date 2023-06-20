@@ -58,13 +58,19 @@ def configure(cfg: Config) -> None:
 
 
 """
-# Built-In Endpoints
+# Config and Server Start 
 """
+
 
 def start_server():
     """starts the server using the given config and sets up local rpcs"""
     _setup_server_rpcs()
     uvicorn.run(app, port=config.port, host=config.host)
+
+
+"""
+# Built-In Endpoints
+"""
 
 
 @app.get("/")
@@ -105,5 +111,3 @@ def _setup_server_rpcs():
         # And register it with the API server
         decorator = app.post(f"/{rpc.name}")
         decorator(f)
-
-
