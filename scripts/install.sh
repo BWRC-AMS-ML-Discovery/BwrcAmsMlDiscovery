@@ -6,4 +6,5 @@ pip install \
     -e ./Discovery/Client \
     -e ./Example/Shared \
     -e ./Example/Server \
-    -e ./Example/Client
+    -e ./Example/Client \
+    -e ./Auto
