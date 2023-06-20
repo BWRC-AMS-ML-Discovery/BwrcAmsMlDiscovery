@@ -7,7 +7,7 @@ from .parameters import Parameters
 # Get the path to this file
 file_path = path.dirname(path.abspath(__file__))
 # Get the path to the yaml file
-yaml_path = path.join(file_path, "test.yaml")
+yaml_path = path.join(file_path, "parameters_test.yaml")
 
 test_parameters_object = Parameters(yaml_path)
 
