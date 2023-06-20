@@ -25,17 +25,32 @@ from example_shared import (
     AutoCktOutput,
 )
 
+# The client library will create client stubs for all defined RPCs, including all those functions above.
+import discovery_client as dc
+
 
 # FIXME Maybe put this variable somewhere else?
 ENABLE_HTTP = True
-
-
-if ENABLE_HTTP:
-    # Importing the client library will create client stubs for all defined RPCs, including all those functions above.
-    import discovery_client as _
-else:
+if not ENABLE_HTTP:
+    dc.client_start = lambda: None
     # Short-circuiting by directly calling server functions
     import example_server as _
+
+
+def example_client_start():
+    """retrieve values from .env file then configure nad start the client"""
+
+    # Load the .env file
+    env = dotenv_values()
+
+    # And get the server URL
+    THE_SERVER_URL = env.get("THE_SERVER_URL", None)
+    if not THE_SERVER_URL:
+        raise ValueError("THE_SERVER_URL not set in .env file")
+
+    # set server_url
+    dc.configure(dc.Config(server_url=THE_SERVER_URL))
+    dc.client_start()
 
 
 """
