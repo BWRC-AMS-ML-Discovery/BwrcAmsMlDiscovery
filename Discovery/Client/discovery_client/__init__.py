@@ -65,7 +65,8 @@ Set up a client function for each defined `Rpc`.
 """
 
 
-def _setup_client_rpcs():   
+def _setup_client_rpcs():
+    # Import the list of RPCs
     from discovery_shared.rpc import rpcs
 
     # And set up a client function for each
