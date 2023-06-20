@@ -51,25 +51,6 @@ def client_start():
 
 
 """
-#Client Config
-"""
-
-# put all client config variables in here
-options = {
-    "THE_SERVER_URL": THE_SERVER_URL,
-}
-
-
-def configure(**kwargs):
-    # searchs for corresponding key in optiions dict and updates if it exists
-    for key, value in kwargs.items():
-        if key in options:
-            options[key] = value
-        else:
-            print(f"ignoring unknown option: {key}")
-
-
-"""
 # Built-In Endpoints
 """
 
