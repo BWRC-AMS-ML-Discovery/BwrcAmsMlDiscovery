@@ -1,10 +1,9 @@
 set -eo
 
 pip install \
-    -e ./Discovery/Shared \
-    -e ./Discovery/Server \
-    -e ./Discovery/Client \
-    -e ./Example/Shared \
-    -e ./Example/Server \
-    -e ./Example/Client \
-    -e ./Auto
+    -e ./Discovery/Shared[dev] \
+    -e ./Discovery/Server[dev] \
+    -e ./Discovery/Client[dev] \
+    -e ./Example/Shared[dev] \
+    -e ./Example/Server[dev] \
+    -e ./Example/Client[dev]
