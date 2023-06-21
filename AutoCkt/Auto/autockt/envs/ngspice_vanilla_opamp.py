@@ -114,7 +114,8 @@ class TwoStageAmp(gym.Env):
         self.cur_specs = self.update(self.cur_params_idx)
 
         # reward
-        reward = self.reward(self.cur_specs, self.specs_ideal)
+        # reward = self.reward(self.cur_specs, self.specs_ideal)
+        reward = self.optimize_reward(self.cur_specs)
 
         # applicable only when you have multiple goals, normalizes everything to some global_g
         self.specs_ideal_norm = self.lookup(self.specs_ideal, self.global_g)
@@ -136,7 +137,8 @@ class TwoStageAmp(gym.Env):
 
         # Get current specs and normalize
         self.cur_specs = self.update(self.cur_params_idx)
-        reward = self.reward(self.cur_specs, self.specs_ideal)
+        # reward = self.reward(self.cur_specs, self.specs_ideal)
+        reward = self.optimize_reward(self.cur_specs)
 
         # incentivize reaching goal state
         done = False
@@ -172,37 +174,39 @@ class TwoStageAmp(gym.Env):
         norm_spec = (spec - goal_spec) / (goal_spec + spec)
         return norm_spec
 
-    def reward(self, spec, goal_spec):
+    def reward(self, spec, reward, goal_spec):
         """
         Reward: doesn't penalize for overshooting spec, is negative
         """
         rel_specs = self.lookup(spec, goal_spec)
         pos_val = []
-        reward = 0.0
+        # reward.value = 0.0
         for i, rel_spec in enumerate(rel_specs):
             if self.specs_id[i] == "ibias_max":
                 rel_spec = rel_spec * -1.0  # /10.0
             if rel_spec < 0:
                 reward += rel_spec
-                pos_val.append(0)
-            else:
-                pos_val.append(1)
+            #     pos_val.append(0)
+            # else:
+            #     pos_val.append(1)
 
-        return reward if reward < -0.02 else 10
+        # return reward if reward < -0.02 else 10
+        return reward
 
-    def optimize_reward(self):
-        vars = cp.Variable()
+    def optimize_reward(self, cur_param):
+        reward = cp.Variable()
+        param = cp.Parameter(shape=cur_param.shape)
+        param.value = cur_param
         
-        reward = self.reward(vars, self.specs_ideal)
-        objective = cp.Maximize(reward)
+        res = self.reward(param, reward, self.specs_ideal)
+        objective = cp.Maximize(res)
 
         #put spec constraints
-        constraints = []
+        constraints = [reward<=10]
 
         problem = cp.Problem(objective, constraints)
         problem.solve()
-
-
+        return problem.value if problem.value < -0.02 else 10
 
 
     def update(self, params_idx):
