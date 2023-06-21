@@ -11,8 +11,6 @@ import os, pickle, random
 import numpy as np
 import gym
 from gym import spaces
-import yaml
-import yaml.constructor
 
 # Workspace Imports
 from .create_design_and_simulate_lib import create_design_and_simulate
@@ -21,6 +19,17 @@ from shared import *
 
 # FIXME Avoid storing files?
 SPECS_DIR = "/tmp/ckt_da_new/specs/"
+PARAMS_RANGE = [
+    [1, 100, 1],
+    [1, 100, 1],
+    [1, 100, 1],
+    [1, 100, 1],
+    [1, 100, 1],
+    [1, 100, 1],
+    [1, 100, 1],
+]
+NORM_CONSTANT = [350, 0.001, 60, 950000.0]
+TARGET_RANGE = [[200, 400], [1.0e6, 2.5e7], [60, 60.0000001], [0.0001, 0.01]]
 
 
 class TwoStageAmp(gym.Env):
@@ -32,7 +41,7 @@ class TwoStageAmp(gym.Env):
     PERF_HIGH = np.inf
 
     # obtains yaml file
-    CIR_YAML = SPECS_DIR + "in/two_stage_opamp.yaml"
+    # CIR_YAML = SPECS_DIR + "in/two_stage_opamp.yaml"
 
     def __init__(self, env_config):
         # Custom attributes (not from gym.Env)
@@ -191,21 +200,12 @@ class TwoStageAmp(gym.Env):
 
     def _load_specs(self):
         # assign parameter range
-        params = [
-            [1, 100, 1],
-            [1, 100, 1],
-            [1, 100, 1],
-            [1, 100, 1],
-            [1, 100, 1],
-            [1, 100, 1],
-            [1, 100, 1],
-        ]
-
+        params = PARAMS_RANGE
         # assign normalizing constants
-        norm = [350, 0.001, 60, 950000.0]
+        norm = NORM_CONSTANT
 
         # assign target spec range
-        target = [[200, 400], [1.0e6, 2.5e7], [60, 60.0000001], [0.0001, 0.01]]
+        target = TARGET_RANGE
 
         # input spec into manager
         self.pm.load_spec(params, target, norm)
@@ -226,7 +226,6 @@ class TwoStageAmp(gym.Env):
 
         # Get the g* (overall design spec) you want to reach
         # Only when generalize=False and multi-goal=False
-        print("Initial specs values:", list(self.specs.values()))
 
         self.global_g = []
         self.fixed_goal_idx = -1
