@@ -32,6 +32,7 @@ class Config:
     """# Server Configuration"""
 
     server_url: str = "localhost:8000"
+    enable_http: bool = True
 
 
 # Create the module-scope configuration
@@ -47,7 +48,8 @@ def configure(cfg: Config) -> None:
 def client_start():
     """perform client start operations and sets up local client rpcs"""
     # TODO: is there anything else to add here
-    _setup_client_rpcs()
+    if config.enable_http:
+        _setup_client_rpcs()
 
 
 """

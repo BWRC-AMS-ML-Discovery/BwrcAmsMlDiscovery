@@ -30,14 +30,13 @@ import discovery_client as dc
 
 
 # FIXME Maybe put this variable somewhere else?
-ENABLE_HTTP = True
-if not ENABLE_HTTP:
-    dc.client_start = lambda: None
-    # Short-circuiting by directly calling server functions
-    import example_server as _
+# ENABLE_HTTP = False
+# if not ENABLE_HTTP:
+#     #Short-circuiting by directly calling server functions
+# import example_server
 
 
-def example_client_start():
+def example_client_start(ENABLE_HTTP = True):
     """retrieve values from .env file then configure nad start the client"""
 
     # Load the .env file
@@ -47,9 +46,13 @@ def example_client_start():
     THE_SERVER_URL = env.get("THE_SERVER_URL", None)
     if not THE_SERVER_URL:
         raise ValueError("THE_SERVER_URL not set in .env file")
+    
+    # if not ENABLE_HTTP:
+    global example_server
+    example_server = __import__('example_server', globals(), locals())
 
     # set server_url
-    dc.configure(dc.Config(server_url=THE_SERVER_URL))
+    dc.configure(dc.Config(server_url=THE_SERVER_URL, enable_http=ENABLE_HTTP))
     dc.client_start()
 
 

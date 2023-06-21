@@ -17,7 +17,11 @@ import ray.tune as tune
 
 # Workspace Imports
 from autockt.envs.ngspice_vanilla_opamp import TwoStageAmp
+from example_client import(
+    example_client_start
+)
 
+example_client_start(ENABLE_HTTP=False)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--checkpoint_dir", "-cpd", type=str)
