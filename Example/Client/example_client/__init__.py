@@ -24,13 +24,19 @@ from example_shared import (
     AutoCktInput,
     AutoCktOutput,
 )
+from example_shared.auto_ckt_sim_lib import (
+    create_design,
+    simulate,
+    translate_result,
+)
+
 
 # The client library will create client stubs for all defined RPCs, including all those functions above.
 import discovery_client as dc
 
 
 # FIXME Maybe put this variable somewhere else?
-# ENABLE_HTTP = False
+# ENABLE_HTTP = True
 # if not ENABLE_HTTP:
 #     #Short-circuiting by directly calling server functions
 # import example_server
@@ -47,13 +53,15 @@ def example_client_start(ENABLE_HTTP = True):
     if not THE_SERVER_URL:
         raise ValueError("THE_SERVER_URL not set in .env file")
     
-    # if not ENABLE_HTTP:
-    global example_server
-    example_server = __import__('example_server', globals(), locals())
-
-    # set server_url
-    dc.configure(dc.Config(server_url=THE_SERVER_URL, enable_http=ENABLE_HTTP))
-    dc.client_start()
+    if not ENABLE_HTTP:
+        print("Loading example server")
+        global example_server
+        example_server = __import__('example_server', globals(), locals())
+    else:
+        # set server_url
+        print("loading discovery client")
+        dc.configure(dc.Config(server_url=THE_SERVER_URL, enable_http=ENABLE_HTTP))
+        dc.client_start()
 
 
 """
@@ -149,3 +157,17 @@ def local_inverter_beta_ratio(inp: InverterBetaRatioInput):
         trise=output / 2,
         tfall=output / 2,
     )
+
+def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
+    """
+    AutoCkt Simulation
+    """
+
+    design_folder, fpath = create_design(inp)
+
+    # Error return?
+    info = simulate(fpath)
+
+    specs = translate_result(design_folder)
+
+    return specs

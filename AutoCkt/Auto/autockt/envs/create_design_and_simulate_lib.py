@@ -1,7 +1,6 @@
 from example_shared import AutoCktInput, AutoCktOutput
 from example_client import auto_ckt_sim
 
-
 def ordered_dict_to_input(param_val):
     return AutoCktInput(
         mp1=param_val["mp1"],
@@ -21,7 +20,6 @@ def output_to_dict(out: AutoCktOutput) -> dict:
         "phm": out.phm,
         "ibias": out.ibias,
     }
-
 
 def create_design_and_simulate(param_val) -> dict:
     inp: AutoCktInput = ordered_dict_to_input(param_val)

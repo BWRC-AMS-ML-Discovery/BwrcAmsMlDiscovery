@@ -5,7 +5,7 @@ from example_client import (
 
 
 def main():
-    example_client_start()
+    example_client_start(ENABLE_HTTP=True)
     
     reinforcement_learning_env = {"steps": 5, "update": None}
 

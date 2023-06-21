@@ -28,7 +28,7 @@ from example_shared import (
     AutoCktInput,
     AutoCktOutput,
 )
-from .auto_ckt_sim_lib import (
+from example_shared.auto_ckt_sim_lib import (
     create_design,
     simulate,
     translate_result,
