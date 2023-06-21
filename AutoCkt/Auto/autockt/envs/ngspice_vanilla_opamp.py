@@ -8,6 +8,7 @@ from collections import OrderedDict
 
 # PyPi Imports
 import numpy as np
+import cvxpy as cp
 import gym
 from gym import spaces
 import yaml
@@ -189,6 +190,21 @@ class TwoStageAmp(gym.Env):
 
         return reward if reward < -0.02 else 10
 
+    def optimize_reward(self):
+        vars = cp.Variable()
+        
+        reward = self.reward(vars, self.specs_ideal)
+        objective = cp.Maximize(reward)
+
+        #put spec constraints
+        constraints = []
+
+        problem = cp.Problem(objective, constraints)
+        problem.solve()
+
+
+
+
     def update(self, params_idx):
         """
 
@@ -354,3 +370,4 @@ class TwoStageAmp(gym.Env):
             [0] * len(self.params_id),
             [(len(param_vec) - 1) for param_vec in self.params],
         )
+

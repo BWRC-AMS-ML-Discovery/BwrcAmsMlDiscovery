@@ -30,6 +30,7 @@ setup(
         ## FIXME: can we ease up on the version requirements?
         ## Maybe, but it's nice for intra-workspace consistency.
         "numpy==1.21.5",
+        "cvxpy==1.2",
         "scipy==1.10.1",
         "gym==0.23.1",  # Core ML dependency: OpenAI Gym
         "ray[rllib,tune]==2.0.0",  # Ray for RL, parallelization, training
