@@ -236,7 +236,7 @@ class TwoStageAmp(gym.Env):
         cur_specs = dict(
             sorted(
                 #
-                # !!! FIXME: this call here gotta get replaced!
+                # !!! Important replacement
                 #
                 create_design_and_simulate(param_val).items(),
                 key=lambda k: k[0],
