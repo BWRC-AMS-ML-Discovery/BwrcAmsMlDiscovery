@@ -1,5 +1,18 @@
 """
 # Discovery Server
+
+Example use case
+```python
+import discovery_server as ds 
+
+# ... 
+# Define all my RPCs etc
+# ... 
+
+ds.configure(ds.Config(port=8002, host="www.whatever.com")
+ds.start_server()
+
+```
 """
 
 # PyPi Imports
@@ -8,10 +21,6 @@ import uvicorn
 
 # Workspace Imports
 from discovery_shared.git import GitInfo
-
-
-# Needed to get server functions
-import example_server as _
 
 
 app = FastAPI(
@@ -27,15 +36,41 @@ app = FastAPI(
 from .mock import *
 from .user import *
 
+from pydantic.dataclasses import dataclass
+
+
+@dataclass
+class Config:
+    """# Server Configuration"""
+
+    port: int = 8000
+    host: str = "127.0.0.1"
+
+
+# Create the module-scope configuration
+config = Config()
+
+
+def configure(cfg: Config) -> None:
+    """Set the module-scope `Config`."""
+    global config
+    config = cfg
+
+
+"""
+# Config and Server Start 
+"""
+
+
+def start_server():
+    """starts the server using the given config and sets up local rpcs"""
+    _setup_server_rpcs()
+    uvicorn.run(app, port=config.port, host=config.host)
+
 
 """
 # Built-In Endpoints
 """
-
-
-# FIXME Should use environment variables
-def start_server():
-    uvicorn.run(app, port=8002, host="127.0.0.1")
 
 
 @app.get("/")
@@ -76,6 +111,3 @@ def _setup_server_rpcs():
         # And register it with the API server
         decorator = app.post(f"/{rpc.name}")
         decorator(f)
-
-
-_setup_server_rpcs()
