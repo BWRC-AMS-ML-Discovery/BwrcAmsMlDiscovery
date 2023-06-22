@@ -15,26 +15,13 @@ from gym import spaces
 # Workspace Imports
 from .create_design_and_simulate_lib import create_design_and_simulate
 from shared import *
-
+from eval_engines import PARAMS_RANGE, NORM_CONSTANT, TARGET_RANGE
 
 # FIXME Avoid storing files?
 SPECS_DIR = "/tmp/ckt_da_new/specs/"
-PARAMS_RANGE = [
-    ["mp1", [1, 100, 1]],
-    ["mp3", [1, 100, 1]],
-    ["mn1", [1, 100, 1]],
-    ["mn3", [1, 100, 1]],
-    ["mn4", [1, 100, 1]],
-    ["mn5", [1, 100, 1]],
-    ["cc", [1, 100, 1]],
-]
-NORM_CONSTANT = [["gain", 350], ["ibias", 0.001], ["phm", 60], ["ugbw", 950000.0]]
-TARGET_RANGE = [
-    ["gain_min", [200, 400]],
-    ["ibias_max", [1.0e6, 2.5e7]],
-    ["phm_min", [60, 60.0000001]],
-    ["ugbw_min", [0.0001, 0.01]],
-]
+PARAMS_RANGE = PARAMS_RANGE
+NORM_CONSTANT = NORM_CONSTANT
+TARGET_RANGE = TARGET_RANGE
 
 
 class ParamManager:
@@ -264,7 +251,6 @@ class TwoStageAmp(gym.Env):
         params = PARAMS_RANGE
         # assign normalizing constants
         norm = NORM_CONSTANT
-
         # assign target spec range
         target = TARGET_RANGE
 
