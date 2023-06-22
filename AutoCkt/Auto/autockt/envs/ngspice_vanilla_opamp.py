@@ -20,16 +20,77 @@ from shared import *
 # FIXME Avoid storing files?
 SPECS_DIR = "/tmp/ckt_da_new/specs/"
 PARAMS_RANGE = [
-    [1, 100, 1],
-    [1, 100, 1],
-    [1, 100, 1],
-    [1, 100, 1],
-    [1, 100, 1],
-    [1, 100, 1],
-    [1, 100, 1],
+    ["mp1", [1, 100, 1]],
+    ["mp3", [1, 100, 1]],
+    ["mn1", [1, 100, 1]],
+    ["mn3", [1, 100, 1]],
+    ["mn4", [1, 100, 1]],
+    ["mn5", [1, 100, 1]],
+    ["cc", [1, 100, 1]],
 ]
-NORM_CONSTANT = [350, 0.001, 60, 950000.0]
-TARGET_RANGE = [[200, 400], [1.0e6, 2.5e7], [60, 60.0000001], [0.0001, 0.01]]
+NORM_CONSTANT = [["gain", 350], ["ibias", 0.001], ["phm", 60], ["ugbw", 950000.0]]
+TARGET_RANGE = [
+    ["gain_min", [200, 400]],
+    ["ibias_max", [1.0e6, 2.5e7]],
+    ["phm_min", [60, 60.0000001]],
+    ["ugbw_min", [0.0001, 0.01]],
+]
+
+
+class ParamManager:
+    """
+    A Processor for Managing Parameters handling
+    input and output and other mechanism inside RL script
+    """
+
+    def __init__(self):
+        self.spec = None
+        self.params = None
+        self.norm = None
+
+    def load_spec(self, params: list, target: list, norm: list) -> CktInput:
+        """
+        params: parameters range, n# of ranges with step sizes, n * 3 for each [min, max, step]
+        target: ideal spec range, n# of ranges without step sizes, n * 2 for each [min, max]
+        norm: normalizing constants, 4# of constraints
+        """
+        params_values = {
+            param[0]: Range(param[1][0], param[1][1], param[1][2]) for param in params
+        }
+        target_values = {
+            target_[0]: Range(target_[1][0], target_[1][1]) for target_ in target
+        }
+
+        normalize_values = {norm_[0]: norm_[1] for norm_ in norm}
+
+        ckt = CktInput(
+            Params(params_values),
+            Normalize(normalize_values),
+            TargetSpecs(target_values),
+        )
+
+        self.params = Params(params_values)
+        self.spec = TargetSpecs(target_values)
+        self.norm = Normalize(normalize_values)
+        return ckt
+
+    def get_spec(self) -> Spec:
+        """
+        return the spec for initial setup
+        """
+        return self.spec
+
+    def get_param(self) -> Params:
+        """
+        return the parameters passed in for initial setup
+        """
+        return self.params
+
+    def get_norm(self) -> Spec:
+        """
+        return the normalizing constants passed in for initial setup
+        """
+        return self.norm
 
 
 class TwoStageAmp(gym.Env):
@@ -177,7 +238,7 @@ class TwoStageAmp(gym.Env):
 
         # [34, 34, 34, 34, 34, 15, 2.1e-12]
         params = [
-            getattr(self.params, param_id).get_value_at_index(params_idx[i])
+            self.params.ranges[param_id].get_value_at_index(params_idx[i])
             for i, param_id in enumerate(self.params_id)
         ]
 
@@ -216,26 +277,34 @@ class TwoStageAmp(gym.Env):
         self.specs_ideal = []
 
         # ['gain_min', 'ibias_max', 'phm_min', 'ugbw_min']
-        self.specs_id = list(self.specs.keys())
+        self.specs_id = list(self.specs.ranges.keys())
 
         # ['mp1', 'mn1', 'mp3', 'mn3', 'mn4', 'mn5', 'cc']
-        self.params_id = list(self.params.keys())
+        self.params_id = list(self.params.ranges.keys())
 
         # num_specs (originally 350)
-        self.num_os = len(list(self.specs.values())[0])
+        self.num_os = len(list(self.specs.ranges.values())[0])
 
         # Get the g* (overall design spec) you want to reach
         # Only when generalize=False and multi-goal=False
 
+        # self.global_g = []
+        # self.fixed_goal_idx = -1
+        # for spec in list(self.specs.ranges.values()):
+        #     self.global_g.append(float(spec.get_value_at_index(self.fixed_goal_idx)))
+
+        # self.g_star = np.array(self.global_g)
+
+        # # used for normalization
+        # self.global_g = np.array(self.pm.get_norm().constants.values())
         self.global_g = []
         self.fixed_goal_idx = -1
-        for spec in list(self.specs.values()):
+        for spec in list(self.specs.ranges.values()):
             self.global_g.append(float(spec.get_value_at_index(self.fixed_goal_idx)))
 
         self.g_star = np.array(self.global_g)
 
-        # used for normalization
-        self.global_g = np.array(self.pm.get_norm().values())
+        self.global_g = np.array(list(self.pm.get_norm().constants.values()))
 
     def _save_specs(self):
         if self.specs_save:
@@ -274,7 +343,7 @@ class TwoStageAmp(gym.Env):
             else:
                 idx = random.randint(0, self.num_os - 1)
             self.specs_ideal = []
-            for spec in list(self.specs.values()):
+            for spec in list(self.specs.ranges.values()):
                 self.specs_ideal.append(spec.get_value_at_index(idx))
             self.specs_ideal = np.array(self.specs_ideal)
         else:
@@ -283,7 +352,7 @@ class TwoStageAmp(gym.Env):
             else:
                 idx = random.randint(0, self.num_os - 1)
                 self.specs_ideal = []
-                for spec in list(self.specs.values()):
+                for spec in list(self.specs.ranges.values()):
                     self.specs_ideal.append(spec[idx])
                 self.specs_ideal = np.array(self.specs_ideal)
 
