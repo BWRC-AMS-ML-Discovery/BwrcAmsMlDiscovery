@@ -12,6 +12,7 @@
     "fritchman",
     "hexsha",
     "httpx",
+    "ibias",
     "NGSPICE",
     "Nmos",
     "npar",
@@ -22,6 +23,7 @@
     "rpcs",
     "tfall",
     "trise",
+    "ugbw",
     "Vlsir",
     "vlsirtools"
   ]
