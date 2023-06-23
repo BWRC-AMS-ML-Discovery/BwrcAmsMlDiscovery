@@ -1,5 +1,5 @@
 from example_shared import AutoCktInput, AutoCktOutput
-from example_client import auto_ckt_sim
+from example_client import auto_ckt_sim, reward
 
 
 def ordered_dict_to_input(param_val):
@@ -28,3 +28,4 @@ def create_design_and_simulate(param_val) -> dict:
     out: AutoCktOutput = auto_ckt_sim(inp)
     result: dict = output_to_dict(out)
     return result
+

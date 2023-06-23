@@ -6,7 +6,7 @@ Shared code
 # Std-Lib Imports
 from typing import Optional, Union
 from collections import OrderedDict
-from typing import List
+from typing import List, Callable, Type
 
 # Workspace Imports
 from dataclasses import dataclass, fields
@@ -76,4 +76,21 @@ class CktInput:
     params: Params
     normalize: Normalize
     target_specs: TargetSpecs
+
+@dataclass
+class CktOutput:
+    spec: Spec
+
+@dataclass
+class CircuitOptimization:
+    # auto_input: CktInput
+
+    ckt_input_type: Type
+    ckt_output_type: Type
+
+    reward_fnc: Callable[..., float]
+
+    def __call__(self, *args, **kwargs):
+        #some convertion operation to go from what the ml model has to the client reward function's expected input
+        return self.reward_fnc(*args, **kwargs)
 

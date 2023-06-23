@@ -27,10 +27,11 @@ from example_shared import (
 
 # The client library will create client stubs for all defined RPCs, including all those functions above.
 import discovery_client as dc
+from eval_engines import config
 
 
 # FIXME Maybe put this variable somewhere else?
-ENABLE_HTTP = True
+ENABLE_HTTP = False
 if not ENABLE_HTTP:
     dc.client_start = lambda: None
     # Short-circuiting by directly calling server functions
@@ -51,6 +52,8 @@ def example_client_start():
     # set server_url
     dc.configure(dc.Config(server_url=THE_SERVER_URL))
     dc.client_start()
+
+    #configure reward func
 
 
 """
@@ -146,3 +149,33 @@ def local_inverter_beta_ratio(inp: InverterBetaRatioInput):
         trise=output / 2,
         tfall=output / 2,
     )
+
+#some reward func
+def lookup(spec, goal_spec):
+        """
+        Normalizes (so-called) spec to goal_spec
+        """
+        goal_spec = [float(e) for e in goal_spec]
+        norm_spec = (spec - goal_spec) / (goal_spec + spec)
+        return norm_spec
+
+#gotta make this more generic
+def reward(spec, specs_id, goal_spec):
+    """
+    Reward: doesn't penalize for overshooting spec, is negative
+    """
+    rel_specs = lookup(spec, goal_spec)
+    pos_val = []
+    reward = 0.0
+    for i, rel_spec in enumerate(rel_specs):
+        if specs_id[i] == "ibias_max":
+            rel_spec = rel_spec * -1.0  # /10.0
+        if rel_spec < 0:
+            reward += rel_spec
+            pos_val.append(0)
+        else:
+            pos_val.append(1)
+
+    return reward if reward < -0.02 else 10
+
+config.create_circuit_optimization(AutoCktInput, AutoCktOutput, reward)
