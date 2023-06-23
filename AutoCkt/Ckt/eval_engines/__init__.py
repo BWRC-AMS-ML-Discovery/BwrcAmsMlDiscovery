@@ -31,6 +31,7 @@ class EvalEnginesConfig:
             ["ugbw_min", [0.0001, 0.01]],
         ]
 
+        #add a default circuit_opt method
         self.CIRCUIT_OPT = None
 
     def get_params_range(self):

@@ -85,12 +85,16 @@ class CktOutput:
 class CircuitOptimization:
     # auto_input: CktInput
 
+    #clients expected input and output for the reward function
     ckt_input_type: Type
     ckt_output_type: Type
 
+    #reward function to be used by RL model
     reward_fnc: Callable[..., float]
 
     def __call__(self, *args, **kwargs):
         #some convertion operation to go from what the ml model has to the client reward function's expected input
+        
+
         return self.reward_fnc(*args, **kwargs)
 
