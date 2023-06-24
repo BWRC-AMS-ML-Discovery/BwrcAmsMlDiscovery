@@ -11,5 +11,4 @@ class AutoCktGym(gym.Env):
     }
 
     def __init__(self, env_config: AutoCktGymEnvConfig):
-        # Custom attributes (not from gym.Env)
         pass
