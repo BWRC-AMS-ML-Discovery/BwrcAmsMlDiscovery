@@ -9,6 +9,11 @@ from shared.autockt_gym_env_config import (
     AutoCktSpec,
 )
 
+from example_client import (
+    AutoCktInput,
+    AutoCktOutput,
+)
+
 
 def main():
     circuit_optimization = AutoCktCircuitOptimization(
@@ -31,6 +36,9 @@ def main():
                 AutoCktSpec("ugbw", 0.0001, 0.01, 950000.0),
             ]
         ),
+        input_type=AutoCktInput,
+        output_type=AutoCktOutput,
+        reward=None,  # FIXME
     )
 
     gym_env_config = AutoCktGymEnvConfig(
