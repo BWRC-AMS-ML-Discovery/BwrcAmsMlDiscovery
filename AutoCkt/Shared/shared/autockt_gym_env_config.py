@@ -23,7 +23,13 @@ class AutoCktParam:
 
 @dataclass
 class AutoCktParams:
-    params: dict[str, AutoCktParam]
+    """
+    Why not define a dataclass when we want to use different parameters?
+    Because it might just be too tedious when we simply want to control
+    which parameters to vary.
+    """
+
+    params: list[AutoCktParam]
 
 
 @dataclass
@@ -35,7 +41,13 @@ class AutoCktSpec:
 
 @dataclass
 class AutoCktSpecs:
-    specs: dict[str, AutoCktSpec]
+    """
+    Why not define a dataclass when we want to achieve different specs?
+    Because it might just be too tedious when we simply want to control
+    which specs to achieve.
+    """
+
+    specs: list[AutoCktSpec]
 
 
 @dataclass
