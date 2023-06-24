@@ -28,12 +28,12 @@ def main():
                 AutoCktParam("cc", (0.1e-12, 10.0e-12), step=0.1e-12, init=2.1e-12),
             ]
         ),
-        specs=AutoCktSpecs(  # FIXME Numbers ain't right
+        specs=AutoCktSpecs(  # FIXME Numbers right?
             [
                 AutoCktSpec("gain", (200, 400), 350),
-                AutoCktSpec("ibias", (1.0e6, 2.5e7), 1.0e7),
+                AutoCktSpec("ugbw", (1.0e6, 2.5e7), 9.5e5),
                 AutoCktSpec("phm", (60, 60.0000001), 60),
-                AutoCktSpec("ugbw", (0.0001, 0.01), 950000.0),
+                AutoCktSpec("ibias", (0.0001, 0.01), 0.001),
             ]
         ),
         input_type=AutoCktInput,
