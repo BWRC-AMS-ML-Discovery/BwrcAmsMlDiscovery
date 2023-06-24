@@ -63,4 +63,6 @@ class AutoCktCircuitOptimization:
 @dataclass
 class AutoCktGymEnvConfig:
     circuit_optimization: AutoCktCircuitOptimization
-    actions_per_param: list
+    actions_per_param: list[
+        int  # TODO Here, int is number of steps. Can be more general.
+    ]

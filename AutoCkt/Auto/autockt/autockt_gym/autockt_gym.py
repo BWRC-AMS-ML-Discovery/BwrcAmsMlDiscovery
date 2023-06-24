@@ -21,6 +21,7 @@ class AutoCktGym(gym.Env):
         match env_config:
             case AutoCktGymEnvConfig(
                 circuit_optimization=circuit_optimization,
+                actions_per_param=actions_per_param,
             ):
                 match circuit_optimization:
                     case AutoCktCircuitOptimization(
@@ -33,7 +34,7 @@ class AutoCktGym(gym.Env):
                         pass
 
         # Necessary for the gym.Env API
-        self._build_action_space(params)
+        self._build_action_space(params, actions_per_param)
         self._build_observation_space(params, specs)
 
     def reset(self):
@@ -42,12 +43,28 @@ class AutoCktGym(gym.Env):
     def step(self, action):
         pass
 
-    def _build_action_space(self, params: AutoCktParams):
+    def _build_action_space(
+        self,
+        params: AutoCktParams,
+        actions_per_param: list[int],
+    ):
+        # TODO We can generalize actions
+        num_actions_per_param = len(actions_per_param)
+
         self.action_space = spaces.Dict(
-            {param.name: spaces.Discrete(3) for param in params}
+            {
+                param.name: spaces.Discrete(
+                    num_actions_per_param,
+                )
+                for param in params
+            }
         )
 
-    def _build_observation_space(self, params: AutoCktParams, specs: AutoCktSpecs):
+    def _build_observation_space(
+        self,
+        params: AutoCktParams,
+        specs: AutoCktSpecs,
+    ):
         # TODO We can observe more things
         num_fields = sum(
             len(params),  # Current params in this step
