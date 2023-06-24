@@ -51,7 +51,7 @@ class AutoCktSpecs:
 
 
 @dataclass
-class AutoCktGymEnvConfig:
+class AutoCktCircuitOptimization:
     params: AutoCktParams
     specs: AutoCktSpecs
     input_type: type
@@ -63,3 +63,8 @@ class AutoCktGymEnvConfig:
         # https://spinningup.openai.com/en/latest/spinningup/rl_intro.html#reward-and-return
         float,
     ]
+
+
+@dataclass
+class AutoCktGymEnvConfig:
+    circuit_optimization: AutoCktCircuitOptimization
