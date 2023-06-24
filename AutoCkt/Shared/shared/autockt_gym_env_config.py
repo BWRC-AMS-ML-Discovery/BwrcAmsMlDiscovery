@@ -21,7 +21,7 @@ class AutoCktParam:
     step: Number
 
 
-AutoCktParams: list[AutoCktParam]
+AutoCktParams = list[AutoCktParam]
 """
 Why not define a dataclass when we want to use different parameters?
 Because it might just be too tedious to create a new dataclass
@@ -36,7 +36,7 @@ class AutoCktSpec:
     normalize: Number
 
 
-AutoCktSpecs: list[AutoCktSpec]
+AutoCktSpecs = list[AutoCktSpec]
 """
 Why not define a dataclass when we want to achieve different specs?
 Because it might just be too tedious to create a new dataclass
