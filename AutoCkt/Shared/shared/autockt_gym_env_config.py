@@ -19,6 +19,7 @@ class AutoCktParam:
     name: str
     range: Range
     step: Number
+    init: Number
 
 
 AutoCktParams = list[AutoCktParam]
@@ -62,3 +63,4 @@ class AutoCktCircuitOptimization:
 @dataclass
 class AutoCktGymEnvConfig:
     circuit_optimization: AutoCktCircuitOptimization
+    actions_per_param: list
