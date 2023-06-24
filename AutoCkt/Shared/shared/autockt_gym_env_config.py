@@ -21,15 +21,12 @@ class AutoCktParam:
     step: Number
 
 
-@dataclass
-class AutoCktParams:
-    """
-    Why not define a dataclass when we want to use different parameters?
-    Because it might just be too tedious when we simply want to control
-    which parameters to vary.
-    """
-
-    params: list[AutoCktParam]
+AutoCktParams: list[AutoCktParam]
+"""
+Why not define a dataclass when we want to use different parameters?
+Because it might just be too tedious to create a new dataclass
+when we simply want to control which parameters to vary.
+"""
 
 
 @dataclass
@@ -39,15 +36,12 @@ class AutoCktSpec:
     normalize: Number
 
 
-@dataclass
-class AutoCktSpecs:
-    """
-    Why not define a dataclass when we want to achieve different specs?
-    Because it might just be too tedious when we simply want to control
-    which specs to achieve.
-    """
-
-    specs: list[AutoCktSpec]
+AutoCktSpecs: list[AutoCktSpec]
+"""
+Why not define a dataclass when we want to achieve different specs?
+Because it might just be too tedious to create a new dataclass
+when we simply want to control which specs to achieve.
+"""
 
 
 @dataclass
