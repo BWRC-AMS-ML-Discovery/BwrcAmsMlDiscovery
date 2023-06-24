@@ -30,10 +30,10 @@ def main():
         ),
         specs=AutoCktSpecs(  # FIXME Numbers ain't right
             [
-                AutoCktSpec("gain", 200, 400, 350),
-                AutoCktSpec("ibias", 1.0e6, 2.5e7, 1.0e7),
-                AutoCktSpec("phm", 60, 60.0000001, 60),
-                AutoCktSpec("ugbw", 0.0001, 0.01, 950000.0),
+                AutoCktSpec("gain", (200, 400), 350),
+                AutoCktSpec("ibias", (1.0e6, 2.5e7), 1.0e7),
+                AutoCktSpec("phm", (60, 60.0000001), 60),
+                AutoCktSpec("ugbw", (0.0001, 0.01), 950000.0),
             ]
         ),
         input_type=AutoCktInput,
