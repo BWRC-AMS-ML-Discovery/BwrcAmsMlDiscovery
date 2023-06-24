@@ -15,25 +15,31 @@ class Range:
 
 
 @dataclass
-class Param:
+class AutoCktParam:
     name: str
     range: Range
 
 
 @dataclass
-class Params:
+class AutoCktParams:
     pass
 
 
 @dataclass
-class Specs:
+class AutoCktSpec:
+    name: str
+    range: Range
+
+
+@dataclass
+class AutoCktSpecs:
     pass
 
 
 @dataclass
 class AutoCktGymEnvConfig:
-    params: Params
-    specs: Specs
+    params: AutoCktParams
+    specs: AutoCktSpecs
     input_type: type
     output_type: type
-    reward: Callable[[], float]
+    reward: Callable[[TODO], float]
