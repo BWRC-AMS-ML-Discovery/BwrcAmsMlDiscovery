@@ -22,7 +22,7 @@ class AutoCktParam:
 
 @dataclass
 class AutoCktParams:
-    pass
+    params: dict[str, AutoCktParam]
 
 
 @dataclass
@@ -33,7 +33,7 @@ class AutoCktSpec:
 
 @dataclass
 class AutoCktSpecs:
-    pass
+    specs: dict[str, AutoCktSpec]
 
 
 @dataclass
