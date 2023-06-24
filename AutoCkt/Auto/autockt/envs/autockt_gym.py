@@ -36,9 +36,15 @@ class AutoCktGym(gym.Env):
         self._build_action_space(params)
         self._build_observation_space(params, specs)
 
+    def reset(self):
+        pass
+
+    def step(self, action):
+        pass
+
     def _build_action_space(self, params: AutoCktParams):
         self.action_space = spaces.Dict(
-            {param: spaces.Discrete(3) for param in params.params}
+            {param.name: spaces.Discrete(3) for param in params}
         )
 
     def _build_observation_space(self, params: AutoCktParams, specs: AutoCktSpecs):
