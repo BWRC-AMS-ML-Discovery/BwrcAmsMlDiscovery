@@ -1,29 +1,46 @@
-from autockt import AutoCktTrainer, derive_action_space
+from autockt import AutoCktTrainer
 
-# eval_engines will be renamed to something like
-from eval_engines import (
-    ExampleOpAmpParams,
-    ExampleOpAmpSpecs,
-    # ExampleOpAmpActionSpace, # Suppose we want to derive this
-    ExampleOpAmpObservationSpace,
-    ExampleOpAmpReward,
+from shared.autockt_gym_env_config import (
+    AutoCktCircuitOptimization,
+    AutoCktGymEnvConfig,
+    AutoCktParams,
+    AutoCktParam,
+    AutoCktSpecs,
+    AutoCktSpec,
 )
 
 
 def main():
-    # Create the trainer
-    trainer = AutoCktTrainer()
-
-    # Train the model
-    agent = trainer.train(
-        params=ExampleOpAmpParams,
-        specs=ExampleOpAmpSpecs,
-        action_space=derive_action_space(ExampleOpAmpParams),  # Derive the action space
-        observation_space=ExampleOpAmpObservationSpace,
-        reward=ExampleOpAmpReward,
+    circuit_optimization = AutoCktCircuitOptimization(
+        params=AutoCktParams(
+            [
+                AutoCktParam("mp1", (1, 100), 1),
+                AutoCktParam("mn1", (1, 100), 1),
+                AutoCktParam("mp3", (1, 100), 1),
+                AutoCktParam("mn3", (1, 100), 1),
+                AutoCktParam("mn4", (1, 100), 1),
+                AutoCktParam("mn5", (1, 100), 1),
+                AutoCktParam("cc", (0.1e-12, 10.0e-12), 0.1e-12),
+            ]
+        ),
+        specs=AutoCktSpecs(  # FIXME Numbers ain't right
+            [
+                AutoCktSpec("gain", 200, 400, 350),
+                AutoCktSpec("ibias", 1.0e6, 2.5e7, 1.0e7),
+                AutoCktSpec("phm", 60, 60.0000001, 60),
+                AutoCktSpec("ugbw", 0.0001, 0.01, 950000.0),
+            ]
+        ),
     )
 
-    # Save the model
+    gym_env_config = AutoCktGymEnvConfig(
+        circuit_optimization=circuit_optimization,
+    )
+
+    trainer = AutoCktTrainer()
+
+    agent = trainer.train(gym_env_config)
+
     agent.save()
 
 
