@@ -19,13 +19,13 @@ def main():
     circuit_optimization = AutoCktCircuitOptimization(
         params=AutoCktParams(
             [
-                AutoCktParam("mp1", (1, 100), 1),
-                AutoCktParam("mn1", (1, 100), 1),
-                AutoCktParam("mp3", (1, 100), 1),
-                AutoCktParam("mn3", (1, 100), 1),
-                AutoCktParam("mn4", (1, 100), 1),
-                AutoCktParam("mn5", (1, 100), 1),
-                AutoCktParam("cc", (0.1e-12, 10.0e-12), 0.1e-12),
+                AutoCktParam("mp1", (1, 100), step=1, init=34),
+                AutoCktParam("mn1", (1, 100), step=1, init=34),
+                AutoCktParam("mp3", (1, 100), step=1, init=34),
+                AutoCktParam("mn3", (1, 100), step=1, init=34),
+                AutoCktParam("mn4", (1, 100), step=1, init=34),
+                AutoCktParam("mn5", (1, 100), step=1, init=15),
+                AutoCktParam("cc", (0.1e-12, 10.0e-12), step=0.1e-12, init=2.1e-12),
             ]
         ),
         specs=AutoCktSpecs(  # FIXME Numbers ain't right
