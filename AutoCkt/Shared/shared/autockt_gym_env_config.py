@@ -18,6 +18,7 @@ class Range:
 class AutoCktParam:
     name: str
     range: Range
+    step: Number
 
 
 @dataclass
@@ -29,6 +30,7 @@ class AutoCktParams:
 class AutoCktSpec:
     name: str
     range: Range
+    normalize: Number
 
 
 @dataclass
