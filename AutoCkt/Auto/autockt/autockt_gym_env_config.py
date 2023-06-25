@@ -1,5 +1,6 @@
 # Stdlib imports
 from typing import Callable, Generic, TypeVar
+from dataclasses import asdict
 
 # PyPI imports
 from pydantic.dataclasses import dataclass
@@ -66,3 +67,9 @@ class AutoCktGymEnvConfig:
     actions_per_param: list[
         int  # TODO Here, int is number of steps. Can be more general.
     ]
+
+    def __iter__(self):
+        """
+        FIXME Needs to be iterable, required by ray
+        """
+        yield from asdict(self).items()
