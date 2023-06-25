@@ -4,7 +4,6 @@ A new ckt environment based on a new structure of MDP
 
 # Std-Lib Imports
 import os, pickle, random
-from dataclasses import fields
 
 # from collections import OrderedDict
 
@@ -15,7 +14,7 @@ from gym import spaces
 
 # Workspace Imports
 from .create_design_and_simulate_lib import create_design_and_simulate
-from shared import Range, CktInput, Params, Normalize, TargetSpecs, Spec
+from shared import *
 from eval_engines import PARAMS_RANGE, NORM_CONSTANT, TARGET_RANGE
 
 # FIXME Avoid storing files?
