@@ -4,8 +4,8 @@ from typing import Callable, Generic, TypeVar
 # PyPI imports
 from pydantic.dataclasses import dataclass
 
-
-Number = int | float
+# Local imports
+from shared.typing import Number
 
 
 @dataclass
