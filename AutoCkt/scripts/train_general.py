@@ -8,8 +8,11 @@ if __name__ != "__main__":
     raise Exception("This is a SCRIPT and should be run as __main__!")
 
 
-from autockt.trainer import AutoCktTrainer
+# PyPI Imports
+from ray import tune
+from ray.tune.experiment import Experiment
 
+# Local Imports
 from autockt.autockt_gym_env_config import (
     AutoCktCircuitOptimization,
     AutoCktGymEnvConfig,
@@ -18,7 +21,6 @@ from autockt.autockt_gym_env_config import (
     AutoCktSpecs,
     AutoCktSpec,
 )
-
 from example_client import (
     AutoCktInput,
     AutoCktOutput,
@@ -56,7 +58,10 @@ def main():
         actions_per_param=[-1, 0, 2],
     )
 
-    trainer = AutoCktTrainer()
+    trainer = Experiment(
+        name="train_45nm_ngspice",
+        # FIXME what goes here?
+    )
 
     agent = trainer.train(gym_env_config)
 
