@@ -7,7 +7,7 @@ from autockt.autockt_gym_env_config import AutoCktGymEnvConfig
 
 
 def autockt_train(
-    name: str,
+    experiment_name: str,
     gym_env_config: AutoCktGymEnvConfig,
 ):
     """
@@ -44,5 +44,5 @@ def autockt_train(
     }
 
     tune.run_experiments(
-        {name: config_experiment},
+        {experiment_name: config_experiment},
     )
