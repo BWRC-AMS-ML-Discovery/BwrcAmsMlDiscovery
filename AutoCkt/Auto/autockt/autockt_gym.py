@@ -41,10 +41,10 @@ class AutoCktGym(gym.Env):
         self._build_observation_space(params, specs)
 
     def reset(self):
-        pass
+        raise NotImplementedError
 
     def step(self, action):
-        pass
+        raise NotImplementedError
 
     def _build_action_space(
         self,
