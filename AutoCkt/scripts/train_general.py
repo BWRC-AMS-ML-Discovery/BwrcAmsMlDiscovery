@@ -1,4 +1,4 @@
-from autockt import AutoCktTrainer
+from autockt.trainer import AutoCktTrainer
 
 from shared.autockt_gym_env_config import (
     AutoCktCircuitOptimization,
