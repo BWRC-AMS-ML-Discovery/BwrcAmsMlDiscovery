@@ -13,7 +13,7 @@ class AutoCktTrainer:
     figure out how to properly use ray and gym.
     """
 
-    def train(gym_env_config: AutoCktGymEnvConfig):
+    def train(name: str, gym_env_config: AutoCktGymEnvConfig):
         # configures training of the agent with associated hyperparameters
         # See Ray documentation for details on each parameter
         config_train = {
@@ -29,10 +29,7 @@ class AutoCktTrainer:
                 "fcnet_hiddens": [64, 64],
             },
             "num_workers": 1,
-            "env_config": {  # a kwarg to the env constructor
-                "generalize": True,
-                "run_valid": False,
-            },
+            "env_config": gym_env_config,  # a kwarg to the env constructor
             # "disable_env_checking": True,
         }
 
@@ -41,29 +38,7 @@ class AutoCktTrainer:
             "config": config_train,
             "run": "PPO",
             "checkpoint_freq": 1,
+            "stop": {"episode_reward_mean": -0.02},
         }
 
-        # Ray training starts
-        ray.init()
-
-        # Runs training and saves the result in ~/ray_results/train_ngspice_45nm
-        # If checkpoint fails for any reason, training can be restored
-        if not args.checkpoint_dir:
-            tune.run_experiments(
-                {
-                    "train_45nm_ngspice": {
-                        **config_experiment,
-                        "stop": {"episode_reward_mean": -0.02},
-                    }
-                }
-            )
-        else:
-            print("RESTORING NOW!!!!!!")
-            tune.run_experiments(
-                {
-                    "restore_ppo": {
-                        **config_experiment,
-                        "restore": args.checkpoint_dir,
-                    }
-                }
-            )
+        tune.run_experiments({name: config_experiment})
