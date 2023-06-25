@@ -1,4 +1,4 @@
-from shared.autockt_gym_env_config import AutoCktGymEnvConfig
+from autockt.autockt_gym_env_config import AutoCktGymEnvConfig
 
 
 class AutoCktTrainer:

@@ -10,7 +10,7 @@ if __name__ != "__main__":
 
 from autockt.trainer import AutoCktTrainer
 
-from shared.autockt_gym_env_config import (
+from autockt.autockt_gym_env_config import (
     AutoCktCircuitOptimization,
     AutoCktGymEnvConfig,
     AutoCktParams,
