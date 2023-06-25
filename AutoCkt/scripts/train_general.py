@@ -53,6 +53,7 @@ def main():
 
     gym_env_config = AutoCktGymEnvConfig(
         circuit_optimization=circuit_optimization,
+        actions_per_param=[-1, 0, 2],
     )
 
     trainer = AutoCktTrainer()
