@@ -17,7 +17,10 @@ class AutoCktGym(gym.Env):
         "render.modes": ["human"],
     }
 
-    def __init__(self, env_config: AutoCktGymEnvConfig):
+    def __init__(
+        self,
+        env_config: AutoCktGymEnvConfig,  # FIXME It's actually an EnvContext(dict)
+    ):
         match env_config:
             case AutoCktGymEnvConfig(
                 circuit_optimization=circuit_optimization,
@@ -67,9 +70,11 @@ class AutoCktGym(gym.Env):
     ):
         # TODO We can observe more things
         num_fields = sum(
-            len(params),  # Current params in this step
-            len(specs),  # Current simulated specs based on params in this step
-            len(specs),  # Ideal (target) specs in this episode
+            [
+                len(params),  # Current params in this step
+                len(specs),  # Current simulated specs based on params in this step
+                len(specs),  # Ideal (target) specs in this episode
+            ]
         )
 
         # TODO Currently space is infinite
