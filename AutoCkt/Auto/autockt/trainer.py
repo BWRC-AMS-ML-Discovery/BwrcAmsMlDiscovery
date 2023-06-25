@@ -43,4 +43,6 @@ def autockt_train(
         "stop": {"episode_reward_mean": -0.02},
     }
 
-    tune.run_experiments({name: config_experiment})
+    tune.run_experiments(
+        {name: config_experiment},
+    )
