@@ -52,7 +52,7 @@ class AutoCktCircuitOptimization:
     input_type: type
     output_type: type
     reward: Callable[
-        ["Self.OutputType", "Self.OutputType"],  # TODO Typing
+        ["Self.OutputType", dict[str, Number]],  # TODO Typing
         # TODO The input to reward can be expanded to (s_t, a_t, s_{t+1}),
         # as defined in OpenAI's Spinning Up intro to RL:
         # https://spinningup.openai.com/en/latest/spinningup/rl_intro.html#reward-and-return

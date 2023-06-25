@@ -1,7 +1,8 @@
 from example_client import AutoCktOutput
+from shared.typing import Number
 
 
-def settaluri_reward(curr_specs: AutoCktOutput, ideal_specs: AutoCktOutput):
+def settaluri_reward(curr_specs: AutoCktOutput, ideal_specs: dict[str, Number]):
     """
     Reward: doesn't penalize for overshooting spec, is negative
     """
