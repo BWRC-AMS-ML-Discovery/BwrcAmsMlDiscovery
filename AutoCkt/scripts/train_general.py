@@ -26,6 +26,7 @@ from example_client import (
 
 def main():
     experiment_name = "train_45nm_ngspice"
+    num_workers = 1
 
     circuit_optimization = AutoCktCircuitOptimization(
         params=AutoCktParams(
@@ -60,6 +61,7 @@ def main():
     autockt_train(
         experiment_name,
         gym_env_config,
+        num_workers,
     )
 
 
