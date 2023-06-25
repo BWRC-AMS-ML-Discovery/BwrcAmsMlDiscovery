@@ -9,7 +9,9 @@ if __name__ != "__main__":
 
 
 # Local Imports
-from autockt.trainer import autockt_train
+from autockt.trainer import (
+    autockt_train,
+)
 from autockt.autockt_gym_env_config import (
     AutoCktCircuitOptimization,
     AutoCktGymEnvConfig,
@@ -21,6 +23,9 @@ from autockt.autockt_gym_env_config import (
 from example_client import (
     AutoCktInput,
     AutoCktOutput,
+)
+from eval_engines.rewards import (
+    settaluri_reward,
 )
 
 
@@ -50,7 +55,7 @@ def main():
         ),
         input_type=AutoCktInput,
         output_type=AutoCktOutput,
-        reward=None,  # FIXME
+        reward=settaluri_reward,
     )
 
     gym_env_config = AutoCktGymEnvConfig(
