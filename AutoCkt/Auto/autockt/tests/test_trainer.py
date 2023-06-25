@@ -1,5 +1,5 @@
-from ..trainer import AutoCktTrainer
+from ..trainer import autockt_train
 
 
 def test():
-    pass
+    assert type(autockt_train) == type(lambda: None)
