@@ -58,14 +58,12 @@ def main():
         actions_per_param=[-1, 0, 2],
     )
 
-    trainer = Experiment(
+    experiment = Experiment(
         name="train_45nm_ngspice",
         # FIXME what goes here?
     )
 
-    agent = trainer.train(gym_env_config)
-
-    agent.save()
+    tune.run_experiments(experiment)
 
 
 if __name__ == "__main__":
