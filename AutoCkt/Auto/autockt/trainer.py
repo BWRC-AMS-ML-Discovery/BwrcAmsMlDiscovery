@@ -9,6 +9,7 @@ from autockt.autockt_gym_env_config import AutoCktGymEnvConfig
 def autockt_train(
     experiment_name: str,
     gym_env_config: AutoCktGymEnvConfig,
+    num_workers: int,
 ):
     """
     The reason that this exists is because the interaction between ray and gym
@@ -30,7 +31,7 @@ def autockt_train(
         "model": {
             "fcnet_hiddens": [64, 64],
         },
-        "num_workers": 1,
+        "num_workers": num_workers,
         "env_config": gym_env_config,  # a kwarg to the env constructor
         # "disable_env_checking": True,
     }
