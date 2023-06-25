@@ -23,6 +23,7 @@
     "protobuf",
     "pydantic",
     "rpcs",
+    "settaluri",
     "tfall",
     "trise",
     "ugbw",
