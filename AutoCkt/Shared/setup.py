@@ -30,7 +30,6 @@ setup(
         ## FIXME: can we ease up on the version requirements?
         ## Maybe, but it's nice for intra-workspace consistency.
         "numpy==1.21.5",
-        "pydantic",
     ],
     # extras_require={
     #     "dev": [
