@@ -1,2 +1,6 @@
+from shared.autockt_gym_env_config import AutoCktGymEnvConfig
+
+
 class AutoCktTrainer:
-    pass
+    def train(gym_env_config: AutoCktGymEnvConfig):
+        pass
