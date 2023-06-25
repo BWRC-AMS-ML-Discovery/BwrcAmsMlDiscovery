@@ -10,7 +10,7 @@ def settaluri_reward(
     Reward: doesn't penalize for overshooting spec, is negative
     """
 
-    def calc_relative(curr: float, ideal: float):
+    def calc_relative(curr: Number, ideal: Number):
         ideal = float(ideal)  # Not sure if this is necessary
         relative = (curr - ideal) / (curr + ideal)
         return relative
