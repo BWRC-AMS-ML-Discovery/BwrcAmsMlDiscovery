@@ -72,8 +72,10 @@ class TargetSpecs:
     ranges: dict[str, Range]
 
 
+
 @dataclass
 class CktInput:
     params: Params
     normalize: Normalize
     target_specs: TargetSpecs
+
