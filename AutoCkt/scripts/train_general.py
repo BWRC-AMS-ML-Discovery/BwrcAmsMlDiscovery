@@ -1,3 +1,13 @@
+"""
+Use this script to train an AutoCkt agent that knows how to optimize
+a specific circuit within some constraints.
+"""
+
+
+if __name__ != "__main__":
+    raise Exception("This is a SCRIPT and should be run as __main__!")
+
+
 from autockt.trainer import AutoCktTrainer
 
 from shared.autockt_gym_env_config import (
