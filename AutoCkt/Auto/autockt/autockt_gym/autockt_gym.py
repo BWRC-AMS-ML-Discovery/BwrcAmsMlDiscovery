@@ -4,7 +4,7 @@ import gym
 from gym import spaces
 
 # Local imports
-from shared.autockt_gym_env_config import (
+from .autockt_gym_env_config import (
     AutoCktParams,
     AutoCktSpecs,
     AutoCktGymEnvConfig,
