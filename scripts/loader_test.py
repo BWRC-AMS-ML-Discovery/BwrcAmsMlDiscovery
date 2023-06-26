@@ -1,4 +1,4 @@
-from shared import ParamManager
+from autockt.envs.ngspice_vanilla_opamp import ParamManager
 
 
 def main():

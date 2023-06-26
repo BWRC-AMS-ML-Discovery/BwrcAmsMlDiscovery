@@ -4,6 +4,7 @@
     "editor.defaultFormatter": "ms-python.black-formatter"
   },
   "cSpell.words": [
+    "autockt",
     "bwrc",
     "dotenv",
     "dtype",
@@ -13,6 +14,7 @@
     "hexsha",
     "httpx",
     "ibias",
+    "Keerthana",
     "NGSPICE",
     "Nmos",
     "npar",
@@ -21,6 +23,7 @@
     "protobuf",
     "pydantic",
     "rpcs",
+    "settaluri",
     "tfall",
     "trise",
     "ugbw",

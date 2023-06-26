@@ -1,12 +1,21 @@
 from example_client import (
     test_auto_ckt,
-    example_client_start
+    example_client_start,
 )
 
 
 def main():
+    """
+    Not picked up by pytest
+    """
     example_client_start()
-    
+    test()
+
+
+def test():
+    """
+    Picked up by pytest
+    """
     reinforcement_learning_env = {"steps": 5, "update": None}
 
     for reinforcement_learning_step in range(

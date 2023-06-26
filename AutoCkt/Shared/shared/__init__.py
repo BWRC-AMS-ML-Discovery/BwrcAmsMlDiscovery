@@ -1,6 +1,8 @@
 """
 # Local AutoCkt Dep
 Shared code
+
+FIXME This folder should be renamed to autockt_shared
 """
 
 # Std-Lib Imports
@@ -68,7 +70,6 @@ class Params:
 @dataclass
 class TargetSpecs:
     ranges: dict[str, Range]
-
 
 
 @dataclass
