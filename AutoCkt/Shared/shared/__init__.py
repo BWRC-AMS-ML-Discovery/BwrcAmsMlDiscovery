@@ -9,6 +9,7 @@ FIXME This folder should be renamed to autockt_shared
 from typing import Optional, Union
 from collections import OrderedDict
 from typing import List, Callable, Type
+from shared.typing import Number
 
 # Workspace Imports
 from dataclasses import dataclass, fields
@@ -89,10 +90,10 @@ class CircuitOptimization:
     target_output_type: Type
 
     #reward function to be used by RL model
-    reward_fnc: Callable[..., float]
+    reward_fnc: Callable[["Self.OutputType", dict[str, Number]], float]
 
     #assume auto is of type spec maybe change this
-    def convert(self, auto, curr_output_type):
+    def auto_ckt_to_output_type(self, auto, curr_output_type):
         curr_output = curr_output_type(       
             ugbw = auto[0],
             gain = auto[1],
@@ -108,7 +109,7 @@ class CircuitOptimization:
         auto_target = kwargs['specs_ideal']
 
         #convert between types
-        curr_output = self.convert(auto_output, self.curr_output_type)
+        curr_output = self.auto_ckt_to_output_type(auto_output, self.curr_output_type)
         target_output = auto_target
 
         return self.reward_fnc(curr_output, target_output)
