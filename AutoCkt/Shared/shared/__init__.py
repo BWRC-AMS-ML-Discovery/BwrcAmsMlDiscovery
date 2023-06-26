@@ -79,38 +79,40 @@ class CktInput:
     normalize: Normalize
     target_specs: TargetSpecs
 
-@dataclass
-class CktOutput:
-    spec: Spec
 
 @dataclass
 class CircuitOptimization:
-    #clients expected input and output for the reward function
-    curr_output_type: Type
-    target_output_type: Type
+    #auto ckt input and output
+    param : Params
+    specs : Spec
+    target_specs : Spec
+
+    #clients input and output 
+    input_type: Type
+    output_type: Type
 
     #reward function to be used by RL model
     reward_fnc: Callable[["Self.OutputType", dict[str, Number]], float]
 
     #assume auto is of type spec maybe change this
-    def auto_ckt_to_output_type(self, auto, curr_output_type):
-        curr_output = curr_output_type(       
-            ugbw = auto[0],
-            gain = auto[1],
-            phm = auto[2],
-            ibias = auto[3]
+    def specs_to_output_type(self, specs, output_type):
+        curr_output = output_type(       
+            ugbw = specs[0],
+            gain = specs[1],
+            phm = specs[2],
+            ibias = specs[3]
         )
         return curr_output
 
-
     def __call__(self, *args, **kwargs):
         #some convertion operation to go from what the ml model has to the client reward function's expected input
-        auto_output = kwargs['cur_spec']
-        auto_target = kwargs['specs_ideal']
+        self.specs = kwargs['cur_spec']
+        self.target_specs = kwargs['specs_ideal']
 
         #convert between types
-        curr_output = self.auto_ckt_to_output_type(auto_output, self.curr_output_type)
-        target_output = auto_target
+        curr_output = self.auto_ckt_to_output_type(self.specs, self.output_type)
 
-        return self.reward_fnc(curr_output, target_output)
+        #do other convertions as well before passing to reward func
+
+        return self.reward_fnc(curr_output, self.target_specs)
 

@@ -2,7 +2,12 @@ from typing import Type, Callable
 from eval_engines.rewards import (
     settaluri_reward,
 )
-from example_client import AutoCktOutput
+
+#remove this dependency later. Needed to run for now. 
+from example_client import (
+    AutoCktOutput,
+    AutoCktInput
+)
 from shared.typing import Number
 
 from shared import (
@@ -51,13 +56,17 @@ class EvalEnginesConfig:
     def get_circuit_opt(self):
         return self.CIRCUIT_OPT
 
-    def create_circuit_optimization(self, output:Type, target_output:Type, reward:Callable):
+    def create_circuit_optimization(self, input:Type, output:Type, reward:Callable):
         self.CIRCUIT_OPT = CircuitOptimization(
-            curr_output_type = output,
-            target_output_type = target_output,
+            param = self.PARAMS_RANGE,
+            specs = self.TARGET_RANGE,
+            input_type = input,
+            output_type = output,
             reward_fnc = reward,
         )
 
 
 config = EvalEnginesConfig()
-config.create_circuit_optimization(output=AutoCktOutput, target_output=dict[str, Number], reward=settaluri_reward)
+
+#this probably goes in AutoCkt
+config.create_circuit_optimization(input=AutoCktInput, output=AutoCktOutput, reward=settaluri_reward)
