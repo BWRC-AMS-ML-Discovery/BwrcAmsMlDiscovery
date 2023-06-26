@@ -24,11 +24,6 @@ from example_shared import (
     AutoCktInput,
     AutoCktOutput,
 )
-from example_shared.auto_ckt_sim_lib import (
-    create_design,
-    simulate,
-    translate_result,
-)
 
 
 # The client library will create client stubs for all defined RPCs, including all those functions above.
@@ -38,11 +33,11 @@ import discovery_client as dc
 # FIXME Maybe put this variable somewhere else?
 # ENABLE_HTTP = True
 # if not ENABLE_HTTP:
+#     import example_server
+    
 #     #Short-circuiting by directly calling server functions
-# import example_server
 
-
-def example_client_start(ENABLE_HTTP = True):
+def example_client_start(ENABLE_HTTP):
     """retrieve values from .env file then configure nad start the client"""
 
     # Load the .env file
@@ -147,27 +142,3 @@ def elaborate_that_opamp_here_and_simulate_on_the_server(
     # Got some data back! Decode it from protobuf into a `SimResultProto`.
     sim_result = h.sim.SimResultProto.ParseFromString(from_the_server.proto_bytes)
     return sim_result
-
-
-def local_inverter_beta_ratio(inp: InverterBetaRatioInput):
-    wp = inp.wp
-    wn = inp.wn
-    output = (wp - 23) ** 2 + (wn - 4) ** 2
-    return InverterBetaRatioOutput(
-        trise=output / 2,
-        tfall=output / 2,
-    )
-
-def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
-    """
-    AutoCkt Simulation
-    """
-
-    design_folder, fpath = create_design(inp)
-
-    # Error return?
-    info = simulate(fpath)
-
-    specs = translate_result(design_folder)
-
-    return specs
