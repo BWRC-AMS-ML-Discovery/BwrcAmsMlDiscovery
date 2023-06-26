@@ -95,13 +95,32 @@ class CircuitOptimization:
 
     #assume auto is of type spec maybe change this
     def specs_to_output_type(self, specs, output_type):
+        """
+        Expected order of spec ids  from TwoOpAmp load_spec
+        ['gain_min', 'ibias_max', 'phm_min', 'ugbw_min']
+        """
         curr_output = output_type(       
-            ugbw = specs[0],
-            gain = specs[1],
+            gain = specs[0],
+            ibias = specs[1],
             phm = specs[2],
-            ibias = specs[3]
+            ugbw = specs[3]
         )
         return curr_output
+    
+    def target_specs_to_dict(self, target):
+        """
+        names shorted to match the AutoCktOutput
+
+        Expected order of spec ids  from TwoOpAmp load_spec
+        ['gain_min', 'ibias_max', 'phm_min', 'ugbw_min']
+        """
+        dict = {
+        "gain": target[0],
+        "ibias": target[1],
+        "phm": target[2],
+        "ugbw": target[3]
+        }
+        return dict
 
     def __call__(self, *args, **kwargs):
         #some convertion operation to go from what the ml model has to the client reward function's expected input
@@ -111,7 +130,8 @@ class CircuitOptimization:
         #convert between types
         curr_output = self.specs_to_output_type(self.specs, self.output_type)
 
-        #do other convertions as well before passing to reward func
+        #do other convertions as well before passing to reward funcs
+        target_dict = self.target_specs_to_dict(target_specs)
 
-        return self.reward_fnc(curr_output, target_specs)
+        return self.reward_fnc(curr_output, target_dict)
 

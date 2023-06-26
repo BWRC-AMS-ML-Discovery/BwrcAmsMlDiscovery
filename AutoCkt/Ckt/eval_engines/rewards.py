@@ -17,15 +17,16 @@ def settaluri_reward(
 
     #adapted TwoAmp reward using new variables
     def reward(curr_output, target_output):
-        curr_output_vals = list(curr_output.__dict__.values())[:4]
-        output_id = list(curr_output.__dict__.keys())[:4]
-
-        output_relative = calc_relative(curr_output_vals, target_output)
-
+        #populate relative for each key input of target
+        output_relative = {}
+        for key in target_output:
+            output_relative[key] = calc_relative(getattr(curr_output, key), target_output[key])
+        
         pos_val = []
         reward = 0.0
-        for i, rel_spec in enumerate(output_relative):
-            if output_id[i] == "ibias_max":
+        for key in output_relative:
+            rel_spec = output_relative[key]
+            if key == "ibias":
                 rel_spec = rel_spec * -1.0  # /10.0
             if rel_spec < 0:
                 reward += rel_spec
