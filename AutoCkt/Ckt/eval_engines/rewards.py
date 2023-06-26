@@ -1,5 +1,6 @@
 from example_client import AutoCktOutput
 from shared.typing import Number
+from eval_engines import config
 
 
 def settaluri_reward(
@@ -15,5 +16,25 @@ def settaluri_reward(
         relative = (curr - ideal) / (curr + ideal)
         return relative
 
-    # FIXME
-    raise NotImplementedError
+    #adapted TwoAmp reward using new variables
+    def reward(curr_output, target_output):
+        output_relative = calc_relative(curr_output, target_output)
+        output_id = list(curr_output.__dict__.keys())
+
+        pos_val = []
+        reward = 0.0
+        for i, rel_spec in enumerate(output_relative):
+            if output_id[i] == "ibias_max":
+                rel_spec = rel_spec * -1.0  # /10.0
+            if rel_spec < 0:
+                reward += rel_spec
+                pos_val.append(0)
+            else:
+                pos_val.append(1)
+
+        return reward if reward < -0.02 else 10
+
+    
+    reward(curr_output, target_output)
+
+config.create_circuit_optimization(output=AutoCktOutput, target_output=dict[str, Number], reward=settaluri_reward)

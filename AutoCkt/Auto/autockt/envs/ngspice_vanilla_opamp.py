@@ -166,7 +166,7 @@ class TwoStageAmp(gym.Env):
             reward = self.reward(self.cur_specs, self.specs_ideal)
         else:
             #else use the client provided one
-            reward = self.auto_ckt_opt(self.cur_specs, self.specs_id, self.specs_ideal)
+            reward = self.auto_ckt_opt(cur_spec=self.cur_specs, specs_ideal=self.specs_ideal)
 
         # incentivize reaching goal state
         done = False

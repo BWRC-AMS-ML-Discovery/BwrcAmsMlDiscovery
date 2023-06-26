@@ -84,18 +84,32 @@ class CktOutput:
 
 @dataclass
 class CircuitOptimization:
-    # auto_input: CktInput
-
     #clients expected input and output for the reward function
-    ckt_input_type: Type
-    ckt_output_type: Type
+    curr_output_type: Type
+    target_output_type: Type
 
     #reward function to be used by RL model
     reward_fnc: Callable[..., float]
 
+    #assume auto is of type spec maybe change this
+    def convert(self, auto, curr_output_type):
+        keys = list(curr_output_type.__dict__.keys())
+        if len(keys) != len(auto):
+            print("{} types dont equate: {}", keys, auto) 
+            raise ValueError
+        
+        data = dict(zip(keys, auto))
+        return curr_output_type(**data)
+
+
     def __call__(self, *args, **kwargs):
         #some convertion operation to go from what the ml model has to the client reward function's expected input
-        
+        auto_output = kwargs['cur_spec']
+        auto_target = kwargs['specs_ideal']
 
-        return self.reward_fnc(*args, **kwargs)
+        #convert between types
+        curr_output = self.convert(auto_output, self.curr_output_type)
+        target_output = auto_target
+
+        return self.reward_fnc(curr_output, target_output)
 

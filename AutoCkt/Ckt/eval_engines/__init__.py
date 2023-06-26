@@ -46,10 +46,10 @@ class EvalEnginesConfig:
     def get_circuit_opt(self):
         return self.CIRCUIT_OPT
 
-    def create_circuit_optimization(self, input:Type, output:Type, reward:Callable):
+    def create_circuit_optimization(self, output:Type, target_output:Type, reward:Callable):
         self.CIRCUIT_OPT = CircuitOptimization(
-            ckt_input_type= input,
-            ckt_output_type= output,
+            curr_output_type = output,
+            target_output_type = target_output,
             reward_fnc = reward,
         )
 

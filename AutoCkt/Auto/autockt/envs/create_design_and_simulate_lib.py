@@ -1,5 +1,5 @@
 from example_shared import AutoCktInput, AutoCktOutput
-from example_client import auto_ckt_sim, reward
+from example_client import auto_ckt_sim
 
 
 def ordered_dict_to_input(param_val):
