@@ -85,7 +85,6 @@ class CircuitOptimization:
     #auto ckt input and output
     param : Params
     specs : Spec
-    target_specs : Spec
 
     #clients input and output 
     input_type: Type
@@ -107,12 +106,12 @@ class CircuitOptimization:
     def __call__(self, *args, **kwargs):
         #some convertion operation to go from what the ml model has to the client reward function's expected input
         self.specs = kwargs['cur_spec']
-        self.target_specs = kwargs['specs_ideal']
+        target_specs = kwargs['specs_ideal']
 
         #convert between types
-        curr_output = self.auto_ckt_to_output_type(self.specs, self.output_type)
+        curr_output = self.specs_to_output_type(self.specs, self.output_type)
 
         #do other convertions as well before passing to reward func
 
-        return self.reward_fnc(curr_output, self.target_specs)
+        return self.reward_fnc(curr_output, target_specs)
 
