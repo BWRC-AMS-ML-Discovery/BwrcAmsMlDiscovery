@@ -93,13 +93,13 @@ class CircuitOptimization:
 
     #assume auto is of type spec maybe change this
     def convert(self, auto, curr_output_type):
-        keys = list(curr_output_type.__dict__.keys())
-        if len(keys) != len(auto):
-            print("{} types dont equate: {}", keys, auto) 
-            raise ValueError
-        
-        data = dict(zip(keys, auto))
-        return curr_output_type(**data)
+        curr_output = curr_output_type(       
+            ugbw = auto[0],
+            gain = auto[1],
+            phm = auto[2],
+            ibias = auto[3]
+        )
+        return curr_output
 
 
     def __call__(self, *args, **kwargs):

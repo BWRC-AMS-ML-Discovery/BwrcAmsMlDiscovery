@@ -1,6 +1,5 @@
 from example_client import AutoCktOutput
 from shared.typing import Number
-from eval_engines import config
 
 
 def settaluri_reward(
@@ -12,14 +11,16 @@ def settaluri_reward(
     """
 
     def calc_relative(curr: Number, ideal: Number):
-        ideal = float(ideal)  # Not sure if this is necessary
+        # ideal = float(ideal)  # Not sure if this is necessary
         relative = (curr - ideal) / (curr + ideal)
         return relative
 
     #adapted TwoAmp reward using new variables
     def reward(curr_output, target_output):
-        output_relative = calc_relative(curr_output, target_output)
-        output_id = list(curr_output.__dict__.keys())
+        curr_output_vals = list(curr_output.__dict__.values())[:4]
+        output_id = list(curr_output.__dict__.keys())[:4]
+
+        output_relative = calc_relative(curr_output_vals, target_output)
 
         pos_val = []
         reward = 0.0
@@ -34,7 +35,6 @@ def settaluri_reward(
 
         return reward if reward < -0.02 else 10
 
-    
-    reward(curr_output, target_output)
+    #run the reward function
+    return reward(curr_output, target_output)
 
-config.create_circuit_optimization(output=AutoCktOutput, target_output=dict[str, Number], reward=settaluri_reward)

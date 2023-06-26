@@ -1,4 +1,9 @@
 from typing import Type, Callable
+from eval_engines.rewards import (
+    settaluri_reward,
+)
+from example_client import AutoCktOutput
+from shared.typing import Number
 
 from shared import (
     CircuitOptimization
@@ -55,3 +60,4 @@ class EvalEnginesConfig:
 
 
 config = EvalEnginesConfig()
+config.create_circuit_optimization(output=AutoCktOutput, target_output=dict[str, Number], reward=settaluri_reward)
