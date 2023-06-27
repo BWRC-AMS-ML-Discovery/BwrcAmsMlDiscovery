@@ -35,31 +35,31 @@ class ParamManager:
         self.params = None
         self.norm = None
 
-    def load_spec(self, params: list, target: list, norm: list) -> CktInput:
-        """
-        params: parameters range, n# of ranges with step sizes, n * 3 for each [min, max, step]
-        target: ideal spec range, n# of ranges without step sizes, n * 2 for each [min, max]
-        norm: normalizing constants, 4# of constraints
-        """
-        params_values = {
-            param[0]: Range(param[1][0], param[1][1], param[1][2]) for param in params
-        }
-        target_values = {
-            target_[0]: Range(target_[1][0], target_[1][1]) for target_ in target
-        }
+    # def load_spec(self, params: list, target: list, norm: list) -> CktInput:
+    #     """
+    #     params: parameters range, n# of ranges with step sizes, n * 3 for each [min, max, step]
+    #     target: ideal spec range, n# of ranges without step sizes, n * 2 for each [min, max]
+    #     norm: normalizing constants, 4# of constraints
+    #     """
+    #     params_values = {
+    #         param[0]: Range(param[1][0], param[1][1], param[1][2]) for param in params
+    #     }
+    #     target_values = {
+    #         target_[0]: Range(target_[1][0], target_[1][1]) for target_ in target
+    #     }
 
-        normalize_values = {norm_[0]: norm_[1] for norm_ in norm}
+    #     normalize_values = {norm_[0]: norm_[1] for norm_ in norm}
 
-        ckt = CktInput(
-            Params(params_values),
-            Normalize(normalize_values),
-            TargetSpecs(target_values),
-        )
+    #     ckt = CktInput(
+    #         Params(params_values),
+    #         Normalize(normalize_values),
+    #         TargetSpecs(target_values),
+    #     )
 
-        self.params = Params(params_values)
-        self.spec = TargetSpecs(target_values)
-        self.norm = Normalize(normalize_values)
-        return ckt
+    #     self.params = Params(params_values)
+    #     self.spec = TargetSpecs(target_values)
+    #     self.norm = Normalize(normalize_values)
+    #     return ckt
 
     def get_spec(self) -> Spec:
         """
@@ -133,9 +133,6 @@ class TwoStageAmp(gym.Env):
         # initialize current parameters
         self.cur_params_idx = np.array([33, 33, 33, 33, 33, 14, 20])
         self.cur_specs = self.update(self.cur_params_idx)
-
-        # reward
-        reward = self.reward(self.cur_specs, self.specs_ideal)
 
         # applicable only when you have multiple goals, normalizes everything to some global_g
         self.specs_ideal_norm = self.lookup(self.specs_ideal, self.global_g)

@@ -2,6 +2,7 @@
 import numpy as np
 import gym
 from gym import spaces
+from autockt.envs.create_design_and_simulate_lib import create_design_and_simulate
 
 # Local imports
 from .autockt_gym_env_config import (
@@ -10,6 +11,8 @@ from .autockt_gym_env_config import (
     AutoCktGymEnvConfig,
     AutoCktCircuitOptimization,
 )
+
+from .autockt_gym_params_mng.py import AutoCktParamsManager
 
 
 class AutoCktGym(gym.Env):
@@ -39,12 +42,14 @@ class AutoCktGym(gym.Env):
         # Necessary for the gym.Env API
         self._build_action_space(params, actions_per_param)
         self._build_observation_space(params, specs)
+        self.params_manager = AutoCktParamsManager(params, self.action_space)
 
     def reset(self):
-        raise NotImplementedError
+        self.params_manager.reset_to_init()
+        cur_params = self.params_manager.get_cur_params()
 
     def step(self, action):
-        raise NotImplementedError
+        return self.params_manager.step(action)
 
     def _build_action_space(
         self,
@@ -82,3 +87,10 @@ class AutoCktGym(gym.Env):
             low=np.full(num_fields, -np.inf),
             high=np.full(num_fields, np.inf),
         )
+
+    def update(self, params_dict):
+        """returns the updated sim results of specs"""
+        # run param vals and simulate
+        result = create_design_and_simulate(params_dict)
+        cur_specs = np.array(list(result.values()))
+        return cur_specs
