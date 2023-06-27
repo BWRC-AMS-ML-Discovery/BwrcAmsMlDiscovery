@@ -2,9 +2,7 @@ from example_server import (
     example_func,
 )
 
-from example_shared import (
-    Example
-)
+from example_shared import Example
 
 
 def test_example_server_func_1():
