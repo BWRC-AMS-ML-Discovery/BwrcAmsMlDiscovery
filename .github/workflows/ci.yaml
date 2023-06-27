@@ -1,0 +1,25 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: ci
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # Run `black` formatting. Fail if not already formatted. 
+  fmt:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Black Formatting Check
+        uses: psf/black@stable
+        with:
+          version: "22.6"
+          options: "--check --diff --verbose"
