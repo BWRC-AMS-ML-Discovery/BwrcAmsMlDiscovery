@@ -86,30 +86,30 @@ def Latch(p: LatchParams) -> h.Module:
 # (i) settling time;
 # (ii) power consumption
 
-class MosDcopSim:
-    """# Mos Dc Operating Point Simulation Input"""
-    # def __init__(params):
+# class MosDcopSim:
+#     """# Mos Dc Operating Point Simulation Input"""
+#     # def __init__(params):
         
 
-    @h.module
-    class Tb:
-        """# Basic Mos Testbench"""
+#     @h.module
+#     class Tb:
+#         """# Basic Mos Testbench"""
 
-        VSS = h.Port()  # The testbench interface: sole port VSS
-        vdc = h.Vdc(dc=1.2)(n=VSS)  # A DC voltage source
-        dcin = h.Diff()
-        sig_out = h.Signal()
-        i_bias = h.Signal()
-        sig_p = h.Vdc(dc=0.6, ac=0.5)(p=dcin.p,n=VSS)
-        sig_n = h.Vdc(dc=0.6, ac=-0.5)(p=dcin.n,n=VSS)
-        Isource = h.Isrc(dc = 3e-5)(p = vdc.p, n = i_bias)
+#         VSS = h.Port()  # The testbench interface: sole port VSS
+#         vdc = h.Vdc(dc=1.2)(n=VSS)  # A DC voltage source
+#         dcin = h.Diff()
+#         sig_out = h.Signal()
+#         i_bias = h.Signal()
+#         sig_p = h.Vdc(dc=0.6, ac=0.5)(p=dcin.p,n=VSS)
+#         sig_n = h.Vdc(dc=0.6, ac=-0.5)(p=dcin.n,n=VSS)
+#         Isource = h.Isrc(dc = 3e-5)(p = vdc.p, n = i_bias)
         
-        inst=Latch()(VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out)
+#         inst=Latch()(VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out)
 
-    # Simulation Stimulus
-    op = hs.Op()
-    ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
-    mod = hs.Include("../45nm_bulk.txt")
+#     # Simulation Stimulus
+#     op = hs.Op()
+#     ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
+#     mod = hs.Include("../45nm_bulk.txt")
 
 
 
