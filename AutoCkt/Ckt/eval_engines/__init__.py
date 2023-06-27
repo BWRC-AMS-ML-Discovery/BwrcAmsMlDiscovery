@@ -3,11 +3,6 @@ from eval_engines.rewards import (
     settaluri_reward,
 )
 
-#remove this dependency later. Needed to run for now. 
-from example_client import (
-    AutoCktOutput,
-    AutoCktInput
-)
 from shared.typing import Number
 
 from shared import (
@@ -68,5 +63,3 @@ class EvalEnginesConfig:
 
 config = EvalEnginesConfig()
 
-#this probably goes in AutoCkt
-config.create_circuit_optimization(input=AutoCktInput, output=AutoCktOutput, reward=settaluri_reward)

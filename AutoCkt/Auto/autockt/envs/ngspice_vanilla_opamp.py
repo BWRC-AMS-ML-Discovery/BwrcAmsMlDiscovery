@@ -161,6 +161,7 @@ class TwoStageAmp(gym.Env):
         # Get current specs and normalize
         self.cur_specs = self.update(self.cur_params_idx)
 
+        reward = 0.0
         if self.auto_ckt_opt is None:
             #use default reward function if not set
             reward = self.reward(self.cur_specs, self.specs_ideal)

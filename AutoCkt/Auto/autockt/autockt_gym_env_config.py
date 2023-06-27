@@ -60,6 +60,7 @@ class AutoCktCircuitOptimization:
         float,
     ]
 
+
 @dataclass
 class AutoCktGymEnvConfig:
     circuit_optimization: AutoCktCircuitOptimization

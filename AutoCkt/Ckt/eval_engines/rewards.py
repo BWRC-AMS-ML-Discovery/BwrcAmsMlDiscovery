@@ -11,7 +11,7 @@ def settaluri_reward(
     """
 
     def calc_relative(curr: Number, ideal: Number):
-        # ideal = float(ideal)  # Not sure if this is necessary
+        ideal = float(ideal)  # Not sure if this is necessary
         relative = (curr - ideal) / (curr + ideal)
         return relative
 

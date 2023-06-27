@@ -93,13 +93,13 @@ class CircuitOptimization:
     #reward function to be used by RL model
     reward_fnc: Callable[["Self.OutputType", dict[str, Number]], float]
 
-    #assume auto is of type spec maybe change this
-    def specs_to_output_type(self, specs, output_type):
+    #convert specs to output_type
+    def specs_to_output_type(self, specs):
         """
         Expected order of spec ids  from TwoOpAmp load_spec
         ['gain_min', 'ibias_max', 'phm_min', 'ugbw_min']
         """
-        curr_output = output_type(       
+        curr_output = self.output_type(       
             gain = specs[0],
             ibias = specs[1],
             phm = specs[2],
@@ -128,7 +128,7 @@ class CircuitOptimization:
         target_specs = kwargs['specs_ideal']
 
         #convert between types
-        curr_output = self.specs_to_output_type(self.specs, self.output_type)
+        curr_output = self.specs_to_output_type(self.specs)
 
         #do other convertions as well before passing to reward funcs
         target_dict = self.target_specs_to_dict(target_specs)
