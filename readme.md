@@ -20,6 +20,18 @@ python scripts/server_start.py
 python scripts/client_do_example_stuff.py
 ```
 
+## Running AutoCkt Training
+
+```sh
+python AutoCkt/scripts/train_general.py
+```
+
+## Running Tests
+
+```sh
+pytest
+```
+
 ## Authentication Token
 
 1. To register and obtain the auth token, go to [website](https://bwrc-ams-ml-discovery-firebase-save.vercel.app/enter).
