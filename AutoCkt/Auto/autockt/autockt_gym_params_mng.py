@@ -6,7 +6,6 @@ class AutoCktParamsManager:
     def __init__(self, params, action):
         self.params_ranges = params
         self.action_space = action
-        self.cur_params = self.reset_to_init
 
     def reset_to_init(self):
         """returns the init params dict for resetting the env"""
@@ -21,8 +20,11 @@ class AutoCktParamsManager:
 
         for idx, (name, _) in enumerate(self.cur_params.items()):
             step_update = self.cur_params[name] + update_actions[idx]
-            if step_update <= self.params_ranges[idx].range.max and step_update >= self.params_ranges[idx].range.min:
-                 self.cur_params[name] = step_update
-    
+            if (
+                step_update <= self.params_ranges[idx].range.max
+                and step_update >= self.params_ranges[idx].range.min
+            ):
+                self.cur_params[name] = step_update
+
     def get_cur_params(self):
         return self.cur_params
