@@ -47,11 +47,17 @@ class AutoCktGym(gym.Env):
         self.params_manager = AutoCktParamsManager(params, actions_per_param)
 
     def reset(self):
+        # reset parameters to init value
         self.params_manager.reset_to_init()
+        # get parameters
         cur_params = self.params_manager.get_cur_params()
 
     def step(self, action: list[Number]):
-        return self.params_manager.step(action)
+        """action: a list of actions from action space to take upon parameters"""
+        # update parameters by each action
+        self.params_manager.step(action)
+        # retrieve current parameters
+        cur_params = self.params_manager.get_cur_params()
 
     def _build_action_space(
         self,
