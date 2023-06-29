@@ -8,19 +8,21 @@ import numpy as np
 from pydantic.dataclasses import dataclass
 
 # local imports
-from autockt_gym_env_config import (
+from .autockt_gym_env_config import (
     AutoCktSpec,
     AutoCktSpecs,
     AutoCktParam,
     AutoCktParams,
     Number,
 )
-from envs.create_design_and_simulate_lib import create_design_and_simulate
+from .envs.create_design_and_simulate_lib import create_design_and_simulate
 
-
-#
 @dataclass
 class SpecManager:
+    """
+    handles state management and generation of specs in RL model
+    """
+
     # the inital specs used to create the spec manager
     init_spec: AutoCktSpecs
 

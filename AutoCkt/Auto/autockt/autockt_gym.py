@@ -11,7 +11,7 @@ from .autockt_gym_env_config import (
     AutoCktCircuitOptimization,
 )
 
-from autockt_gym_ideal_specs_mng import SpecManager
+from .autockt_gym_ideal_specs_mng import SpecManager
 
 
 class AutoCktGym(gym.Env):
@@ -37,12 +37,13 @@ class AutoCktGym(gym.Env):
                         reward=reward,
                     ):
                         pass
+        #create spec manager
+        self.sm = SpecManager(specs)
 
         # Necessary for the gym.Env API
         self._build_action_space(params, actions_per_param)
         self._build_observation_space(params, specs)
 
-        self.sm = SpecManager(specs)
 
     def reset(self):
         params = None #get from param manager
@@ -58,6 +59,7 @@ class AutoCktGym(gym.Env):
         reward = None #calc from cur_spec and ideal_spec
 
         done = False
+        #do something related to reward 
 
         self.ob = np.concatenate(
             [cur_norm, ideal_norm, params]
