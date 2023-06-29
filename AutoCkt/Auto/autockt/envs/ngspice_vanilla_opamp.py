@@ -125,8 +125,6 @@ class TwoStageAmp(gym.Env):
         # [0, 0, 0, 0, 0, 0, 0]
         self.cur_params_idx = np.zeros(len(self.params_id), dtype=np.int32)
 
-        self.auto_ckt_opt = config.get_circuit_opt()
-
     def reset(self):
         """
         Called when horizon is reached (or when env is reset, which never happens in our code)
@@ -160,14 +158,8 @@ class TwoStageAmp(gym.Env):
 
         # Get current specs and normalize
         self.cur_specs = self.update(self.cur_params_idx)
+        reward = self.reward(self.cur_specs, self.specs_ideal)
 
-        reward = 0.0
-        if self.auto_ckt_opt is None:
-            #use default reward function if not set
-            reward = self.reward(self.cur_specs, self.specs_ideal)
-        else:
-            #else use the client provided one
-            reward = self.auto_ckt_opt(cur_spec=self.cur_specs, specs_ideal=self.specs_ideal)
 
         # incentivize reaching goal state
         done = False
@@ -241,7 +233,7 @@ class TwoStageAmp(gym.Env):
 
         # OrderedDict([('mp1', 34), ('mn1', 34), ('mp3', 34), ('mn3', 34), ('mn4', 34), ('mn5', 15), ('cc', 2.1e-12)])
         param_val = dict(list(zip(self.params_id, params)))
-
+        print(f"START: {param_val}")
         # run param vals and simulate
         cur_specs = dict(
             sorted(
@@ -252,7 +244,9 @@ class TwoStageAmp(gym.Env):
                 key=lambda k: k[0],
             )
         )
+        print(cur_specs)
         cur_specs = np.array(list(cur_specs.values()))
+        print(cur_specs)
 
         return cur_specs
 

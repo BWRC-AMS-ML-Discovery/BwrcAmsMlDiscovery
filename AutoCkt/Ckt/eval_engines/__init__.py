@@ -5,10 +5,6 @@ from eval_engines.rewards import (
 
 from shared.typing import Number
 
-from shared import (
-    CircuitOptimization
-)
-
 from dataclasses import dataclass, fields
 
 @dataclass
@@ -16,7 +12,6 @@ class EvalEnginesConfig:
     PARAMS_RANGE : list
     NORM_CONSTANT : list
     TARGET_RANGE : list
-    CIRCUIT_OPT : CircuitOptimization
 
     def __init__(self):
         self.PARAMS_RANGE = [
@@ -36,9 +31,6 @@ class EvalEnginesConfig:
             ["ugbw_min", [0.0001, 0.01]],
         ]
 
-        #add a default circuit_opt method
-        self.CIRCUIT_OPT = None
-
     def get_params_range(self):
         return self.PARAMS_RANGE
     
@@ -47,19 +39,6 @@ class EvalEnginesConfig:
     
     def get_target_range(self):
         return self.TARGET_RANGE
-    
-    def get_circuit_opt(self):
-        return self.CIRCUIT_OPT
-
-    def create_circuit_optimization(self, input:Type, output:Type, reward:Callable):
-        self.CIRCUIT_OPT = CircuitOptimization(
-            param = self.PARAMS_RANGE,
-            specs = self.TARGET_RANGE,
-            input_type = input,
-            output_type = output,
-            reward_fnc = reward,
-        )
-
 
 config = EvalEnginesConfig()
 

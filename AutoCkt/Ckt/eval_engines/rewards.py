@@ -2,6 +2,7 @@ from example_client import AutoCktOutput
 from shared.typing import Number
 
 
+#TODO: remove target_output, can be assumed from rl model
 def settaluri_reward(
     curr_output: AutoCktOutput,  # This is from simulation
     target_output: dict[str, Number],  # This is from Specs
