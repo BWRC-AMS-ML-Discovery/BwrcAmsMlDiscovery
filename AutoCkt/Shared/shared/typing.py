@@ -1,1 +1,1 @@
-Number = int | float
+Number: int | float

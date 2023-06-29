@@ -12,6 +12,8 @@ from .autockt_gym_env_config import (
     AutoCktCircuitOptimization,
 )
 
+from shared.typing import Number
+
 from .autockt_gym_params_mng.py import AutoCktParamsManager
 
 
@@ -42,13 +44,13 @@ class AutoCktGym(gym.Env):
         # Necessary for the gym.Env API
         self._build_action_space(params, actions_per_param)
         self._build_observation_space(params, specs)
-        self.params_manager = AutoCktParamsManager(params, self.action_space)
+        self.params_manager = AutoCktParamsManager(params, actions_per_param)
 
     def reset(self):
         self.params_manager.reset_to_init()
         cur_params = self.params_manager.get_cur_params()
 
-    def step(self, action):
+    def step(self, action: list[Number]):
         return self.params_manager.step(action)
 
     def _build_action_space(
