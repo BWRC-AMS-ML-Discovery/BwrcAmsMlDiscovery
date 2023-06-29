@@ -1,29 +1,35 @@
 # BWRC AMS ML Discovery
 
-## Installation New
-
-Currently requires Python <= 3.10
-
-```
-sh scripts/install.sh
-```
-
 ## Installation
 
-```
-pip install -e ".[dev]"
+Currently recommends Python == 3.10
+
+```sh
+sh scripts/install.sh
 ```
 
 ## Running a Local Dev Server
 
-```
-bash scripts/serve.sh
+```sh
+python scripts/server_start.py
 ```
 
 ## Running Client Examples
 
+```sh
+python scripts/client_do_example_stuff.py
 ```
-python scripts/client_examples.py
+
+## Running AutoCkt Training
+
+```sh
+python AutoCkt/scripts/train_general.py
+```
+
+## Running Tests
+
+```sh
+pytest
 ```
 
 ## Authentication Token

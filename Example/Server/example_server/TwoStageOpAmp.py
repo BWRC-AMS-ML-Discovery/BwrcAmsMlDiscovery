@@ -43,18 +43,18 @@ def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
     # Extract our metrics from those results
     ac_result = results["ac"]
     sig_out = ac_result.data["v(xtop.sig_out)"]
-    dc_gain = find_dc_gain(2 * sig_out)
+    gain = find_dc_gain(2 * sig_out)
     ugbw = find_ugbw(ac_result.freq, 2 * sig_out)
     phm = find_phm(ac_result.freq, 2 * sig_out)
     idd = ac_result.data["i(v.xtop.vvdc)"]
-    i_vdd = find_I_vdd(idd)
+    ibias = find_I_vdd(idd)
 
     # And return them as an `AutoCktOutput`
     return AutoCktOutput(
-        dc_gain,
-        ugbw,
-        phm,
-        i_vdd,
+        ugbw=ugbw,
+        gain=gain,
+        phm=phm,
+        ibias=ibias,
     )
 
 
@@ -62,11 +62,6 @@ def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
 Create a small "PDK" consisting of an externally-defined Nmos and Pmos transistor. 
 Real versions will have some more parameters; these just have multiplier "m". 
 """
-
-
-@h.paramclass
-class MosParams:
-    m = h.Param(dtype=int, desc="Transistor Multiplier")
 
 
 @h.paramclass
@@ -116,7 +111,7 @@ def OpAmp(p: OpAmpParams) -> h.Module:
     """# Two stage OpAmp"""
 
     @h.module
-    class DiffOta:
+    class OpAmp:
         # IO Interface
         VDD, VSS = 2 * h.Input()
         ibias = h.Input()
@@ -151,42 +146,17 @@ def OpAmp(p: OpAmpParams) -> h.Module:
         # Compensation Network
         Cc = h.Cap(c=p.Cc)(p=net5, n=out)  # Miller Capacitance
 
-    return DiffOta
-
-
-@h.module
-class CapCell:
-    """# Compensation Capacitor Cell"""
-
-    p, n, VDD, VSS = 4 * h.Port()
-    # FIXME: internal content! Using tech-specific `ExternalModule`s
-
-
-@h.module
-class ResCell:
-    """# Compensation Resistor Cell"""
-
-    p, n, sub = 3 * h.Port()
-    # FIXME: internal content! Using tech-specific `ExternalModule`s
-
-
-@h.module
-class Compensation:
-    """# Single Ended RC Compensation Network"""
-
-    a, b, VDD, VSS = 4 * h.Port()
-    r = ResCell(p=a, sub=VDD)
-    c = CapCell(p=r.n, n=b, VDD=VDD, VSS=VSS)
+    return OpAmp
 
 
 def OpAmpSim(params: OpAmpParams) -> h.sim.Sim:
+    """# Op Amp Simulation Input"""
+
     @hs.sim
     class OpAmpSim:
-        """# Mos Dc Operating Point Simulation Input"""
-
         @h.module
         class Tb:
-            """# Basic Mos Testbench"""
+            """# Testbench"""
 
             VSS = h.Port()  # The testbench interface: sole port VSS
             vdc = h.Vdc(dc=1.2)(n=VSS)  # A DC voltage source
