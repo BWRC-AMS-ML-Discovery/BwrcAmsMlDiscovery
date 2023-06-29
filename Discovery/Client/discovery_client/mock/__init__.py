@@ -21,4 +21,3 @@ def mock_inverter_beta_ratio(
         "/mock/inverter_beta_ratio",
         inp,
     )
-
