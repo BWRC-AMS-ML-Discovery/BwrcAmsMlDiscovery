@@ -25,28 +25,33 @@ class SpecManager:
     init_spec: AutoCktSpecs
 
     # list if ids the spec has
-    spec_id: list(str)
+    spec_id: list[str]
     # what spec is initially generated to
-    ideal_spec: dict[str:Number]
+    ideal_spec: dict[str, Number]
     # the current spec value
-    cur_spec: dict[str:Number]
+    cur_spec: dict[str, Number]
     # ideal norm is calculate from ideal_spec and normalized values
-    ideal_norm: dict[str:Number]
+    ideal_norm: dict[str, Number]
 
-    def __init__(self, init_spec: AutoCktSpecs):
+    def __init__(self, init_spec):
         """
-        takes init_spec : AutoCktSpecs
-
         generates initial variable
         """
         self.init_spec = init_spec
 
-        self.spec_id = [spec.str for spec in init_spec]
+        self.spec_id = [spec.name for spec in init_spec]
         self.ideal_spec = self.gen_spec()
         self.ideal_norm = self.normalize(self.ideal_spec)
-        self.cur_spec = np.zeroes(len(self.spec_id))
 
-    def step(self, params: dict[str:Number]):
+        zeros = np.zeros(len(self.spec_id))
+        self.cur_spec = dict(zip(self.spec_id, zeros))
+
+        print(f"spec id: {self.spec_id}")
+        print(f"ideal spec: {self.ideal_spec}")
+        print(f"ideal norm: {self.ideal_norm}")
+        print(f"cur spec: {self.cur_spec}")
+
+    def step(self, params: dict[str, Number]):
         """
         Takes a dict of param values and updates the current spec values
 
@@ -58,7 +63,7 @@ class SpecManager:
 
         return [self.cur_spec, self.ideal_spec, cur_norm, self.ideal_norm]
 
-    def reset(self, params: dict[str:Number]):
+    def reset(self, params: dict[str, Number]):
         """
         Takes a dict of param values to reset the current spec value to
         generates a new set of ideal specs
@@ -73,21 +78,23 @@ class SpecManager:
 
         return [cur_norm, self.ideal_norm]
 
-    def update(self, params: dict[str:Number]) -> dict[str:Number]:
+    def update(self, params: dict[str, Number]) -> dict[str, Number]:
         """
         simulates on the given param values and returns a spec dict
         """
         simulated = create_design_and_simulate(params)
         return simulated
 
-    def normalize(self, specs: dict[str:Number]) -> dict[str:Number]:
+    def normalize(self, specs: dict[str, Number]) -> dict[str, Number]:
         """
         given a dict of specs, calculate and return normalized spec value
         """
-        to_normalize = specs.values()
-        normalize = [spec.normalize for spec in self.init_spec]
+        relative = []
 
-        relative = (to_normalize - normalize) / (to_normalize + normalize)
+        for spec in self.init_spec:
+            to_normalize = specs[spec.name]
+            rel = (to_normalize - spec.normalize) / (to_normalize + spec.normalize)
+            relative.append(rel)
 
         spec_norm = dict(zip(self.spec_id, relative))
         return spec_norm
@@ -99,6 +106,8 @@ class SpecManager:
         spec_values = []
         for spec in self.init_spec:
             range = spec.range
+            print(spec)
+            print(type(range.min))
             if isinstance(range.min, int):
                 val = random.randint(int(range.min), int(range.max))
             else:
@@ -107,3 +116,20 @@ class SpecManager:
 
         cur_spec = dict(zip(self.spec_id, spec_values))
         return cur_spec
+
+
+# for testing
+# specs = AutoCktSpecs(  # FIXME Numbers right?
+#     [
+#         AutoCktSpec("gain", (200, 400), normalize=350),
+#         AutoCktSpec("ugbw", (1.0e6, 2.5e7), normalize=9.5e5),
+#         AutoCktSpec("phm", (60, 60.0000001), normalize=60),
+#         AutoCktSpec("ibias", (0.0001, 0.01), normalize=0.001),
+#     ]
+# )
+# sm = SpecManager(specs)
+
+# param_vals = {'mp1':34, 'mn1':34, 'mp3':34, 'mn3':34, 'mn4':34, 'mn5':15, 'cc':2.1e-12}
+# norm, ideal_norm = sm.step(param_vals)
+# print(f"val norm: {norm}")
+# print(f"ideal norm: {ideal_norm}")
