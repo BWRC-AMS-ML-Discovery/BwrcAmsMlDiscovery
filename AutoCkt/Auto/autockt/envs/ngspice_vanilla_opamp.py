@@ -159,7 +159,6 @@ class TwoStageAmp(gym.Env):
         self.cur_specs = self.update(self.cur_params_idx)
         reward = self.reward(self.cur_specs, self.specs_ideal)
 
-
         # incentivize reaching goal state
         done = False
         if reward >= 10:

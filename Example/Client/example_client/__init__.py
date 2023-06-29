@@ -52,9 +52,6 @@ def example_client_start():
     dc.configure(dc.Config(server_url=THE_SERVER_URL))
     dc.client_start()
 
-    #configure reward func
-
-
 """
 Now we can just call the RPCs as though they were implemented locally.
 """
