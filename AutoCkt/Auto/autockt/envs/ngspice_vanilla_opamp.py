@@ -15,14 +15,13 @@ from gym import spaces
 # Workspace Imports
 from .create_design_and_simulate_lib import create_design_and_simulate
 from shared import *
-# from eval_engines import PARAMS_RANGE, NORM_CONSTANT, TARGET_RANGE, fetch_circuit_opt
-from eval_engines import config
+from eval_engines import PARAMS_RANGE, NORM_CONSTANT, TARGET_RANGE
 
 # FIXME Avoid storing files?
 SPECS_DIR = "/tmp/ckt_da_new/specs/"
-PARAMS_RANGE = config.get_params_range()
-NORM_CONSTANT = config.get_norm_constant()
-TARGET_RANGE = config.get_target_range()
+PARAMS_RANGE = PARAMS_RANGE
+NORM_CONSTANT = NORM_CONSTANT
+TARGET_RANGE = TARGET_RANGE
 
 
 class ParamManager:

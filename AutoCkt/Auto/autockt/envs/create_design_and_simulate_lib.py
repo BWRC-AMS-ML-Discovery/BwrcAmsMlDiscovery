@@ -28,4 +28,3 @@ def create_design_and_simulate(param_val) -> dict:
     out: AutoCktOutput = auto_ckt_sim(inp)
     result: dict = output_to_dict(out)
     return result
-
