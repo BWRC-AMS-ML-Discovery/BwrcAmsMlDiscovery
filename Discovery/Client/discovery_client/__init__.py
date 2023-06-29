@@ -97,6 +97,3 @@ def _setup_client_rpcs():
         f.__doc__ = rpc.docstring
         # Set it as the function for the RPC
         rpc.func = f
-
-
-

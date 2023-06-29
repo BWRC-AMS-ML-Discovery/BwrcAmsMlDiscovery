@@ -8,8 +8,7 @@ FIXME This folder should be renamed to autockt_shared
 # Std-Lib Imports
 from typing import Optional, Union
 from collections import OrderedDict
-from typing import List, Callable, Type
-from shared.typing import Number
+from typing import List
 
 # Workspace Imports
 from dataclasses import dataclass, fields

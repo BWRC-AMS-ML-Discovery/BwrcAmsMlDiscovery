@@ -135,7 +135,7 @@ class TwoStageAmp(gym.Env):
         self.cur_specs = self.update(self.cur_params_idx)
 
         # reward
-        # reward = self.reward(self.cur_specs, self.specs_ideal)
+        reward = self.reward(self.cur_specs, self.specs_ideal)
 
         # applicable only when you have multiple goals, normalizes everything to some global_g
         self.specs_ideal_norm = self.lookup(self.specs_ideal, self.global_g)
@@ -232,7 +232,7 @@ class TwoStageAmp(gym.Env):
 
         # OrderedDict([('mp1', 34), ('mn1', 34), ('mp3', 34), ('mn3', 34), ('mn4', 34), ('mn5', 15), ('cc', 2.1e-12)])
         param_val = dict(list(zip(self.params_id, params)))
-        print(f"START: {param_val}")
+
         # run param vals and simulate
         cur_specs = dict(
             sorted(
@@ -243,9 +243,7 @@ class TwoStageAmp(gym.Env):
                 key=lambda k: k[0],
             )
         )
-        print(cur_specs)
         cur_specs = np.array(list(cur_specs.values()))
-        print(cur_specs)
 
         return cur_specs
 
