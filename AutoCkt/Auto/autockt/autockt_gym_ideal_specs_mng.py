@@ -7,32 +7,31 @@ import numpy as np
 # PyPI imports
 from pydantic.dataclasses import dataclass
 
-#local imports
+# local imports
 from autockt_gym_env_config import (
     AutoCktSpec,
     AutoCktSpecs,
     AutoCktParam,
     AutoCktParams,
-    Number
+    Number,
 )
-from envs.create_design_and_simulate_lib import (
-    create_design_and_simulate
-)
+from envs.create_design_and_simulate_lib import create_design_and_simulate
+
 
 #
 @dataclass
 class SpecManager:
-    #the inital specs used to create the spec manager
-    init_spec : AutoCktSpecs
+    # the inital specs used to create the spec manager
+    init_spec: AutoCktSpecs
 
-    #list if ids the spec has
-    spec_id : list(str)
-    #what spec is initially generated to
-    ideal_spec : dict[str : Number]
-    #the current spec value
-    cur_spec : dict[str : Number]
-    #ideal norm is calculate from ideal_spec and normalized values
-    ideal_norm : dict[str : Number]
+    # list if ids the spec has
+    spec_id: list(str)
+    # what spec is initially generated to
+    ideal_spec: dict[str:Number]
+    # the current spec value
+    cur_spec: dict[str:Number]
+    # ideal norm is calculate from ideal_spec and normalized values
+    ideal_norm: dict[str:Number]
 
     def __init__(self, init_spec):
         self.init_spec = init_spec
@@ -48,7 +47,7 @@ class SpecManager:
 
         return [self.cur_spec, cur_norm, self.ideal_norm]
 
-    def reset(self, params : dict[str : Number]):
+    def reset(self, params: dict[str:Number]):
         self.ideal_spec = self.gen_spec()
         self.ideal_norm = self.normalize(self.ideal_spec)
 
@@ -57,7 +56,7 @@ class SpecManager:
 
         return [cur_norm, self.ideal_norm]
 
-    def update(self, params: dict[str : Number]):
+    def update(self, params: dict[str:Number]):
         simulated = create_design_and_simulate(params)
         return simulated
 
@@ -69,7 +68,7 @@ class SpecManager:
 
         spec_norm = dict(zip(self.spec_id, relative))
         return spec_norm
-    
+
     def gen_spec(self):
         """
         using the given range, randomly generate one set of specs which fits this range
@@ -82,7 +81,6 @@ class SpecManager:
             else:
                 val = random.uniform(float(range.min), float(range.max))
             spec_values.append(val)
-        
+
         cur_spec = dict(zip(self.spec_id, spec_values))
         return cur_spec
-

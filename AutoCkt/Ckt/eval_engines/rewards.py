@@ -2,7 +2,7 @@ from example_client import AutoCktOutput
 from shared.typing import Number
 
 
-#TODO: remove target_output, can be assumed from rl model
+# TODO: remove target_output, can be assumed from rl model
 def settaluri_reward(
     curr_output: AutoCktOutput,  # This is from simulation
     target_output: dict[str, Number],  # This is from Specs
@@ -16,13 +16,15 @@ def settaluri_reward(
         relative = (curr - ideal) / (curr + ideal)
         return relative
 
-    #adapted TwoAmp reward using new variables
+    # adapted TwoAmp reward using new variables
     def reward(curr_output, target_output):
-        #populate relative for each key input of target
+        # populate relative for each key input of target
         output_relative = {}
         for key in target_output:
-            output_relative[key] = calc_relative(getattr(curr_output, key), target_output[key])
-        
+            output_relative[key] = calc_relative(
+                getattr(curr_output, key), target_output[key]
+            )
+
         pos_val = []
         reward = 0.0
         for key in output_relative:
@@ -37,6 +39,5 @@ def settaluri_reward(
 
         return reward if reward < -0.02 else 10
 
-    #run the reward function
+    # run the reward function
     return reward(curr_output, target_output)
-
