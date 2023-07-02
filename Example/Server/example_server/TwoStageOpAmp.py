@@ -29,6 +29,8 @@ def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
 
     # Create a set of simulation input for it
     sim_input = OpAmpSim(params)
+    print(sim_input)
+    print(params)
 
     # Simulation options
     opts = vsp.SimOptions(
@@ -167,6 +169,7 @@ def OpAmpSim(params: OpAmpParams) -> h.sim.Sim:
             sig_n = h.Vdc(dc=0.6, ac=-0.5)(p=dcin.n, n=VSS)
             Isource = h.Isrc(dc=3e-5)(p=vdc.p, n=i_bias)
 
+            print(params)
             inst = OpAmp(params)(
                 VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out
             )
