@@ -48,7 +48,7 @@ class AutoCktGym(gym.Env):
         self.reward = reward
 
         # create spec manager
-        self.params_manager = AutoCktParamsManager(params, actions_per_param)
+        self.params_manager = AutoCktParamsManager(params)
         self.sm = SpecManager(specs)
 
         # Necessary for the gym.Env API
