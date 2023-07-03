@@ -37,6 +37,7 @@ def settaluri_reward(
             else:
                 pos_val.append(1)
 
+        # TODO this 10 seems pretty arbitrary
         return reward if reward < -0.02 else 10
 
     # run the reward function
