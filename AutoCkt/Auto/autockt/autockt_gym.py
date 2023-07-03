@@ -15,7 +15,7 @@ from .autockt_gym_env_config import (
 from .autockt_gym_ideal_specs_mng import SpecManager
 from shared.typing import Number
 
-from .autockt_gym_params_mng.py import AutoCktParamsManager
+from .autockt_gym_params_mng import AutoCktParamsManager
 
 
 class AutoCktGym(gym.Env):
