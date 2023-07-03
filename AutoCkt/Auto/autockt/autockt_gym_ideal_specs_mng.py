@@ -15,6 +15,11 @@ from .autockt_gym_env_config import (
     AutoCktParams,
     Number,
 )
+
+
+# FIXME This lib was an adapter to use auto_ckt_sim for Keerthana's code
+# We should use the auto_ckt_sim directly, since if you look into this lib,
+# it's not generalizable
 from .envs.create_design_and_simulate_lib import create_design_and_simulate
 
 
