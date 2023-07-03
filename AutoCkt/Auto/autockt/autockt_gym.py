@@ -2,6 +2,7 @@
 import numpy as np
 import gym
 from gym import spaces
+from autockt.envs.create_design_and_simulate_lib import create_design_and_simulate
 
 # Local imports
 from .autockt_gym_env_config import (
@@ -12,6 +13,9 @@ from .autockt_gym_env_config import (
 )
 
 from .autockt_gym_ideal_specs_mng import SpecManager
+from shared.typing import Number
+
+from .autockt_gym_params_mng.py import AutoCktParamsManager
 
 
 class AutoCktGym(gym.Env):
@@ -43,14 +47,27 @@ class AutoCktGym(gym.Env):
         # Necessary for the gym.Env API
         self._build_action_space(params, actions_per_param)
         self._build_observation_space(params, specs)
+        self.params_manager = AutoCktParamsManager(params, actions_per_param)
 
     def reset(self):
+        # reset parameters to init value
+        self.params_manager.reset_to_init()
+        # get parameters
+        cur_params = self.params_manager.get_cur_params()
+
         params = None  # get from param manager
         cur_norm, ideal_norm = self.sm.reset(params)
         self.ob = np.concatenate([cur_norm, ideal_norm, params])
         return self.ob
 
     def step(self, action):
+        # def step(self, action: list[Number]):
+        """action: a list of actions from action space to take upon parameters"""
+        # update parameters by each action
+        self.params_manager.step(action)
+        # retrieve current parameters
+        cur_params = self.params_manager.get_cur_params()
+
         params = None  # get from param manager
         cur_spec, ideal_spec, cur_norm, ideal_norm = self.sm.step(params)
         reward = None  # calc from cur_spec and ideal_spec
@@ -100,3 +117,10 @@ class AutoCktGym(gym.Env):
             low=np.full(num_fields, -np.inf),
             high=np.full(num_fields, np.inf),
         )
+
+    def update(self, params_dict):
+        """returns the updated sim results of specs"""
+        # run param vals and simulate
+        result = create_design_and_simulate(params_dict)
+        cur_specs = np.array(list(result.values()))
+        return cur_specs
