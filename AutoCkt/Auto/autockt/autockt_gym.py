@@ -12,10 +12,9 @@ from .autockt_gym_env_config import (
     AutoCktCircuitOptimization,
 )
 
+from .autockt_gym_params_mng import AutoCktParamsManager
 from .autockt_gym_ideal_specs_mng import SpecManager
 from shared.typing import Number
-
-from .autockt_gym_params_mng import AutoCktParamsManager
 
 
 class AutoCktGym(gym.Env):
@@ -42,20 +41,22 @@ class AutoCktGym(gym.Env):
                     ):
                         pass
         # create spec manager
+        self.params_manager = AutoCktParamsManager(params, actions_per_param)
         self.sm = SpecManager(specs)
 
         # Necessary for the gym.Env API
         self._build_action_space(params, actions_per_param)
         self._build_observation_space(params, specs)
-        self.params_manager = AutoCktParamsManager(params, actions_per_param)
 
     def reset(self):
+        # ----------------- Params -----------------
         # reset parameters to init value
         self.params_manager.reset_to_init()
         # get parameters
         cur_params = self.params_manager.get_cur_params()
 
-        params = None  # get from param manager
+        # ----------------- Specs -----------------
+        params = cur_params  # get from param manager
         cur_norm, ideal_norm = self.sm.reset(params)
         self.ob = np.concatenate([cur_norm, ideal_norm, params])
         return self.ob
