@@ -61,21 +61,23 @@ class AutoCktGym(gym.Env):
         return self.ob
 
     def step(self, action):
-        # def step(self, action: list[Number]):
         """action: a list of actions from action space to take upon parameters"""
+
+        # ----------------- Params -----------------
+        # def step(self, action: list[Number]):
         # update parameters by each action
         self.params_manager.step(action)
         # retrieve current parameters
         cur_params = self.params_manager.get_cur_params()
 
-        params = None  # get from param manager
-        cur_spec, ideal_spec, cur_norm, ideal_norm = self.sm.step(params)
+        # ----------------- Specs -----------------
+        cur_spec, ideal_spec, cur_norm, ideal_norm = self.sm.step(cur_params)
         reward = None  # calc from cur_spec and ideal_spec
 
         done = False
         # do something related to reward
 
-        self.ob = np.concatenate([cur_norm, ideal_norm, params])
+        self.ob = np.concatenate([cur_norm, ideal_norm, cur_params])
 
         # update env steps
 
