@@ -15,14 +15,13 @@ from gym import spaces
 # Workspace Imports
 from .create_design_and_simulate_lib import create_design_and_simulate
 from shared import *
-# from eval_engines import PARAMS_RANGE, NORM_CONSTANT, TARGET_RANGE, fetch_circuit_opt
-from eval_engines import config
+from eval_engines import PARAMS_RANGE, NORM_CONSTANT, TARGET_RANGE
 
 # FIXME Avoid storing files?
 SPECS_DIR = "/tmp/ckt_da_new/specs/"
-PARAMS_RANGE = config.get_params_range()
-NORM_CONSTANT = config.get_norm_constant()
-TARGET_RANGE = config.get_target_range()
+PARAMS_RANGE = PARAMS_RANGE
+NORM_CONSTANT = NORM_CONSTANT
+TARGET_RANGE = TARGET_RANGE
 
 
 class ParamManager:
@@ -125,8 +124,6 @@ class TwoStageAmp(gym.Env):
         # [0, 0, 0, 0, 0, 0, 0]
         self.cur_params_idx = np.zeros(len(self.params_id), dtype=np.int32)
 
-        self.auto_ckt_opt = config.get_circuit_opt()
-
     def reset(self):
         """
         Called when horizon is reached (or when env is reset, which never happens in our code)
@@ -138,7 +135,7 @@ class TwoStageAmp(gym.Env):
         self.cur_specs = self.update(self.cur_params_idx)
 
         # reward
-        # reward = self.reward(self.cur_specs, self.specs_ideal)
+        reward = self.reward(self.cur_specs, self.specs_ideal)
 
         # applicable only when you have multiple goals, normalizes everything to some global_g
         self.specs_ideal_norm = self.lookup(self.specs_ideal, self.global_g)
@@ -160,14 +157,7 @@ class TwoStageAmp(gym.Env):
 
         # Get current specs and normalize
         self.cur_specs = self.update(self.cur_params_idx)
-
-        reward = 0.0
-        if self.auto_ckt_opt is None:
-            #use default reward function if not set
-            reward = self.reward(self.cur_specs, self.specs_ideal)
-        else:
-            #else use the client provided one
-            reward = self.auto_ckt_opt(cur_spec=self.cur_specs, specs_ideal=self.specs_ideal)
+        reward = self.reward(self.cur_specs, self.specs_ideal)
 
         # incentivize reaching goal state
         done = False

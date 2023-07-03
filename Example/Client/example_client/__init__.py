@@ -30,7 +30,7 @@ import discovery_client as dc
 
 
 # FIXME Maybe put this variable somewhere else?
-ENABLE_HTTP = False
+ENABLE_HTTP = True
 if not ENABLE_HTTP:
     dc.client_start = lambda: None
     # Short-circuiting by directly calling server functions
@@ -51,8 +51,6 @@ def example_client_start():
     # set server_url
     dc.configure(dc.Config(server_url=THE_SERVER_URL))
     dc.client_start()
-
-    #configure reward func
 
 
 """

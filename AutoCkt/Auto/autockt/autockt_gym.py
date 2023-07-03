@@ -11,6 +11,8 @@ from .autockt_gym_env_config import (
     AutoCktCircuitOptimization,
 )
 
+from .autockt_gym_ideal_specs_mng import SpecManager
+
 
 class AutoCktGym(gym.Env):
     metadata = {
@@ -35,16 +37,32 @@ class AutoCktGym(gym.Env):
                         reward=reward,
                     ):
                         pass
+        # create spec manager
+        self.sm = SpecManager(specs)
 
         # Necessary for the gym.Env API
         self._build_action_space(params, actions_per_param)
         self._build_observation_space(params, specs)
 
     def reset(self):
-        raise NotImplementedError
+        params = None  # get from param manager
+        cur_norm, ideal_norm = self.sm.reset(params)
+        self.ob = np.concatenate([cur_norm, ideal_norm, params])
+        return self.ob
 
     def step(self, action):
-        raise NotImplementedError
+        params = None  # get from param manager
+        cur_spec, ideal_spec, cur_norm, ideal_norm = self.sm.step(params)
+        reward = None  # calc from cur_spec and ideal_spec
+
+        done = False
+        # do something related to reward
+
+        self.ob = np.concatenate([cur_norm, ideal_norm, params])
+
+        # update env steps
+
+        return self.ob, reward, done, {}
 
     def _build_action_space(
         self,
