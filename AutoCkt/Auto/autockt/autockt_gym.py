@@ -45,8 +45,8 @@ class AutoCktGym(gym.Env):
         self.sm = SpecManager(specs)
 
         # Necessary for the gym.Env API
-        self._build_action_space(params, actions_per_param)
-        self._build_observation_space(params, specs)
+        self.action_space = self._build_action_space(params, actions_per_param)
+        self.observation_space = self._build_observation_space(params, specs)
 
     def reset(self):
         # ----------------- Params -----------------
@@ -91,7 +91,7 @@ class AutoCktGym(gym.Env):
         # TODO We can generalize actions
         num_actions_per_param = len(actions_per_param)
 
-        self.action_space = spaces.Dict(
+        action_space = spaces.Dict(
             {
                 param.name: spaces.Discrete(
                     num_actions_per_param,
@@ -99,6 +99,8 @@ class AutoCktGym(gym.Env):
                 for param in params
             }
         )
+
+        return action_space
 
     def _build_observation_space(
         self,
@@ -115,10 +117,12 @@ class AutoCktGym(gym.Env):
         )
 
         # TODO Currently space is infinite
-        self.observation_space = spaces.Box(
+        observation_space = spaces.Box(
             low=np.full(num_fields, -np.inf),
             high=np.full(num_fields, np.inf),
         )
+
+        return observation_space
 
     def update(self, params_dict):
         """returns the updated sim results of specs"""
