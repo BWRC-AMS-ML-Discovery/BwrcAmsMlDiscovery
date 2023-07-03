@@ -2,7 +2,7 @@
 import numpy as np
 import gym
 from gym import spaces
-from autockt.envs.create_design_and_simulate_lib import create_design_and_simulate
+from pydantic.tools import parse_obj_as
 
 # Local imports
 from .autockt_gym_env_config import (
@@ -24,8 +24,12 @@ class AutoCktGym(gym.Env):
 
     def __init__(
         self,
-        env_config: AutoCktGymEnvConfig,  # FIXME It's actually an EnvContext(dict)
+        env_config: AutoCktGymEnvConfig,  # It's actually an EnvContext(dict)
     ):
+        # Adapter due to Ray converting dataclass to dict
+        env_config = parse_obj_as(AutoCktGymEnvConfig, env_config)
+
+        # Extract variables
         match env_config:
             case AutoCktGymEnvConfig(
                 circuit_optimization=circuit_optimization,
@@ -40,6 +44,9 @@ class AutoCktGym(gym.Env):
                         reward=reward,
                     ):
                         pass
+
+        self.reward = reward
+
         # create spec manager
         self.params_manager = AutoCktParamsManager(params, actions_per_param)
         self.sm = SpecManager(specs)
@@ -72,10 +79,13 @@ class AutoCktGym(gym.Env):
 
         # ----------------- Specs -----------------
         cur_spec, ideal_spec, cur_norm, ideal_norm = self.sm.step(cur_params)
-        reward = None  # calc from cur_spec and ideal_spec
 
-        done = False
+        # FIXME
+        reward = self.reward(cur_spec, ideal_spec)  # calc from cur_spec and ideal_spec
+
+        # FIXME 10 is very arbitrary
         # do something related to reward
+        done = reward >= 10
 
         self.ob = np.concatenate([cur_norm, ideal_norm, cur_params])
 
@@ -123,10 +133,3 @@ class AutoCktGym(gym.Env):
         )
 
         return observation_space
-
-    def update(self, params_dict):
-        """returns the updated sim results of specs"""
-        # run param vals and simulate
-        result = create_design_and_simulate(params_dict)
-        cur_specs = np.array(list(result.values()))
-        return cur_specs
