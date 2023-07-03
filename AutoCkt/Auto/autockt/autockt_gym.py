@@ -80,10 +80,10 @@ class AutoCktGym(gym.Env):
         # ----------------- Specs -----------------
         cur_spec, ideal_spec, cur_norm, ideal_norm = self.sm.step(cur_params)
 
-        # FIXME
+        # FIXME type mismatch
         reward = self.reward(cur_spec, ideal_spec)  # calc from cur_spec and ideal_spec
 
-        # FIXME 10 is very arbitrary
+        # TODO 10 is very arbitrary
         # do something related to reward
         done = reward >= 10
 
