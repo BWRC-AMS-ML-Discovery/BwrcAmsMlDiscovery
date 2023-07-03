@@ -3,8 +3,8 @@ from shared.typing import Number
 
 
 class AutoCktParamsManager:
-    params_range: AutoCktParams
-    cur_params: dict
+    def __init__(self, params_ranges: AutoCktParams):
+        self.params_ranges = params_ranges
 
     def reset_to_init(self):
         """returns the init params dict for resetting the env"""
