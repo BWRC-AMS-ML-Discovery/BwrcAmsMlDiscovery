@@ -56,9 +56,8 @@ class AutoCktGym(gym.Env):
         cur_params = self.params_manager.get_cur_params()
 
         # ----------------- Specs -----------------
-        params = cur_params  # get from param manager
-        cur_norm, ideal_norm = self.sm.reset(params)
-        self.ob = np.concatenate([cur_norm, ideal_norm, params])
+        cur_norm, ideal_norm = self.sm.reset(cur_params)
+        self.ob = np.concatenate([cur_norm, ideal_norm, cur_params])
         return self.ob
 
     def step(self, action):
