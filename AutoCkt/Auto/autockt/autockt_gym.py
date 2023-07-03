@@ -80,7 +80,7 @@ class AutoCktGym(gym.Env):
         # ----------------- Specs -----------------
         cur_spec, ideal_spec, cur_norm, ideal_norm = self.sm.step(cur_params)
 
-        # FIXME type mismatch
+        # FIXME type mismatch; cur_spec should be AutoCktOutput?
         reward = self.reward(cur_spec, ideal_spec)  # calc from cur_spec and ideal_spec
 
         # TODO 10 is very arbitrary
