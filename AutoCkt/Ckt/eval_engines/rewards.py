@@ -20,9 +20,12 @@ def settaluri_reward(
     def reward(curr_output, target_output):
         # populate relative for each key input of target
         output_relative = {}
+        # print(f"curr output {curr_output}  target_output {target_output}")
         for key in target_output:
             output_relative[key] = calc_relative(
-                getattr(curr_output, key), target_output[key]
+                # getattr(curr_output, key), target_output[key]
+                curr_output[key],
+                target_output[key],
             )
 
         pos_val = []

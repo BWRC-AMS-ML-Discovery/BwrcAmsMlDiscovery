@@ -14,9 +14,8 @@ class AutoCktParamsManager:
     def step(self, cur_action: list[Number]):
         """based on action space move by action's idx"""
         # Convert to a numpy array and flatten it if it's not already 1D
-
         for idx, (name, _) in enumerate(self.cur_params.items()):
-            step_update = self.cur_params[name] + cur_action[idx]
+            step_update = self.cur_params[name] + cur_action[name]
             if (
                 step_update <= self.params_ranges[idx].range.max
                 and step_update >= self.params_ranges[idx].range.min

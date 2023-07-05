@@ -54,10 +54,10 @@ class SpecManager:
         zeros = np.zeros(len(self.spec_id))
         self.cur_spec = dict(zip(self.spec_id, zeros))
 
-        print(f"spec id: {self.spec_id}")
-        print(f"ideal spec: {self.ideal_spec}")
-        print(f"ideal norm: {self.ideal_norm}")
-        print(f"cur spec: {self.cur_spec}")
+        # print(f"spec id: {self.spec_id}")
+        # print(f"ideal spec: {self.ideal_spec}")
+        # print(f"ideal norm: {self.ideal_norm}")
+        # print(f"cur spec: {self.cur_spec}")
 
     def step(self, params: dict[str, Number]):
         """
@@ -114,8 +114,6 @@ class SpecManager:
         spec_values = []
         for spec in self.init_spec:
             range = spec.range
-            print(spec)
-            print(type(range.min))
             if isinstance(range.min, int):
                 val = random.randint(int(range.min), int(range.max))
             else:
