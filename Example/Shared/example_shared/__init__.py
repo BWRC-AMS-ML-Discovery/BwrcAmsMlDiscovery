@@ -168,6 +168,7 @@ class AutoCktOutput:
     """
     Output type for AutoCkt library, a spec of circuit design
     """
+
     gain: float
     ugbw: float
     phm: float
