@@ -16,6 +16,7 @@ from .autockt_gym_params_mng import AutoCktParamsManager
 from .autockt_gym_ideal_specs_mng import SpecManager
 from shared.typing import Number
 
+from .envs.create_design_and_simulate_lib import create_design_and_simulate
 
 class AutoCktGym(gym.Env):
     metadata = {
@@ -63,7 +64,8 @@ class AutoCktGym(gym.Env):
         cur_params = self.params_manager.get_cur_params()
 
         # ----------------- Specs -----------------
-        cur_norm, ideal_norm = self.spec_manager.reset(cur_params)
+        self.spec_manager.update(create_design_and_simulate(cur_params))
+        cur_norm, ideal_norm = self.spec_manager.reset()
         self.ob = np.concatenate(
             [
                 list(cur_norm.values()),
@@ -84,7 +86,8 @@ class AutoCktGym(gym.Env):
         cur_params = self.params_manager.get_cur_params()
 
         # ----------------- Specs -----------------
-        cur_spec, ideal_spec, cur_norm, ideal_norm = self.spec_manager.step(cur_params)
+        self.spec_manager.update(create_design_and_simulate(cur_params))
+        cur_spec, ideal_spec, cur_norm, ideal_norm = self.spec_manager.step()
 
         # FIXME type mismatch; cur_spec should be AutoCktOutput?
         reward = self.reward(cur_spec, ideal_spec)  # calc from cur_spec and ideal_spec

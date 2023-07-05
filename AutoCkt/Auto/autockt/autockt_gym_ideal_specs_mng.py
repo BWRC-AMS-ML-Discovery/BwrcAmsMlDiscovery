@@ -59,19 +59,18 @@ class SpecManager:
         # print(f"ideal norm: {self.ideal_norm}")
         # print(f"cur spec: {self.cur_spec}")
 
-    def step(self, params: dict[str, Number]):
+    def step(self):
         """
         Takes a dict of param values and updates the current spec values
 
         returns the current spec, ideal_spec, the norm of the current spec, and the norm of the ideal spec
         returns the current and ideal spec so that reward can be calculated
         """
-        self.cur_spec = self.update(params)
         cur_norm = self.normalize(self.cur_spec)
 
         return [self.cur_spec, self.ideal_spec, cur_norm, self.ideal_norm]
 
-    def reset(self, params: dict[str, Number]):
+    def reset(self):
         """
         Takes a dict of param values to reset the current spec value to
         generates a new set of ideal specs
@@ -81,17 +80,15 @@ class SpecManager:
         self.ideal_spec = self.gen_spec()
         self.ideal_norm = self.normalize(self.ideal_spec)
 
-        self.cur_spec = self.update(params)
         cur_norm = self.normalize(self.cur_spec)
 
         return [cur_norm, self.ideal_norm]
 
-    def update(self, params: dict[str, Number]) -> dict[str, Number]:
+    def update(self, simulated: dict[str, Number]) -> dict[str, Number]:
         """
         simulates on the given param values and returns a spec dict
         """
-        simulated = create_design_and_simulate(params)
-        return simulated
+        self.cur_spec = simulated
 
     def normalize(self, specs: dict[str, Number]) -> dict[str, Number]:
         """
