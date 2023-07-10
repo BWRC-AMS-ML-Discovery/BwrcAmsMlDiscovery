@@ -17,7 +17,7 @@ from example_shared import auto_ckt_sim, AutoCktInput, AutoCktOutput
 
 
 @auto_ckt_sim.impl
-def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
+def auto_ckt_sim_Hdl21(inp: AutoCktInput) -> AutoCktOutput:
     """
     AutoCkt Simulation
     """
