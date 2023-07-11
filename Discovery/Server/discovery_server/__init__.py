@@ -21,7 +21,7 @@ import uvicorn
 
 # Workspace Imports
 from discovery_shared.git import GitInfo
-
+from .auth import authenticated_service
 
 app = FastAPI(
     debug=False,
@@ -88,7 +88,8 @@ async def version() -> GitInfo:
     return GitInfo.get()
 
 
-def _setup_server_rpcs():
+@authenticated_service(app.post, "/setup_server_rpcs")
+async def _setup_server_rpcs():
     """# Set up server RPCs"""
     from discovery_shared.rpc import rpcs
 
