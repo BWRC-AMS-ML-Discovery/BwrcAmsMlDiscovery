@@ -16,8 +16,6 @@ from .autockt_gym_params_mng import AutoCktParamsManager
 from .autockt_gym_ideal_specs_mng import SpecManager
 from shared.typing import Number
 
-from example_client import auto_ckt_sim
-
 
 class AutoCktGym(gym.Env):
     metadata = {
@@ -57,7 +55,7 @@ class AutoCktGym(gym.Env):
         self.ckt_to_input = ckt_to_input
         self.output_to_ckt = output_to_ckt
 
-        # create spec manager
+        # create managers
         self.params_manager = AutoCktParamsManager(params)
         self.spec_manager = SpecManager(specs)
 
@@ -67,25 +65,26 @@ class AutoCktGym(gym.Env):
 
     def reset(self):
         # ----------------- Params -----------------
-        # reset parameters to init value
         self.params_manager.reset_to_init()
-        # get parameters
         cur_params = self.params_manager.get_cur_params()
 
+        # ----------------- Simulation -----------------
         result = self.simulation(self.ckt_to_input(cur_params))
         result = self.output_to_ckt(result)
 
         # ----------------- Specs -----------------
         self.spec_manager.update(result)
         cur_norm, ideal_norm = self.spec_manager.reset()
-        self.ob = np.concatenate(
+
+        # ----------------- Observation -----------------
+        observation = np.concatenate(
             [
                 list(cur_norm.values()),
                 list(ideal_norm.values()),
                 list(cur_params.values()),
             ]
         )
-        return self.ob
+        return observation
 
     def step(self, action):
         """action: a list of actions from action space to take upon parameters"""
