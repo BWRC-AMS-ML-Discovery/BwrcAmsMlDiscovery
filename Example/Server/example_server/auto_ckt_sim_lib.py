@@ -29,7 +29,9 @@ _raw_file.close()
 def _mkdir():
     while True:
         try:
-            design_folder = IO_BASE_DIR + "out/" + str(random.randint(0, 1_000_000))
+            design_folder = (
+                IO_BASE_DIR + "out/" + str(random.randint(0, 1_000_000_000_000_000_000))
+            )
             os.makedirs(design_folder)
             return design_folder
         except OSError:
