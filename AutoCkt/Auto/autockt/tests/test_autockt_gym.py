@@ -9,7 +9,11 @@ from autockt.autockt_gym_env_config import (
     AutoCktSpecs,
 )
 from eval_engines.rewards import settaluri_reward
-from example_client import AutoCktInput, AutoCktOutput
+from example_client import (
+    AutoCktInput,
+    AutoCktOutput,
+    auto_ckt_sim,
+)
 
 
 def test() -> AutoCktGym:
@@ -35,6 +39,7 @@ def test() -> AutoCktGym:
         ),
         input_type=AutoCktInput,
         output_type=AutoCktOutput,
+        simluation=auto_ckt_sim,
         reward=settaluri_reward,
     )
 
