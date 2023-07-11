@@ -1,3 +1,5 @@
+from dataclasses import asdict
+
 # PyPI imports
 import numpy as np
 import gym
@@ -46,6 +48,9 @@ class AutoCktGym(gym.Env):
                     ):
                         pass
 
+        self.input_type = input_type
+        self.output_type = output_type
+        self.simulation = simulation
         self.reward = reward
 
         # create managers
@@ -58,15 +63,23 @@ class AutoCktGym(gym.Env):
 
     def reset(self):
         # ----------------- Params -----------------
-        # reset parameters to init value
         self.params_manager.reset_to_init()
-        # get parameters
         cur_params = self.params_manager.get_cur_params()
 
+        # ----------------- Simulation -----------------
+        result: self.output_type = self.simulation(self.input_type(**cur_params))
+
         # ----------------- Specs -----------------
-        cur_norm, ideal_norm = self.spec_manager.reset(cur_params)
-        self.ob = np.concatenate([cur_norm, ideal_norm, cur_params])
-        return self.ob
+        ideal_norm = self.spec_manager.reset(cur_params)
+
+        observation = np.concatenate(
+            [
+                list(asdict(result).values()),
+                list(ideal_norm.values()),
+                list(cur_params.values()),
+            ]
+        )
+        return observation
 
     def step(self, action):
         """action: a list of actions from action space to take upon parameters"""
