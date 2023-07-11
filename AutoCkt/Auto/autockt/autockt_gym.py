@@ -56,7 +56,7 @@ class AutoCktGym(gym.Env):
         self.output_to_ckt = output_to_ckt
 
         # create managers
-        self.params_manager = AutoCktParamsManager(params)
+        self.params_manager = AutoCktParamsManager(params, actions_per_param)
         self.spec_manager = SpecManager(specs)
 
         # Necessary for the gym.Env API
