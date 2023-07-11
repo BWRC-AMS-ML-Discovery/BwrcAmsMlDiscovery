@@ -1,2 +1,5 @@
+from typing import Union
+
+
 # FIXME everything converts to float, why?
-Number = float | int
+Number = Union[float, int]
