@@ -47,9 +47,9 @@ class AutoCktGym(gym.Env):
 
         self.reward = reward
 
-        # create spec manager
+        # create managers
         self.params_manager = AutoCktParamsManager(params)
-        self.sm = SpecManager(specs)
+        self.spec_manager = SpecManager(specs)
 
         # Necessary for the gym.Env API
         self.action_space = self._build_action_space(params, actions_per_param)
@@ -63,7 +63,7 @@ class AutoCktGym(gym.Env):
         cur_params = self.params_manager.get_cur_params()
 
         # ----------------- Specs -----------------
-        cur_norm, ideal_norm = self.sm.reset(cur_params)
+        cur_norm, ideal_norm = self.spec_manager.reset(cur_params)
         self.ob = np.concatenate([cur_norm, ideal_norm, cur_params])
         return self.ob
 
@@ -78,7 +78,7 @@ class AutoCktGym(gym.Env):
         cur_params = self.params_manager.get_cur_params()
 
         # ----------------- Specs -----------------
-        cur_spec, ideal_spec, cur_norm, ideal_norm = self.sm.step(cur_params)
+        cur_spec, ideal_spec, cur_norm, ideal_norm = self.spec_manager.step(cur_params)
 
         # FIXME type mismatch; cur_spec should be AutoCktOutput?
         reward = self.reward(cur_spec, ideal_spec)  # calc from cur_spec and ideal_spec
