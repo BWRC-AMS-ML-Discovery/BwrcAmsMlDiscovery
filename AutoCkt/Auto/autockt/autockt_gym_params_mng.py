@@ -23,5 +23,5 @@ class AutoCktParamsManager:
             ):
                 self.cur_params[name] = step_update
 
-    def get_cur_params(self):
+    def get_cur_params(self) -> dict:
         return self.cur_params
