@@ -97,7 +97,7 @@ class AutoCktGym(gym.Env):
         self.spec_manager.update(asdict(result))
         cur_spec, ideal_spec, cur_norm, ideal_norm = self.spec_manager.step()
 
-        reward = self.reward(result, ideal_spec)  # calc from cur_spec and ideal_spec
+        reward = self.reward(result, ideal_spec)  # calc from result and ideal_spec
 
         # TODO 10 is very arbitrary
         # do something related to reward
