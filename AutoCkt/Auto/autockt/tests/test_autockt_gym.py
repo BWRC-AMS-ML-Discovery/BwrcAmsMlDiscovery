@@ -12,7 +12,7 @@ from eval_engines.rewards import settaluri_reward
 from example_client import AutoCktInput, AutoCktOutput
 
 
-def test():
+def test() -> AutoCktGym:
     circuit_optimization = AutoCktCircuitOptimization(
         params=AutoCktParams(
             [
@@ -44,12 +44,16 @@ def test():
     )
 
     env = AutoCktGym(gym_env_config)
+
     # env.reset()
     # env.step([2, 2, 2, 2, 2, 2, 2])
 
+    return env
+
 
 def main():
-    test()
+    env = test()
+
     IPython.embed()
 
 
