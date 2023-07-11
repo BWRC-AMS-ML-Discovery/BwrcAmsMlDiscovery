@@ -90,17 +90,12 @@ class AutoCktGym(gym.Env):
         """action: a list of actions from action space to take upon parameters"""
 
         # ----------------- Params -----------------
-        # def step(self, action: list[Number]):
-        # update parameters by each action
         self.params_manager.step(action)
-        # retrieve current parameters
         cur_params = self.params_manager.get_cur_params()
 
-        # print(f"cur_params: {cur_params}")
-        process = self.ckt_to_input(cur_params)
-        sim = self.simulation(process)
-        result = self.output_to_ckt(sim)
-        # print(f"result: {result}")
+        # ----------------- Simulation -----------------
+        result = self.simulation(self.ckt_to_input(cur_params))
+        result = self.output_to_ckt(result)
 
         # ----------------- Specs -----------------
         self.spec_manager.update(result)
@@ -113,7 +108,8 @@ class AutoCktGym(gym.Env):
         # do something related to reward
         done = reward >= 10
 
-        self.ob = np.concatenate(
+        # ----------------- Observation -----------------
+        observation = np.concatenate(
             [
                 list(cur_norm.values()),
                 list(ideal_norm.values()),
@@ -121,9 +117,9 @@ class AutoCktGym(gym.Env):
             ]
         )
 
-        # update env steps
+        # TODO update env steps
 
-        return self.ob, reward, done, {}
+        return observation, reward, done, {}
 
     def _build_action_space(
         self,
