@@ -110,9 +110,6 @@ class AutoCktGym(gym.Env):
         # FIXME type mismatch; cur_spec should be AutoCktOutput?
         reward = self.reward(cur_spec, ideal_spec)  # calc from cur_spec and ideal_spec
 
-        # if(reward > -17):
-        #     print(f"simulate: {sim}")
-
         # TODO 10 is very arbitrary
         # do something related to reward
         done = reward >= 10
