@@ -23,10 +23,34 @@ from autockt.autockt_gym_env_config import (
 from example_client import (
     AutoCktInput,
     AutoCktOutput,
+    auto_ckt_sim,
 )
 from eval_engines.rewards import (
     settaluri_reward,
 )
+
+
+def ckt_to_input(params):
+    return AutoCktInput(
+        mp1=params["mp1"],
+        mn1=params["mn1"],
+        mp3=params["mp3"],
+        mn3=params["mn3"],
+        mn4=params["mn4"],
+        mn5=params["mn5"],
+        cc=params["cc"],
+    )
+    # return AutoCktInput(*params)
+
+
+def output_to_ckt(out):
+    # print(f"simulation output {out}")
+    return {
+        "gain": out.gain,
+        "ugbw": out.ugbw,
+        "phm": out.phm,
+        "ibias": out.ibias,
+    }
 
 
 def main():
@@ -55,7 +79,10 @@ def main():
         ),
         input_type=AutoCktInput,
         output_type=AutoCktOutput,
+        simulation=auto_ckt_sim,
         reward=settaluri_reward,
+        ckt_to_input=ckt_to_input,
+        output_to_ckt=output_to_ckt,
     )
 
     gym_env_config = AutoCktGymEnvConfig(

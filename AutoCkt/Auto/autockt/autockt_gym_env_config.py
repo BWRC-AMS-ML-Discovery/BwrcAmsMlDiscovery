@@ -7,6 +7,7 @@ from pydantic.dataclasses import dataclass
 
 # Local imports
 from shared.typing import Number
+from discovery_shared.rpc import Rpc
 
 
 @dataclass
@@ -59,6 +60,15 @@ class AutoCktCircuitOptimization:
         # https://spinningup.openai.com/en/latest/spinningup/rl_intro.html#reward-and-return
         float,
     ]
+
+    # rpc function which simulates
+    simulation: Rpc
+
+    # converts param list to input_type which simulation uses
+    ckt_to_input: Callable[[dict[str, Number]], "Self.InputType"]
+
+    # converts output of simulation to spec list that rl model uses
+    output_to_ckt: Callable[["Self.OutputType"], dict[str, Number]]
 
 
 @dataclass

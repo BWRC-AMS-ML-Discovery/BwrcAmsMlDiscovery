@@ -16,7 +16,7 @@ from .autockt_gym_params_mng import AutoCktParamsManager
 from .autockt_gym_ideal_specs_mng import SpecManager
 from shared.typing import Number
 
-from .envs.create_design_and_simulate_lib import create_design_and_simulate
+from example_client import auto_ckt_sim
 
 
 class AutoCktGym(gym.Env):
@@ -43,11 +43,19 @@ class AutoCktGym(gym.Env):
                         specs=specs,
                         input_type=input_type,
                         output_type=output_type,
+                        simulation=simulation,
                         reward=reward,
+                        ckt_to_input=ckt_to_input,
+                        output_to_ckt=output_to_ckt,
                     ):
                         pass
 
+        self.input_type = input_type
+        self.output_type = output_type
+        self.simulation = simulation
         self.reward = reward
+        self.ckt_to_input = ckt_to_input
+        self.output_to_ckt = output_to_ckt
 
         # create spec manager
         self.params_manager = AutoCktParamsManager(params)
@@ -64,8 +72,11 @@ class AutoCktGym(gym.Env):
         # get parameters
         cur_params = self.params_manager.get_cur_params()
 
+        result = self.simulation(self.ckt_to_input(cur_params))
+        result = self.output_to_ckt(result)
+
         # ----------------- Specs -----------------
-        self.spec_manager.update(create_design_and_simulate(cur_params))
+        self.spec_manager.update(result)
         cur_norm, ideal_norm = self.spec_manager.reset()
         self.ob = np.concatenate(
             [
@@ -86,12 +97,21 @@ class AutoCktGym(gym.Env):
         # retrieve current parameters
         cur_params = self.params_manager.get_cur_params()
 
+        # print(f"cur_params: {cur_params}")
+        process = self.ckt_to_input(cur_params)
+        sim = self.simulation(process)
+        result = self.output_to_ckt(sim)
+        # print(f"result: {result}")
+
         # ----------------- Specs -----------------
-        self.spec_manager.update(create_design_and_simulate(cur_params))
+        self.spec_manager.update(result)
         cur_spec, ideal_spec, cur_norm, ideal_norm = self.spec_manager.step()
 
         # FIXME type mismatch; cur_spec should be AutoCktOutput?
         reward = self.reward(cur_spec, ideal_spec)  # calc from cur_spec and ideal_spec
+
+        # if(reward > -17):
+        #     print(f"simulate: {sim}")
 
         # TODO 10 is very arbitrary
         # do something related to reward

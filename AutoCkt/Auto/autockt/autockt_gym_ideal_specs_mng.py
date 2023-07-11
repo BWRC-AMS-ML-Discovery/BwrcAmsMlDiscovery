@@ -54,11 +54,6 @@ class SpecManager:
         zeros = np.zeros(len(self.spec_id))
         self.cur_spec = dict(zip(self.spec_id, zeros))
 
-        # print(f"spec id: {self.spec_id}")
-        # print(f"ideal spec: {self.ideal_spec}")
-        # print(f"ideal norm: {self.ideal_norm}")
-        # print(f"cur spec: {self.cur_spec}")
-
     def step(self):
         """
         Takes a dict of param values and updates the current spec values
@@ -88,21 +83,23 @@ class SpecManager:
         """
         simulates on the given param values and returns a spec dict
         """
+        # print(f"{simulated}")
         self.cur_spec = simulated
 
     def normalize(self, specs: dict[str, Number]) -> dict[str, Number]:
         """
         given a dict of specs, calculate and return normalized spec value
         """
-        relative = []
+        relative = {}
 
         for spec in self.init_spec:
             to_normalize = specs[spec.name]
             rel = (to_normalize - spec.normalize) / (to_normalize + spec.normalize)
-            relative.append(rel)
+            relative[spec.name] = rel
 
-        spec_norm = dict(zip(self.spec_id, relative))
-        return spec_norm
+        # print(f"{relative}")
+        # spec_norm = dict(zip(self.spec_id, relative))
+        return relative
 
     def gen_spec(self):
         """
@@ -119,20 +116,3 @@ class SpecManager:
 
         cur_spec = dict(zip(self.spec_id, spec_values))
         return cur_spec
-
-
-# for testing
-# specs = AutoCktSpecs(  # FIXME Numbers right?
-#     [
-#         AutoCktSpec("gain", (200, 400), normalize=350),
-#         AutoCktSpec("ugbw", (1.0e6, 2.5e7), normalize=9.5e5),
-#         AutoCktSpec("phm", (60, 60.0000001), normalize=60),
-#         AutoCktSpec("ibias", (0.0001, 0.01), normalize=0.001),
-#     ]
-# )
-# sm = SpecManager(specs)
-
-# param_vals = {'mp1':34, 'mn1':34, 'mp3':34, 'mn3':34, 'mn4':34, 'mn5':15, 'cc':2.1e-12}
-# norm, ideal_norm = sm.step(param_vals)
-# print(f"val norm: {norm}")
-# print(f"ideal norm: {ideal_norm}")
