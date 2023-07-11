@@ -39,7 +39,7 @@ def test() -> AutoCktGym:
         ),
         input_type=AutoCktInput,
         output_type=AutoCktOutput,
-        simluation=auto_ckt_sim,
+        simulation=auto_ckt_sim,
         reward=settaluri_reward,
     )
 
@@ -50,8 +50,18 @@ def test() -> AutoCktGym:
 
     env = AutoCktGym(gym_env_config)
 
-    # env.reset()
-    # env.step([2, 2, 2, 2, 2, 2, 2])
+    env.reset()
+    env.step(
+        {
+            "mp1": 0,
+            "mn1": 1,
+            "mp3": 2,
+            "mn3": 0,
+            "mn4": 1,
+            "mn5": 2,
+            "cc": 0,
+        }
+    )
 
     return env
 
