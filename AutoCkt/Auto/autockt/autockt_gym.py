@@ -41,6 +41,7 @@ class AutoCktGym(gym.Env):
                         specs=specs,
                         input_type=input_type,
                         output_type=output_type,
+                        simulation=simulation,
                         reward=reward,
                     ):
                         pass

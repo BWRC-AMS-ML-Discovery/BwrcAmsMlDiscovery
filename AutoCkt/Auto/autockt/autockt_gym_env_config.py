@@ -7,6 +7,7 @@ from pydantic.dataclasses import dataclass
 
 # Local imports
 from shared.typing import Number
+from discovery_shared.rpc import Rpc
 
 
 @dataclass
@@ -50,8 +51,11 @@ when we simply want to control which specs to achieve.
 class AutoCktCircuitOptimization:
     params: AutoCktParams
     specs: AutoCktSpecs
+
     input_type: type
     output_type: type
+    simulation: Rpc  # rpc function which simulates
+
     reward: Callable[
         ["Self.OutputType", dict[str, Number]],  # TODO Typing
         # TODO The input to reward can be expanded to (s_t, a_t, s_{t+1}),

@@ -23,6 +23,7 @@ from autockt.autockt_gym_env_config import (
 from example_client import (
     AutoCktInput,
     AutoCktOutput,
+    auto_ckt_sim,
 )
 from eval_engines.rewards import (
     settaluri_reward,
@@ -55,6 +56,7 @@ def main():
         ),
         input_type=AutoCktInput,
         output_type=AutoCktOutput,
+        simulation=auto_ckt_sim,
         reward=settaluri_reward,
     )
 
