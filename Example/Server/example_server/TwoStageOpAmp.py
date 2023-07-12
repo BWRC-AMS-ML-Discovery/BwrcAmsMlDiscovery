@@ -13,52 +13,6 @@ import vlsirtools.spice as vsp
 from hdl21.external_module import SpiceType
 from hdl21.prefix import µ, NANO
 
-from example_shared import auto_ckt_sim, AutoCktInput, AutoCktOutput
-
-
-@auto_ckt_sim.impl
-def auto_ckt_sim_Hdl21(inp: AutoCktInput) -> AutoCktOutput:
-    """
-    AutoCkt Simulation
-    """
-    if not vsp.ngspice.available():
-        raise RuntimeError
-
-    # Convert our input into `OpAmpParams`
-    params = OpAmpParams(**asdict(inp))
-
-    # Create a set of simulation input for it
-    sim_input = OpAmpSim(params)
-    print(sim_input)
-    print(params)
-
-    # Simulation options
-    opts = vsp.SimOptions(
-        simulator=vsp.SupportedSimulators.NGSPICE,
-        fmt=vsp.ResultFormat.SIM_DATA,  # Get Python-native result types
-        rundir="./scratch",  # Set the working directory for the simulation. Uses a temporary directory by default.
-    )
-
-    # Run the simulation!
-    results = sim_input.run(opts)
-
-    # Extract our metrics from those results
-    ac_result = results["ac"]
-    sig_out = ac_result.data["v(xtop.sig_out)"]
-    gain = find_dc_gain(2 * sig_out)
-    ugbw = find_ugbw(ac_result.freq, 2 * sig_out)
-    phm = find_phm(ac_result.freq, 2 * sig_out)
-    idd = ac_result.data["i(v.xtop.vvdc)"]
-    ibias = find_I_vdd(idd)
-
-    # And return them as an `AutoCktOutput`
-    return AutoCktOutput(
-        ugbw=ugbw,
-        gain=gain,
-        phm=phm,
-        ibias=ibias,
-    )
-
 
 """ 
 Create a small "PDK" consisting of an externally-defined Nmos and Pmos transistor. 

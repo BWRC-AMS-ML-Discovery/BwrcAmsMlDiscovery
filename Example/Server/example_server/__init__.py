@@ -2,6 +2,9 @@
 # Example Server
 """
 
+# Stdlib Imports
+from dataclasses import asdict
+
 # PyPi Imports
 import hdl21 as h
 import vlsirtools.spice as vsp
@@ -25,7 +28,7 @@ from example_shared import (
     InverterBetaRatioInput,
     InverterBetaRatioOutput,
     auto_ckt_sim,
-    auto_ckt_sim_Hdl21,
+    auto_ckt_sim_hdl21,
     AutoCktInput,
     AutoCktOutput,
 )
@@ -183,8 +186,8 @@ def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
     return specs
 
 
-@auto_ckt_sim_Hdl21.impl
-def auto_ckt_sim_Hdl21(inp: AutoCktInput) -> AutoCktOutput:
+@auto_ckt_sim_hdl21.impl
+def auto_ckt_sim_hdl21(inp: AutoCktInput) -> AutoCktOutput:
     """
     AutoCkt Simulation
     """

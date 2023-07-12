@@ -182,8 +182,8 @@ auto_ckt_sim = Rpc(
     docstring="Simulation on the Server",
 )
 
-auto_ckt_sim_Hdl21 = Rpc(
-    name="auto_ckt_sim_Hdl21",
+auto_ckt_sim_hdl21 = Rpc(
+    name="auto_ckt_sim_hdl21",
     input_type=AutoCktInput,
     return_type=AutoCktOutput,
     docstring="Simulation on the Server",
