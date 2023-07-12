@@ -28,7 +28,7 @@ setup(
     python_requires=">=3.7, <4",
     install_requires=[
         "python-dotenv==1.0.0",
-        "fastapi>=0.92.0",
+        "fastapi==0.99.1",
         "GitPython>=3.1.31",
         "uvicorn>=0.20.0",
         "firebase_admin>=6.0.1",

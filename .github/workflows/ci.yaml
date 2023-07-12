@@ -23,3 +23,9 @@ jobs:
         with:
           version: "22.6"
           options: "--check --diff --verbose"
+
+      - name: Install
+        run: bash scripts/install.sh
+
+      - name: pytest
+        run: python -m pytest .
