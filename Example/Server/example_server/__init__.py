@@ -38,6 +38,7 @@ from .auto_ckt_sim_lib import (
     translate_result,
 )
 from .TwoStageOpAmp import (
+    OpAmpParams as TwoStageOpAmpParams,
     OpAmpSim,
     find_dc_gain,
     find_I_vdd,
@@ -195,7 +196,7 @@ def auto_ckt_sim_hdl21(inp: AutoCktInput) -> AutoCktOutput:
         raise RuntimeError
 
     # Convert our input into `OpAmpParams`
-    params = OpAmpParams(**asdict(inp))
+    params = TwoStageOpAmpParams(**asdict(inp))
 
     # Create a set of simulation input for it
     sim_input = OpAmpSim(params)
