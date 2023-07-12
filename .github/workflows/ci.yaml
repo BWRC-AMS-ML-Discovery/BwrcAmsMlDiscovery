@@ -28,4 +28,4 @@ jobs:
         run: bash scripts/install.sh
 
       - name: pytest
-        run: python -m pytest
+        run: python -m pytest .
