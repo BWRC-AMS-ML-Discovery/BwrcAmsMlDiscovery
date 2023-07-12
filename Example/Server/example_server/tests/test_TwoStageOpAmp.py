@@ -16,6 +16,7 @@ from hdl21.external_module import SpiceType
 from hdl21.prefix import µ, NANO
 
 from ..TwoStageOpAmp import (
+    OpAmp,
     find_I_vdd,
     find_dc_gain,
     find_ugbw,

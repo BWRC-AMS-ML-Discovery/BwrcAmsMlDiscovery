@@ -136,29 +136,36 @@ class Compensation:
     c = CapCell(p=r.n, n=b, VDD=VDD, VSS=VSS)
 
 
-@hs.sim
-class MosDcopSim:
-    """# Mos Dc Operating Point Simulation Input"""
+def OpAmpSim(params: OpAmpParams) -> h.sim.Sim:
+    """# Op Amp Simulation Input"""
 
-    @h.module
-    class Tb:
-        """# Basic Mos Testbench"""
+    @hs.sim
+    class MosDcopSim:
+        """# Mos Dc Operating Point Simulation Input"""
 
-        VSS = h.Port()  # The testbench interface: sole port VSS
-        vdc = h.Vdc(dc=1.2)(n=VSS)  # A DC voltage source
-        dcin = h.Diff()
-        sig_out = h.Signal()
-        i_bias = h.Signal()
-        sig_p = h.Vdc(dc=0.6, ac=0.5)(p=dcin.p, n=VSS)
-        sig_n = h.Vdc(dc=0.6, ac=-0.5)(p=dcin.n, n=VSS)
-        Isource = h.Isrc(dc=3e-5)(p=vdc.p, n=i_bias)
+        @h.module
+        class Tb:
+            """# Basic Mos Testbench"""
 
-        inst = OpAmp()(VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out)
+            VSS = h.Port()  # The testbench interface: sole port VSS
+            vdc = h.Vdc(dc=1.2)(n=VSS)  # A DC voltage source
+            dcin = h.Diff()
+            sig_out = h.Signal()
+            i_bias = h.Signal()
+            sig_p = h.Vdc(dc=0.6, ac=0.5)(p=dcin.p, n=VSS)
+            sig_n = h.Vdc(dc=0.6, ac=-0.5)(p=dcin.n, n=VSS)
+            Isource = h.Isrc(dc=3e-5)(p=vdc.p, n=i_bias)
 
-    # Simulation Stimulus
-    op = hs.Op()
-    ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
-    mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
+            inst = OpAmp(params)(
+                VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out
+            )
+
+        # Simulation Stimulus
+        op = hs.Op()
+        ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
+        mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
+
+    return MosDcopSim
 
 
 def find_I_vdd(vout: numpy.array) -> float:
