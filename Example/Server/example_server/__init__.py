@@ -196,7 +196,16 @@ def auto_ckt_sim_hdl21(inp: AutoCktInput) -> AutoCktOutput:
         raise RuntimeError
 
     # Convert our input into `OpAmpParams`
-    params = TwoStageOpAmpParams(**asdict(inp))
+    # FIXME Is this correct?
+    params = TwoStageOpAmpParams(
+        wp1=inp.mp1,
+        wn1=inp.mn1,
+        wp3=inp.mp3,
+        wn3=inp.mn3,
+        wn4=inp.mn4,
+        wn5=inp.mn5,
+        Cc=inp.cc,
+    )
 
     # Create a set of simulation input for it
     sim_input = OpAmpSim(params)
