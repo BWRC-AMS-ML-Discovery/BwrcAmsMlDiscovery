@@ -180,7 +180,7 @@ def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
     tmpdir, design_folder, fpath = create_design(inp)
 
     # print(f"design created {design_folder}")
-    # Error return?
+    # TODO Error return?
     info = simulate(fpath)
 
     # print(f"simualted {info}")
