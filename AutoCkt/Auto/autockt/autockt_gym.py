@@ -1,3 +1,5 @@
+from dataclasses import asdict
+
 # PyPI imports
 import numpy as np
 import gym
@@ -15,8 +17,6 @@ from .autockt_gym_env_config import (
 from .autockt_gym_params_mng import AutoCktParamsManager
 from .autockt_gym_ideal_specs_mng import SpecManager
 from shared.typing import Number
-
-from example_client import auto_ckt_sim
 
 
 class AutoCktGym(gym.Env):
@@ -45,8 +45,6 @@ class AutoCktGym(gym.Env):
                         output_type=output_type,
                         simulation=simulation,
                         reward=reward,
-                        ckt_to_input=ckt_to_input,
-                        output_to_ckt=output_to_ckt,
                     ):
                         pass
 
@@ -54,11 +52,9 @@ class AutoCktGym(gym.Env):
         self.output_type = output_type
         self.simulation = simulation
         self.reward = reward
-        self.ckt_to_input = ckt_to_input
-        self.output_to_ckt = output_to_ckt
 
-        # create spec manager
-        self.params_manager = AutoCktParamsManager(params)
+        # create managers
+        self.params_manager = AutoCktParamsManager(params, actions_per_param)
         self.spec_manager = SpecManager(specs)
 
         # Necessary for the gym.Env API
@@ -67,54 +63,48 @@ class AutoCktGym(gym.Env):
 
     def reset(self):
         # ----------------- Params -----------------
-        # reset parameters to init value
         self.params_manager.reset_to_init()
-        # get parameters
         cur_params = self.params_manager.get_cur_params()
 
-        result = self.simulation(self.ckt_to_input(cur_params))
-        result = self.output_to_ckt(result)
+        # ----------------- Simulation -----------------
+        result = self.simulation(self.input_type(**cur_params))
 
         # ----------------- Specs -----------------
-        self.spec_manager.update(result)
+        self.spec_manager.update(asdict(result))
         cur_norm, ideal_norm = self.spec_manager.reset()
-        self.ob = np.concatenate(
+
+        # ----------------- Observation -----------------
+        observation = np.concatenate(
             [
                 list(cur_norm.values()),
                 list(ideal_norm.values()),
                 list(cur_params.values()),
             ]
         )
-        return self.ob
+        return observation
 
     def step(self, action):
         """action: a list of actions from action space to take upon parameters"""
 
         # ----------------- Params -----------------
-        # def step(self, action: list[Number]):
-        # update parameters by each action
         self.params_manager.step(action)
-        # retrieve current parameters
         cur_params = self.params_manager.get_cur_params()
 
-        # print(f"cur_params: {cur_params}")
-        process = self.ckt_to_input(cur_params)
-        sim = self.simulation(process)
-        result = self.output_to_ckt(sim)
-        # print(f"result: {result}")
+        # ----------------- Simulation -----------------
+        result = self.simulation(self.input_type(**cur_params))
 
         # ----------------- Specs -----------------
-        self.spec_manager.update(result)
+        self.spec_manager.update(asdict(result))
         cur_spec, ideal_spec, cur_norm, ideal_norm = self.spec_manager.step()
 
-        # FIXME type mismatch; cur_spec should be AutoCktOutput?
-        reward = self.reward(cur_spec, ideal_spec)  # calc from cur_spec and ideal_spec
+        reward = self.reward(result, ideal_spec)  # calc from result and ideal_spec
 
         # TODO 10 is very arbitrary
         # do something related to reward
         done = reward >= 10
 
-        self.ob = np.concatenate(
+        # ----------------- Observation -----------------
+        observation = np.concatenate(
             [
                 list(cur_norm.values()),
                 list(ideal_norm.values()),
@@ -122,9 +112,9 @@ class AutoCktGym(gym.Env):
             ]
         )
 
-        # update env steps
+        # TODO update env steps
 
-        return self.ob, reward, done, {}
+        return observation, reward, done, {}
 
     def _build_action_space(
         self,

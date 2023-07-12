@@ -181,3 +181,10 @@ auto_ckt_sim = Rpc(
     return_type=AutoCktOutput,
     docstring="Simulation on the Server",
 )
+
+auto_ckt_sim_hdl21 = Rpc(
+    name="auto_ckt_sim_hdl21",
+    input_type=AutoCktInput,
+    return_type=AutoCktOutput,
+    docstring="Simulation on the Server",
+)

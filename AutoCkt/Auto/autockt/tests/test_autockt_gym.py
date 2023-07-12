@@ -1,39 +1,22 @@
-"""
-Use this script to train an AutoCkt agent that knows how to optimize
-a specific circuit within some constraints.
-"""
-
-
-if __name__ != "__main__":
-    raise Exception("This is a SCRIPT and should be run as __main__!")
-
-
-# Local Imports
-from autockt.trainer import (
-    autockt_train,
-)
+from autockt.autockt_gym import AutoCktGym
+import IPython
 from autockt.autockt_gym_env_config import (
     AutoCktCircuitOptimization,
     AutoCktGymEnvConfig,
-    AutoCktParams,
     AutoCktParam,
-    AutoCktSpecs,
+    AutoCktParams,
     AutoCktSpec,
+    AutoCktSpecs,
 )
+from eval_engines.rewards import settaluri_reward
 from example_client import (
     AutoCktInput,
     AutoCktOutput,
     auto_ckt_sim,
 )
-from eval_engines.rewards import (
-    settaluri_reward,
-)
 
 
-def main():
-    experiment_name = "train_45nm_ngspice"
-    num_workers = 1
-
+def test() -> AutoCktGym:
     circuit_optimization = AutoCktCircuitOptimization(
         params=AutoCktParams(
             [
@@ -65,11 +48,28 @@ def main():
         actions_per_param=[-1, 0, 2],
     )
 
-    autockt_train(
-        experiment_name,
-        gym_env_config,
-        num_workers,
+    env = AutoCktGym(gym_env_config)
+
+    env.reset()
+    env.step(
+        {
+            "mp1": 0,
+            "mn1": 1,
+            "mp3": 2,
+            "mn3": 0,
+            "mn4": 1,
+            "mn5": 2,
+            "cc": 0,
+        }
     )
+
+    return env
+
+
+def main():
+    env = test()
+
+    IPython.embed()
 
 
 if __name__ == "__main__":

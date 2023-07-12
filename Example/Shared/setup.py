@@ -27,7 +27,7 @@ setup(
     packages=find_packages(),
     python_requires=">=3.7, <4",
     install_requires=[
-        "pydantic",
+        "pydantic==1.9.1",
         "hdl21>=3.0.1",
     ],
     extras_require={
