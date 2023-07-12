@@ -205,6 +205,9 @@ def auto_ckt_sim_hdl21(inp: AutoCktInput) -> AutoCktOutput:
         wn4=inp.mn4,
         wn5=inp.mn5,
         Cc=inp.cc,
+        # FIXME Extra, don't need?
+        wp2=inp.mp1,
+        wn2=inp.mn1,
     )
 
     # Create a set of simulation input for it
