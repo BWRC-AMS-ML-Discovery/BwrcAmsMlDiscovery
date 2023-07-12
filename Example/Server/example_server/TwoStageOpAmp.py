@@ -73,7 +73,7 @@ def OpAmp(p: OpAmpParams) -> h.Module:
     """# Two stage OpAmp"""
 
     @h.module
-    class OpAmp:
+    class DiffOta:
         # IO Interface
         VDD, VSS = 2 * h.Input()
         ibias = h.Input()
@@ -108,38 +108,57 @@ def OpAmp(p: OpAmpParams) -> h.Module:
         # Compensation Network
         Cc = h.Cap(c=p.Cc)(p=net5, n=out)  # Miller Capacitance
 
-    return OpAmp
+    return DiffOta
 
 
-def OpAmpSim(params: OpAmpParams) -> h.sim.Sim:
-    """# Op Amp Simulation Input"""
+@h.module
+class CapCell:
+    """# Compensation Capacitor Cell"""
 
-    @hs.sim
-    class OpAmpSim:
-        @h.module
-        class Tb:
-            """# Testbench"""
+    p, n, VDD, VSS = 4 * h.Port()
+    # FIXME: internal content! Using tech-specific `ExternalModule`s
 
-            VSS = h.Port()  # The testbench interface: sole port VSS
-            vdc = h.Vdc(dc=1.2)(n=VSS)  # A DC voltage source
-            dcin = h.Diff()
-            sig_out = h.Signal()
-            i_bias = h.Signal()
-            sig_p = h.Vdc(dc=0.6, ac=0.5)(p=dcin.p, n=VSS)
-            sig_n = h.Vdc(dc=0.6, ac=-0.5)(p=dcin.n, n=VSS)
-            Isource = h.Isrc(dc=3e-5)(p=vdc.p, n=i_bias)
 
-            print(params)
-            inst = OpAmp(params)(
-                VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out
-            )
+@h.module
+class ResCell:
+    """# Compensation Resistor Cell"""
 
-        # Simulation Stimulus
-        op = hs.Op()
-        ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
-        mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
+    p, n, sub = 3 * h.Port()
+    # FIXME: internal content! Using tech-specific `ExternalModule`s
 
-    return OpAmpSim
+
+@h.module
+class Compensation:
+    """# Single Ended RC Compensation Network"""
+
+    a, b, VDD, VSS = 4 * h.Port()
+    r = ResCell(p=a, sub=VDD)
+    c = CapCell(p=r.n, n=b, VDD=VDD, VSS=VSS)
+
+
+@hs.sim
+class MosDcopSim:
+    """# Mos Dc Operating Point Simulation Input"""
+
+    @h.module
+    class Tb:
+        """# Basic Mos Testbench"""
+
+        VSS = h.Port()  # The testbench interface: sole port VSS
+        vdc = h.Vdc(dc=1.2)(n=VSS)  # A DC voltage source
+        dcin = h.Diff()
+        sig_out = h.Signal()
+        i_bias = h.Signal()
+        sig_p = h.Vdc(dc=0.6, ac=0.5)(p=dcin.p, n=VSS)
+        sig_n = h.Vdc(dc=0.6, ac=-0.5)(p=dcin.n, n=VSS)
+        Isource = h.Isrc(dc=3e-5)(p=vdc.p, n=i_bias)
+
+        inst = OpAmp()(VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out)
+
+    # Simulation Stimulus
+    op = hs.Op()
+    ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
+    mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
 
 
 def find_I_vdd(vout: numpy.array) -> float:
