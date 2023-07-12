@@ -20,12 +20,16 @@ import os
 from dataclasses import asdict
 
 # PyPi Imports
-from dotenv import dotenv_values
+import dotenv
 import httpx
 
 # Workspace Imports
 from discovery_shared.git import GitInfo
 from pydantic.dataclasses import dataclass
+
+
+# FIXME Probably should be Config?
+dotenv.load_dotenv()
 
 
 @dataclass
