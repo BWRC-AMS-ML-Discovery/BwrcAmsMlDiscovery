@@ -11,10 +11,10 @@ import re
 from datetime import datetime, timedelta
 from firebase_admin import firestore
 
-db = firestore.client()
-
 
 def verify_auth_key(auth_key: AuthKey) -> User:
+    db = firestore.client()
+
     current_user = None
     time_days_constraint = 1
 
