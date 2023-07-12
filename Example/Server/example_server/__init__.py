@@ -165,7 +165,7 @@ def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
     AutoCkt Simulation
     """
     # print(f"input {inp}")
-    design_folder, fpath = create_design(inp)
+    tmpdir, design_folder, fpath = create_design(inp)
 
     # print(f"design created {design_folder}")
     # Error return?
@@ -173,6 +173,6 @@ def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
 
     # print(f"simualted {info}")
 
-    specs = translate_result(design_folder)
+    specs = translate_result(tmpdir, design_folder)
     # print(f"to specs {specs}")
     return specs
