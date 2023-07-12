@@ -15,8 +15,12 @@ ds.start_server()
 ```
 """
 
+# Std-Lib Imports
+from typing import Annotated
+
 # PyPi Imports
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, Depends
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 import uvicorn
 
 # Workspace Imports
@@ -29,6 +33,8 @@ app = FastAPI(
     description="BWRC AMS ML Discovery CktGym",
     version="0.0.1",
 )
+
+security = HTTPBasic()
 
 
 # Local Imports
@@ -101,7 +107,12 @@ def _setup_server_rpcs():
         # Create the server endpoint
         # FIXME type annotations incorrect, can use a function generator to fix.
         # rpc needs to be evaluated at create time not run time.
-        async def f(arg: rpc.input_type = Body(...), *, rpc=rpc) -> rpc.return_type:
+        async def f(
+            credentials: Annotated[HTTPBasicCredentials, Depends(security)],
+            arg: rpc.input_type = Body(...),
+            *,
+            rpc=rpc,
+        ) -> rpc.return_type:
             return rpc.func(arg)
 
         # Give it the server-function's metadata
