@@ -26,6 +26,15 @@ python scripts/client_do_example_stuff.py
 python AutoCkt/scripts/train_general.py
 ```
 
+## Running Tensorboard
+
+The training checkpoints will be saved in your home directory under `ray_results/`.
+Tensorboard can be used to load reward and loss plots using the command:
+
+```sh
+tensorboard --logdir dir/of/checkpoints
+```
+
 ## Running Tests
 
 ```sh
