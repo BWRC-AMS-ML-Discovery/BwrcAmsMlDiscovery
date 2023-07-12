@@ -17,7 +17,6 @@ from hdl21.prefix import µ, NANO
 import numpy
 
 
-# Get the path to current file
 PARENT_PATH = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SPICE_MODEL_45NM_BULK_PATH = PARENT_PATH / "45nm_bulk.txt"
 
