@@ -6,7 +6,8 @@ for differential circuits.
 
 """
 
-import sys
+import os
+from pathlib import Path
 from copy import deepcopy
 import hdl21 as h
 import hdl21.sim as hs
@@ -14,6 +15,11 @@ import vlsirtools.spice as vsp
 from hdl21.external_module import SpiceType
 from hdl21.prefix import µ, NANO
 import numpy
+
+
+# Get the path to current file
+PARENT_PATH = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SPICE_MODEL_45NM_BULK_PATH = PARENT_PATH / "45nm_bulk.txt"
 
 
 """ 
@@ -159,7 +165,7 @@ class MosDcopSim:
     # Simulation Stimulus
     op = hs.Op()
     ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
-    mod = hs.Include("../ngspice/spice_models/45nm_bulk.txt")
+    mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
 
 
 def main():
