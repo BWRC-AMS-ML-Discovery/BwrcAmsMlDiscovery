@@ -1,3 +1,5 @@
+from dataclasses import asdict
+
 # PyPI imports
 import numpy as np
 import gym
@@ -43,8 +45,6 @@ class AutoCktGym(gym.Env):
                         output_type=output_type,
                         simulation=simulation,
                         reward=reward,
-                        ckt_to_input=ckt_to_input,
-                        output_to_ckt=output_to_ckt,
                     ):
                         pass
 
@@ -52,8 +52,6 @@ class AutoCktGym(gym.Env):
         self.output_type = output_type
         self.simulation = simulation
         self.reward = reward
-        self.ckt_to_input = ckt_to_input
-        self.output_to_ckt = output_to_ckt
 
         # create managers
         self.params_manager = AutoCktParamsManager(params, actions_per_param)
@@ -69,11 +67,10 @@ class AutoCktGym(gym.Env):
         cur_params = self.params_manager.get_cur_params()
 
         # ----------------- Simulation -----------------
-        result = self.simulation(self.ckt_to_input(cur_params))
-        result = self.output_to_ckt(result)
+        result = self.simulation(self.input_type(**cur_params))
 
         # ----------------- Specs -----------------
-        self.spec_manager.update(result)
+        self.spec_manager.update(asdict(result))
         cur_norm, ideal_norm = self.spec_manager.reset()
 
         # ----------------- Observation -----------------
@@ -94,15 +91,13 @@ class AutoCktGym(gym.Env):
         cur_params = self.params_manager.get_cur_params()
 
         # ----------------- Simulation -----------------
-        result = self.simulation(self.ckt_to_input(cur_params))
-        result = self.output_to_ckt(result)
+        result = self.simulation(self.input_type(**cur_params))
 
         # ----------------- Specs -----------------
-        self.spec_manager.update(result)
+        self.spec_manager.update(asdict(result))
         cur_spec, ideal_spec, cur_norm, ideal_norm = self.spec_manager.step()
 
-        # FIXME type mismatch; cur_spec should be AutoCktOutput?
-        reward = self.reward(cur_spec, ideal_spec)  # calc from cur_spec and ideal_spec
+        reward = self.reward(result, ideal_spec)  # calc from result and ideal_spec
 
         # TODO 10 is very arbitrary
         # do something related to reward

@@ -33,7 +33,7 @@ def autockt_train(
         },
         "num_workers": num_workers,
         "env_config": gym_env_config,  # a kwarg to the env constructor
-        "disable_env_checking": True,
+        # "disable_env_checking": True,
     }
 
     config_experiment = {
