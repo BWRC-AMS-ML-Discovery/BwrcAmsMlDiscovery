@@ -24,6 +24,7 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 import uvicorn
 
 # Workspace Imports
+from discovery_server.auth.provider import verify_auth_key
 from discovery_shared.git import GitInfo
 
 
@@ -113,6 +114,9 @@ def _setup_server_rpcs():
             *,
             rpc=rpc,
         ) -> rpc.return_type:
+            # FIXME Perhaps we want to use this User?
+            user = verify_auth_key(credentials.password)
+
             return rpc.func(arg)
 
         # Give it the server-function's metadata
