@@ -36,7 +36,7 @@ setup(
         "tensorflow==2.8.0",  # "ray" needs these
         "protobuf==3.19.1",  # "ray" needs these
         "pyyaml==5.1.2",
-        "pydantic",
+        "pydantic==1.10.11",
         "autockt_shared",  # Local "workspace" dependency
         "example_shared",  # Local "workspace" dependency
         "example_client",  # Local "workspace" dependency
