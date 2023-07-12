@@ -32,9 +32,9 @@ setup(
         "numpy==1.21.5",
         "scipy==1.10.1",
         "gym==0.23.1",  # Core ML dependency: OpenAI Gym
-        "ray[rllib,tune]==2.0.0",  # Ray for RL, parallelization, training
+        "ray[rllib,tune]==2.5.1",  # Ray for RL, parallelization, training
         "tensorflow==2.8.0",  # "ray" needs these
-        "protobuf==3.19.1",  # "ray" needs these
+        "protobuf==4.23",  # "ray" needs these
         "pyyaml==5.1.2",
         "pydantic",
         "autockt_shared",  # Local "workspace" dependency
