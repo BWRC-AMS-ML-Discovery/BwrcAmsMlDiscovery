@@ -16,6 +16,7 @@ ds.start_server()
 """
 
 # Std-Lib Imports
+import os
 from dataclasses import asdict
 
 # PyPi Imports
@@ -89,7 +90,14 @@ def _setup_client_rpcs():
         # rpc needs to be evaluated at create time not run time.
         def f(inp: rpc.input_type, *, rpc=rpc) -> rpc.return_type:
             url = f"http://{config.server_url}/{rpc.name}"
-            resp = httpx.post(url, json=asdict(inp))
+            resp = httpx.post(
+                url,
+                json=asdict(inp),
+                auth=(
+                    os.environ["DISCOVERY_USERNAME"],
+                    os.environ["DISCOVERY_API_KEY"],
+                ),
+            )
             return rpc.return_type(**resp.json())
 
         # Give it the same name as the RPC
