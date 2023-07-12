@@ -287,5 +287,9 @@ def _get_best_crossing(yvec: numpy.array, val: float) -> tuple[int, bool]:
         return (zero_crossings[0] + 1), True
 
 
+def test():
+    main()
+
+
 if __name__ == "__main__":
     main()
