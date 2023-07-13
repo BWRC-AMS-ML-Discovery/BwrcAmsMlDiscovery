@@ -1,3 +1,9 @@
+"""
+@deprecated
+! Avoid using this module
+"""
+
+
 # Std Lib Imports
 from typing import Any, Callable
 
