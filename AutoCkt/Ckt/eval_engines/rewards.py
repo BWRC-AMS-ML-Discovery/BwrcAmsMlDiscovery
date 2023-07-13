@@ -1,5 +1,6 @@
 from example_client import AutoCktOutput
 from shared.typing import Number
+from dataclasses import asdict
 
 
 # TODO: remove target_output, can be assumed from rl model
@@ -21,10 +22,12 @@ def settaluri_reward(
         # populate relative for each key input of target
         output_relative = {}
         # print(f"curr output {curr_output}  target_output {target_output}")
-        for key in target_output:
+        dict_output = asdict(curr_output)
+
+        for index, key in enumerate(dict_output):
             output_relative[key] = calc_relative(
-                getattr(curr_output, key),  # curr_output[key],
-                target_output[key],
+                dict_output[key],
+                target_output[index],
             )
         pos_val = []
         reward = 0.0

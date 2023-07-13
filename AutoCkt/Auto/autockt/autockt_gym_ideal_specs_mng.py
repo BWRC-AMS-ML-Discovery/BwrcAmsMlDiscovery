@@ -32,14 +32,12 @@ class SpecManager:
     # the inital specs used to create the spec manager
     init_spec: AutoCktSpecs
 
-    # list if ids the spec has
-    spec_id: list[str]
     # what spec is initially generated to
-    ideal_spec: dict[str, Number]
+    ideal_spec: list[Number]
     # the current spec value
-    cur_spec: dict[str, Number]
+    cur_spec: list[Number]
     # ideal norm is calculate from ideal_spec and normalized values
-    ideal_norm: dict[str, Number]
+    ideal_norm: list[Number]
 
     def __init__(self, init_spec):
         """
@@ -47,12 +45,10 @@ class SpecManager:
         """
         self.init_spec = init_spec
 
-        self.spec_id = [spec.name for spec in init_spec]
         self.ideal_spec = self.gen_spec()
         self.ideal_norm = self.normalize(self.ideal_spec)
 
-        zeros = np.zeros(len(self.spec_id))
-        self.cur_spec = dict(zip(self.spec_id, zeros))
+        self.cur_spec = np.zeros(len(self.init_spec))
 
     def step(self):
         """
@@ -79,23 +75,24 @@ class SpecManager:
 
         return [cur_norm, self.ideal_norm]
 
-    def update(self, simulated: dict[str, Number]) -> dict[str, Number]:
+    def update(self, simulated: dict[str, Number]) -> list[Number]:
         """
         simulates on the given param values and returns a spec dict
         """
         # print(f"{simulated}")
-        self.cur_spec = simulated
+        self.cur_spec = list(simulated.values())
 
-    def normalize(self, specs: dict[str, Number]) -> dict[str, Number]:
+    def normalize(self, specs: dict[str, Number]) -> list[Number]:
         """
         given a dict of specs, calculate and return normalized spec value
         """
-        relative = {}
+        relative = []
 
-        for spec in self.init_spec:
-            to_normalize = specs[spec.name]
+        for i in range(len(self.init_spec)):
+            to_normalize = specs[i]
+            spec = self.init_spec[i]
             rel = (to_normalize - spec.normalize) / (to_normalize + spec.normalize)
-            relative[spec.name] = rel
+            relative.append(rel)
 
         # print(f"{relative}")
         # spec_norm = dict(zip(self.spec_id, relative))
@@ -114,5 +111,4 @@ class SpecManager:
                 val = random.uniform(float(range.min), float(range.max))
             spec_values.append(val)
 
-        cur_spec = dict(zip(self.spec_id, spec_values))
-        return cur_spec
+        return spec_values

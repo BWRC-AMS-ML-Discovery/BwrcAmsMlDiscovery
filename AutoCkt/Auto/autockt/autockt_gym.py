@@ -76,8 +76,8 @@ class AutoCktGym(gym.Env):
         # ----------------- Observation -----------------
         observation = np.concatenate(
             [
-                list(cur_norm.values()),
-                list(ideal_norm.values()),
+                cur_norm,
+                ideal_norm,
                 list(cur_params.values()),
             ]
         )
@@ -92,7 +92,6 @@ class AutoCktGym(gym.Env):
 
         # ----------------- Simulation -----------------
         result = self.simulation(self.input_type(**cur_params))
-
         # ----------------- Specs -----------------
         self.spec_manager.update(asdict(result))
         cur_spec, ideal_spec, cur_norm, ideal_norm = self.spec_manager.step()
@@ -106,8 +105,8 @@ class AutoCktGym(gym.Env):
         # ----------------- Observation -----------------
         observation = np.concatenate(
             [
-                list(cur_norm.values()),
-                list(ideal_norm.values()),
+                cur_norm,
+                ideal_norm,
                 list(cur_params.values()),
             ]
         )
