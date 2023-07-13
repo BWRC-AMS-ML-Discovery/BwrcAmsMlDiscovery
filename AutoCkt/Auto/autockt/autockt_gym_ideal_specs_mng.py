@@ -48,6 +48,7 @@ class SpecManager:
         self.ideal_spec = self.gen_spec()
         self.ideal_norm = self.normalize(self.ideal_spec)
 
+        # ['gain', 'ugbw', 'phm', 'ibias']
         self.cur_spec = np.zeros(len(self.init_spec))
 
     def step(self):
