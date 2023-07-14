@@ -36,6 +36,9 @@ class SpecManager:
     spec_id: list[str]
     # what spec is initially generated to
     ideal_spec: dict[str, Number]
+
+    ideal_specs: list[dict[str, Number]]
+
     # the current spec value
     cur_spec: dict[str, Number]
     # ideal norm is calculate from ideal_spec and normalized values
@@ -48,7 +51,15 @@ class SpecManager:
         self.init_spec = init_spec
 
         self.spec_id = [spec.name for spec in init_spec]
-        self.ideal_spec = self.gen_spec()
+        # self.ideal_spec = self.gen_spec()
+        self.num_specs = 350
+
+        self.ideal_specs = []
+        for i in range(self.num_specs):
+            self.ideal_specs.append(self.gen_spec())
+
+        idx = random.randint(0, self.num_specs - 1)
+        self.ideal_spec = self.ideal_specs[idx]
         self.ideal_norm = self.normalize(self.ideal_spec)
 
         zeros = np.zeros(len(self.spec_id))
@@ -72,7 +83,8 @@ class SpecManager:
 
         returns the normalied values of the current spec and the ideal spec
         """
-        self.ideal_spec = self.gen_spec()
+        idx = random.randint(0, self.num_specs - 1)
+        self.ideal_spec = self.ideal_specs[idx]
         self.ideal_norm = self.normalize(self.ideal_spec)
 
         cur_norm = self.normalize(self.cur_spec)
