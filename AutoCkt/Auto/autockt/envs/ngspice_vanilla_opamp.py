@@ -4,58 +4,80 @@ A new ckt environment based on a new structure of MDP
 
 # Std-Lib Imports
 import os, pickle, random
-from collections import OrderedDict
+
+# from collections import OrderedDict
 
 # PyPi Imports
 import numpy as np
 import gym
 from gym import spaces
-import yaml
-import yaml.constructor
 
 # Workspace Imports
 from .create_design_and_simulate_lib import create_design_and_simulate
-
+from shared import *
+from eval_engines import PARAMS_RANGE, NORM_CONSTANT, TARGET_RANGE
 
 # FIXME Avoid storing files?
 SPECS_DIR = "/tmp/ckt_da_new/specs/"
+PARAMS_RANGE = PARAMS_RANGE
+NORM_CONSTANT = NORM_CONSTANT
+TARGET_RANGE = TARGET_RANGE
 
 
-# way of ordering the way a yaml file is read
-class OrderedDictYAMLLoader(yaml.Loader):
+class ParamManager:
     """
-    A YAML loader that loads mappings into ordered dictionaries.
+    A Processor for Managing Parameters handling
+    input and output and other mechanism inside RL script
     """
 
-    def __init__(self, *args, **kwargs):
-        yaml.Loader.__init__(self, *args, **kwargs)
+    def __init__(self):
+        self.spec = None
+        self.params = None
+        self.norm = None
 
-        self.add_constructor("tag:yaml.org,2002:map", type(self).construct_yaml_map)
-        self.add_constructor("tag:yaml.org,2002:omap", type(self).construct_yaml_map)
+    def load_spec(self, params: list, target: list, norm: list) -> CktInput:
+        """
+        params: parameters range, n# of ranges with step sizes, n * 3 for each [min, max, step]
+        target: ideal spec range, n# of ranges without step sizes, n * 2 for each [min, max]
+        norm: normalizing constants, 4# of constraints
+        """
+        params_values = {
+            param[0]: Range(param[1][0], param[1][1], param[1][2]) for param in params
+        }
+        target_values = {
+            target_[0]: Range(target_[1][0], target_[1][1]) for target_ in target
+        }
 
-    def construct_yaml_map(self, node):
-        data = OrderedDict()
-        yield data
-        value = self.construct_mapping(node)
-        data.update(value)
+        normalize_values = {norm_[0]: norm_[1] for norm_ in norm}
 
-    def construct_mapping(self, node, deep=False):
-        if isinstance(node, yaml.MappingNode):
-            self.flatten_mapping(node)
-        else:
-            raise yaml.constructor.ConstructorError(
-                None,
-                None,
-                "expected a mapping node, but found %s" % node.id,
-                node.start_mark,
-            )
+        ckt = CktInput(
+            Params(params_values),
+            Normalize(normalize_values),
+            TargetSpecs(target_values),
+        )
 
-        mapping = OrderedDict()
-        for key_node, value_node in node.value:
-            key = self.construct_object(key_node, deep=deep)
-            value = self.construct_object(value_node, deep=deep)
-            mapping[key] = value
-        return mapping
+        self.params = Params(params_values)
+        self.spec = TargetSpecs(target_values)
+        self.norm = Normalize(normalize_values)
+        return ckt
+
+    def get_spec(self) -> Spec:
+        """
+        return the spec for initial setup
+        """
+        return self.spec
+
+    def get_param(self) -> Params:
+        """
+        return the parameters passed in for initial setup
+        """
+        return self.params
+
+    def get_norm(self) -> Spec:
+        """
+        return the normalizing constants passed in for initial setup
+        """
+        return self.norm
 
 
 class TwoStageAmp(gym.Env):
@@ -67,7 +89,7 @@ class TwoStageAmp(gym.Env):
     PERF_HIGH = np.inf
 
     # obtains yaml file
-    CIR_YAML = SPECS_DIR + "in/two_stage_opamp.yaml"
+    # CIR_YAML = SPECS_DIR + "in/two_stage_opamp.yaml"
 
     def __init__(self, env_config):
         # Custom attributes (not from gym.Env)
@@ -85,9 +107,9 @@ class TwoStageAmp(gym.Env):
         self.obj_idx = 0  # objective number (used for validation)
 
         # load specs and params
+        self.pm = ParamManager()
         self._load_specs()
         self._save_specs()
-        self._load_params()
 
         # initialize sim environment
         self.env_steps = 0
@@ -202,13 +224,16 @@ class TwoStageAmp(gym.Env):
         # params_idx[0] = params_idx[3]
 
         # [34, 34, 34, 34, 34, 15, 2.1e-12]
-        params = [self.params[i][params_idx[i]] for i in range(len(self.params_id))]
+        params = [
+            self.params.ranges[param_id].get_value_at_index(params_idx[i])
+            for i, param_id in enumerate(self.params_id)
+        ]
 
         # OrderedDict([('mp1', 34), ('mn1', 34), ('mp3', 34), ('mn3', 34), ('mn4', 34), ('mn5', 15), ('cc', 2.1e-12)])
-        param_val = OrderedDict(list(zip(self.params_id, params)))
+        param_val = dict(list(zip(self.params_id, params)))
 
         # run param vals and simulate
-        cur_specs = OrderedDict(
+        cur_specs = dict(
             sorted(
                 #
                 # !!! Important replacement
@@ -222,50 +247,41 @@ class TwoStageAmp(gym.Env):
         return cur_specs
 
     def _load_specs(self):
-        with open(TwoStageAmp.CIR_YAML, "r") as f:
-            yaml_data = yaml.load(f, OrderedDictYAMLLoader)
+        # assign parameter range
+        params = PARAMS_RANGE
+        # assign normalizing constants
+        norm = NORM_CONSTANT
+        # assign target spec range
+        target = TARGET_RANGE
 
-        # design specs
-        if self.generalize == False:
-            specs = yaml_data["target_specs"]
-        else:
-            load_specs_path = (
-                # TwoStageAmp.path +
-                SPECS_DIR
-                + "out/ngspice_specs_gen_two_stage_opamp"
-            )
-            with open(load_specs_path, "rb") as f:
-                specs = pickle.load(f)
-
-        # OrderedDict(
-        #     [
-        #         ("gain_min", (200, 400, ...in_between)),
-        #         ("ibias_max", (0.0001, 0.01, ...in_between)),
-        #         ("phm_min", (60, 60.0000001, ...in_between)),
-        #         ("ugbw_min", (1000000.0, 25000000.0, ...in_between)),
-        #     ]
-        # )
-        self.specs = OrderedDict(sorted(specs.items(), key=lambda k: k[0]))
+        # input spec into manager
+        self.pm.load_spec(params, target, norm)
+        self.specs = self.pm.get_spec()
+        self.params = self.pm.get_param()
 
         # To be filled in later
         self.specs_ideal = []
 
         # ['gain_min', 'ibias_max', 'phm_min', 'ugbw_min']
-        self.specs_id = list(self.specs.keys())
+        self.specs_id = list(self.specs.ranges.keys())
+
+        # ['mp1', 'mn1', 'mp3', 'mn3', 'mn4', 'mn5', 'cc']
+        self.params_id = list(self.params.ranges.keys())
 
         # num_specs (originally 350)
-        self.num_os = len(list(self.specs.values())[0])
+        self.num_os = len(list(self.specs.ranges.values())[0])
 
         # Get the g* (overall design spec) you want to reach
         # Only when generalize=False and multi-goal=False
-        self.fixed_goal_idx = -1
+
         self.global_g = []
-        for spec in list(self.specs.values()):
-            self.global_g.append(float(spec[self.fixed_goal_idx]))
+        self.fixed_goal_idx = -1
+        for spec in list(self.specs.ranges.values()):
+            self.global_g.append(float(spec.get_value_at_index(self.fixed_goal_idx)))
+
         self.g_star = np.array(self.global_g)
 
-        # used for normalization
-        self.global_g = np.array(yaml_data["normalize"])
+        self.global_g = np.array(list(self.pm.get_norm().constants.values()))
 
     def _save_specs(self):
         if self.specs_save:
@@ -273,22 +289,6 @@ class TwoStageAmp(gym.Env):
                 "specs_" + str(self.num_valid) + str(random.randint(1, 100000)), "wb"
             ) as f:
                 pickle.dump(self.specs, f)
-
-    def _load_params(self):
-        with open(TwoStageAmp.CIR_YAML, "r") as f:
-            yaml_data = yaml.load(f, OrderedDictYAMLLoader)
-
-        # param array
-        params = yaml_data["params"]
-
-        # ['mp1', 'mn1', 'mp3', 'mn3', 'mn4', 'mn5', 'cc']
-        self.params_id = list(params.keys())
-
-        # [array, array, array, array, array, array, array]
-        self.params = []
-        for value in params.values():
-            param_vec = np.arange(value[0], value[1], value[2])
-            self.params.append(param_vec)
 
     def _set_gym_attributes(self):
         # Tuple(Discrete(3), Discrete(3), Discrete(3), Discrete(3), Discrete(3), Discrete(3), Discrete(3))
@@ -320,8 +320,8 @@ class TwoStageAmp(gym.Env):
             else:
                 idx = random.randint(0, self.num_os - 1)
             self.specs_ideal = []
-            for spec in list(self.specs.values()):
-                self.specs_ideal.append(spec[idx])
+            for spec in list(self.specs.ranges.values()):
+                self.specs_ideal.append(spec.get_value_at_index(idx))
             self.specs_ideal = np.array(self.specs_ideal)
         else:
             if self.multi_goal == False:
@@ -329,7 +329,7 @@ class TwoStageAmp(gym.Env):
             else:
                 idx = random.randint(0, self.num_os - 1)
                 self.specs_ideal = []
-                for spec in list(self.specs.values()):
+                for spec in list(self.specs.ranges.values()):
                     self.specs_ideal.append(spec[idx])
                 self.specs_ideal = np.array(self.specs_ideal)
 
@@ -352,5 +352,5 @@ class TwoStageAmp(gym.Env):
         self.cur_params_idx = np.clip(
             self.cur_params_idx,
             [0] * len(self.params_id),
-            [(len(param_vec) - 1) for param_vec in self.params],
+            [len(getattr(self.params, field.name)) for field in fields(self.params)],
         )

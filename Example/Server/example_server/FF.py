@@ -11,95 +11,38 @@ import vlsirtools.spice as vsp
 from hdl21.external_module import SpiceType
 from hdl21.prefix import µ, NANO
 import numpy
-
-
-"""
-Create a small "PDK" consisting of an externally-defined Nmos and Pmos transistor.
-Real versions will have some more parameters; these just have multiplier "m".
-"""
+import Latch
 
 
 @h.paramclass
-class MosParams:
-    m = h.Param(dtype=int, desc="Transistor Multiplier")
-
-@h.paramclass
-class PdkMosParams:
-    w = h.Param(dtype=h.Scalar, desc="Width in resolution units", default=0.5 * µ)
-    l = h.Param(dtype=h.Scalar, desc="Length in resolution units", default=90 * NANO)
-    nf = h.Param(dtype=h.Scalar, desc="Number of parallel fingers", default=1)
-    m = h.Param(dtype=h.Scalar, desc="Transistor Multiplier", default=1)
-
-
-nmos = h.ExternalModule(
-    name="nmos",
-    desc="Nmos Transistor (Multiplier Param Only!)",
-    port_list=deepcopy(h.Mos.port_list),
-    paramtype=PdkMosParams,
-    spicetype=SpiceType.MOS,
-)
-pmos = h.ExternalModule(
-    name="pmos",
-    desc="Pmos Transistor (Multiplier Param Only!)",
-    port_list=deepcopy(h.Mos.port_list),
-    paramtype=PdkMosParams,
-    spicetype=SpiceType.MOS,
-)
-
-@h.paramclass
-class LatchParams:
+class FFParams:
     """Parameter class"""
-    w1 = h.Param(dtype=int, desc="Width of NMOS M1", default=10)
-    w2 = h.Param(dtype=int, desc="Width of PMOS M2", default=20)
-    w3 = h.Param(dtype=int, desc="Width of NMOS M3", default=10)
-    w4 = h.Param(dtype=int, desc="Width of PMOS M4", default=20)
-    w5 = h.Param(dtype=int, desc="Width of NMOS M5", default=10)
-    w6 = h.Param(dtype=int, desc="Width of PMOS M6", default=20)
-    w7 = h.Param(dtype=int, desc="Width of PMOS M7", default=20)
-    w8 = h.Param(dtype=int, desc="Width of PMOS M8", default=20)
-    w9 = h.Param(dtype=int, desc="Width of NMOS M9", default=10)
-    w10= h.Param(dtype=int, desc="Width of NMOS M10",default=10)
-    VDD = h.Param(dtype=h.Scalar, desc="VDD voltage", default=1.2)
+    L1 = h.LatchParams()
+    L2 = h.LatchParams()
 
 
 @h.generator
-def LatchGen(p: LatchParams) -> h.Module:
-    """# Latch """
+def FFgen(p: FFParams) -> h.Module:
+    """# FF """
 
     @h.module
-    class Latch:
+    class FF:
         # IO Interface
         VDD, VSS = 2 * h.Input()
         CLK, CKB = 2 * h.Input()
         D = h.Input()
         Q = h.Output()
 
-        clk_vdd, ckb_vdd, clk_gnd, ckb_gnd = h.Signals(4)
-        QB = h.Signal()
+        intermediate_signal = h.Signal()
 
-        # Input Inverter
-        in_inv_mn  = nmos(m=p.w1)(d=QB, g=D, s=ckb_gnd, b=ckb_gnd) # NMOS of input Inv
-        in_inv_mp  = pmos(m=p.w2)(d=QB, g=D, s=clk_vdd, b=clk_vdd) # PMOS of input Inv
+        # Sampling latch
+        Sampling_latch = LatchGen(FFParams.L1)(VDD=VDD, VSS=VSS, CLK=CKB, CKB=CLK, D=D, Q=intermediate_signal)
 
-        # Output Inverter
-        out_inv_mn = nmos(m=p.w3)(d=QB, g=Q, s=clk_gnd, b=clk_gnd) # NMOS of output Inv
-        out_inv_mp = pmos(m=p.w4)(d=QB, g=Q, s=ckb_vdd, b=ckb_vdd) # PMOS of output Inv
+        # Holding latch
+        Holding_latch  = LatchGen(FFParams.L2)(VDD=VDD, VSS=VSS, CLK=CLK, CKB=CKB, D=intermediate_signal, Q=Q)
 
-        # QB -> Q Inverter
-        qb_inv_mn  = nmos(m=p.w5)(d=Q, g=QB, s=VSS, b=VSS) # NMOS of QB Inv
-        qb_inv_mp  = pmos(m=p.w6)(d=Q, g=QB, s=VDD, b=VDD) # PMOS of QB Inv
 
-        # VDD Transmission Gate
-        vdd_tg_clk = pmos(m=p.w7)(d=clk_vdd, g=CLK, s=VDD, b=VDD) # VDD TG for CLK
-        vdd_tg_ckb = pmos(m=p.w8)(d=ckb_vdd, g=CKB, s=VDD, b=VDD) # VDD TG for CKB
-
-        # GND Transmission Gate
-        gnd_tg_ckg = nmos(m=p.w9)(d=ckb_gnd, g=CKB, s=VSS, b=VSS) # GND TG for CKB
-        gnd_tg_clk = nmos(m=p.w10)(d=clk_gnd, g=CLK, s=VSS, b=VSS) # GND TG for CLK
-        gnd_tg_clk = nmos(m=p.w10)(d=clk_gnd, g=CLK, s=VSS, b=VSS) # GND TG for CLK
-
-    return Latch
-
+    return FF
 
 @hs.sim
 
