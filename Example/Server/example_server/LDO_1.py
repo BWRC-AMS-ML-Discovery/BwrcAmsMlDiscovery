@@ -4,6 +4,8 @@
 Highlights the capacity to use `Diff` signals and `Pair`s of instances 
 for differential circuits. 
 
+This LDO is based on the schematic of Fig2.10 in Keertana's article
+
 """
 
 import sys
@@ -50,57 +52,71 @@ pmos = h.ExternalModule(
 )
 
 @h.paramclass
-class OpAmpParams:
+class LDOParams:
     """Parameter class"""
-    wp1 = h.Param(dtype=int, desc="Width of PMOS mp1", default=10)
-    wp2 = h.Param(dtype=int, desc="Width of PMOS mp2", default=10)
-    wp3 = h.Param(dtype=int, desc="Width of PMOS mp3", default=4)
-    wn1 = h.Param(dtype=int, desc="Width of NMOS mn1", default=38)
-    wn2 = h.Param(dtype=int, desc="Width of NMOS mn2", default=38)
-    wn3 = h.Param(dtype=int, desc="Width of NMOS mn3", default=9)
-    wn4 = h.Param(dtype=int, desc="Width of NMOS mn4", default=20)
-    wn5 = h.Param(dtype=int, desc="Width of NMOS mn5", default=60)
+    w1 = h.Param(dtype=int, desc="Width of m1", default=10)
+    w2 = h.Param(dtype=int, desc="Width of m2", default=10)
+    w3 = h.Param(dtype=int, desc="Width of m3", default=10)
+    w4 = h.Param(dtype=int, desc="Width of m4", default=10)
+    w5 = h.Param(dtype=int, desc="Width of m5", default=10)
+    w6 = h.Param(dtype=int, desc="Width of m6", default=10)
+    w7r = h.Param(dtype=int, desc="Width of m7r", default=10)
+    w8 = h.Param(dtype=int, desc="Width of m8", default=10)
+    wc = h.Param(dtype = int, desc = "Width of mc", default = 10)
+    w10 = h.Param(dtype = int, desc = "Width of m10", default = 10)
+    wpass = h.Param(dtype = int, desc = "Width of mpass", default = 10)
     VDD = h.Param(dtype=h.Scalar, desc="VDD voltage", default=1.2)
-    CL = h.Param(dtype=h.Scalar, desc="CL capacitance", default=1e-11)
-    Cc = h.Param(dtype=h.Scalar, desc="Cc capacitance", default=3e-12)
+    Cc = h.Param(dtype = h.Scalar, desc = "Cc capacitance", default = 1e-11)
+    Cf1 = h.Param(dtype=h.Scalar, desc="Cf1 capacitance", default=1e-11)
+    Cf2 = h.Param(dtype=h.Scalar, desc="Cf2 capacitance", default=1e-11)
+    Rrf1 = h.Param(dtype = h.Scalar, desc = "Rrf1 resistance", default = 1e6)
+    Rrf2 = h.Param(dtype = h.Scalar, desc = "Rrf2 reeistance", default = 4e6)
     ibias = h.Param(dtype=h.Scalar, desc="ibias current", default=3e-5)
 
 
 @h.generator
-def OpAmp(p: OpAmpParams) -> h.Module:
-    """# Two stage OpAmp """
+def OpAmp(p: LDOParams) -> h.Module:
+    """# LDO """
 
     @h.module
-    class DiffOta:
+    class LDO:
         # IO Interface
         VDD, VSS = 2 * h.Input()
         ibias = h.Input()
+        vref = h.Input()
         
-        inp = h.Diff(desc="Differential Input", port=True, role=h.Diff.Roles.SINK)
-        out = h.Output()
+        vout = h.Output()
 
         # Internal Signals
-        net3, net4, net5 = h.Signals(3)
+        v1, v2, v3, v4, v5, v6, vfb = h.Signals(6)
 
-        # Input Stage
-        mp1 = pmos(m=p.wp1)(d=net4, g=net4, s=VDD, b=VDD) # Current mirror within the input stage
-        mp2 = pmos(m=p.wp2)(d=net5, g=net4, s=VDD, b=VDD) # Current mirror within the input stage
-        mn1 = nmos(m=p.wn1)(d=net4, g=inp.n, s=net3, b=net3) # Input MOS pair
-        mn2 = nmos(m=p.wn2)(d=net5, g=inp.p, s=net3, b=net3) # Input MOS pair
-        mn3 = nmos(m=p.wn3)(d=net3, g=ibias, s=VSS, b=VSS) # Mirrored current source
+        # EA
+        m1 = nmos(m = p.w1)(d = v1, g = vfb, s = v3, b = v3)  # vfb
+        m2 = nmos(m = p.w2)(d = v2, f = vref, s = v3, b = v3)   # vref
+        m3 = pmos(m = p.w3)(d = v1, g = v1, s = VDD, b = VDD) # Current Mirror
+        m4 = pmos(m = p.w4)(d = v2, g = v1, s = VDD, b = VDD) # Current Mirror
+        mc = nmos(m = p.wc)(d = v1, g = vref, s = v4, b = v4)
+        m8 = nmos(m = p.w8)(d = v2, g = vref, s = v5, b = v5)
 
-        # Output Stage
-        mp3 = pmos(m=p.wp3)(d=out, g=net5, s=VDD, b=VDD) # Output inverter
-        mn5 = nmos(m=p.wn5)(d = out, g = ibias, s = VSS, b = VSS) # Output inverter
-        CL = h.Cap(c=p.CL)(p = out, n = VSS) # Load capacitance
+        #
+        mpass = pmos(m = p.wpass)(d = vout, g = v2, s = VDD, b = VDD)
 
-        # Biasing
-        mn4 = nmos(m=p.wn4)(d = ibias, g = ibias, s = VSS, b = VSS) # Current mirror co-operating with mn3
+        # Current Biasing
+        m5 = nmos(m = p.w5)(d = v3, g = v6, s = VSS, b = VSS)   # Bias Current
+        m6 = nmos(m = p.w6)(d = v6, g = v6, s = VSS, b = VSS)   # Current Source Bias
+        m7r = nmos(m = p.w7r)(d = v4, g = v6, s = VSS, b = VSS) 
+        m10 = nmos(m = p.w10)(d = v5, g = v6, s = VSS, b = VSS)
+
 
         # Compensation Network
-        Cc = h.Cap(c = p.Cc)(p = net5, n = out) # Miller Capacitance
+        Cc = h.Cap(c = p.Cc)(p = v5, n = vout) # Miller Capacitance
 
-    return DiffOta
+        # Feedback
+        Cf1 = h.Cap(c = p.Cf1)(p = vout, n = vfb)
+        Cf2 = h.Cap(c = p.Cf2)(p = vfb, n = VSS)
+        Rf1 = h.Res(r = p.Rrf1)(p = vout, n = vfb)
+        Rf2 = h.Res(r = p.Rrf2)(p = vfb, n = VSS)
+    return LDO
 
 
 @h.module
@@ -127,7 +143,7 @@ class Compensation:
     r = ResCell(p=a, sub=VDD)
     c = CapCell(p=r.n, n=b, VDD=VDD, VSS=VSS)
 
-
+# FIXME: no sim yet
 @hs.sim
 class MosDcopSim:
     """# Mos Dc Operating Point Simulation Input"""
@@ -176,7 +192,6 @@ def main():
     print("UGBW:            "+str(find_ugbw(results["ac"].freq,2*results["ac"].data["v(xtop.sig_out)"])))
     print("Phase margin:    "+str(find_phm(results["ac"].freq,2*results["ac"].data["v(xtop.sig_out)"])))
     print("Ivdd:            "+str(find_I_vdd(results["ac"].data["i(v.xtop.vvdc)"])))
-    
 
 def find_I_vdd(vout:numpy.array) -> float:
     return numpy.abs(vout)[0]
