@@ -89,54 +89,54 @@ def LatchGen(p: LatchParams) -> h.Module:
         qb_inv_mn  = nmos(m=p.w5)(d=Q, g=QB, s=VSS, b=VSS) # NMOS of QB Inv
         qb_inv_mp  = pmos(m=p.w6)(d=Q, g=QB, s=VDD, b=VDD) # PMOS of QB Inv
 
-        # VDD Transmission Gate
-        vdd_tg_clk = pmos(m=p.w7)(d=clk_vdd, g=CLK, s=VDD, b=VDD) # VDD TG for CLK
-        vdd_tg_ckb = pmos(m=p.w8)(d=ckb_vdd, g=CKB, s=VDD, b=VDD) # VDD TG for CKB
+        # VDD CLK Gate
+        vdd_gate_clk = pmos(m=p.w7)(d=clk_vdd, g=CLK, s=VDD, b=VDD) # VDD gate for CLK
+        vdd_gate_ckb = pmos(m=p.w8)(d=ckb_vdd, g=CKB, s=VDD, b=VDD) # VDD gate for CKB
 
-        # GND Transmission Gate
-        gnd_tg_ckg = nmos(m=p.w9)(d=ckb_gnd, g=CKB, s=VSS, b=VSS) # GND TG for CKB
-        gnd_tg_clk = nmos(m=p.w10)(d=clk_gnd, g=CLK, s=VSS, b=VSS) # GND TG for CLK
-        gnd_tg_clk = nmos(m=p.w10)(d=clk_gnd, g=CLK, s=VSS, b=VSS) # GND TG for CLK
+        # GND CLK Gate
+        gnd_gate_ckg = nmos(m=p.w9)(d=ckb_gnd, g=CKB, s=VSS, b=VSS) # GND gate for CKB
+        gnd_gate_clk = nmos(m=p.w10)(d=clk_gnd, g=CLK, s=VSS, b=VSS) # GND gate for CLK
 
     return Latch
 
-
-@hs.sim
 
 # FIXME: Need to get
 # (i) settling time;
 # (ii) power consumption
 
+@hs.sim
+class LatchSim:
 
-# class MosDcopSim:
-#     """# Mos Dc Operating Point Simulation Input"""
-#     # def __init__(params):
+    @h.module
+    class Tb:
+        """# Basic Mos Testbench"""
 
+        VSS = h.Port()  # The testbench interface: sole port VSS
+        vdc = h.Vdc(dc=1.2)(n=VSS)  # A DC voltage source
 
-#     @h.module
-#     class Tb:
-#         """# Basic Mos Testbench"""
+        input_params = h.PulseVoltageSourceParams(delay=2*NANO, v1=1.2, v2=0, period=10*NANO, width=5*NANO, fall=0, rise=0)
+        vin = h.PulseVoltageSource(input_params)(n=VSS)
 
-#         VSS = h.Port()  # The testbench interface: sole port VSS
-#         vdc = h.Vdc(dc=1.2)(n=VSS)  # A DC voltage source
-#         dcin = h.Diff()
-#         sig_out = h.Signal()
-#         i_bias = h.Signal()
-#         sig_p = h.Vdc(dc=0.6, ac=0.5)(p=dcin.p,n=VSS)
-#         sig_n = h.Vdc(dc=0.6, ac=-0.5)(p=dcin.n,n=VSS)
-#         Isource = h.Isrc(dc = 3e-5)(p = vdc.p, n = i_bias)
+        clock_params = h.PulseVoltageSourceParams(delay=1*NANO, v1=1.2, v2=0, period=20*NANO, width=10*NANO, fall=0, rise=0)
+        clk_b_params = h.PulseVoltageSourceParams(delay=1*NANO, v1=0, v2=1.2, period=20*NANO, width=10*NANO, fall=0, rise=0)
+        CLK = h.PulseVoltageSource(clock_params)(n=VSS)
+        CKB = h.PulseVoltageSource(clk_b_params)(n=VSS)
 
-#         inst=Latch()(VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out)
+        sig_out = h.Signal()
 
-#     # Simulation Stimulus
-#     op = hs.Op()
-#     ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
-#     mod = hs.Include("../45nm_bulk.txt")
+        inst=LatchGen()(VDD=vdc.p, VSS=VSS, D=vin.p, CLK=CLK.p, CKB=CKB.p, Q=sig_out)
+
+    # Simulation Stimulus
+    op = hs.Op()
+    # ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
+    tr = hs.Tran(tstop=11 * NANO, tstep=1 * h.prefix.p , name="mytran")
+    mod = hs.Include("../45nm_bulk.txt")
 
 
 
 def main():
-    # h.netlist(OpAmp(), sys.stdout)
+    # h.netlist(LatchGen(), sys.stdout)
+    h.netlist(LatchGen(LatchParams()), sys.stdout)
 
     opts = vsp.SimOptions(
         simulator=vsp.SupportedSimulators.NGSPICE,
@@ -148,53 +148,17 @@ def main():
         return
 
     # Run the simulation!
-    results = MosDcopSim.run(opts)
+    results = LatchSim.run(opts)
 
-    print("Gain:            "+str(find_dc_gain(2*results["ac"].data["v(xtop.sig_out)"])))
-    print("UGBW:            "+str(find_ugbw(results["ac"].freq,2*results["ac"].data["v(xtop.sig_out)"])))
-    print("Phase margin:    "+str(find_phm(results["ac"].freq,2*results["ac"].data["v(xtop.sig_out)"])))
-    print("Ivdd:            "+str(find_I_vdd(results["ac"].data["i(v.xtop.vvdc)"])))
+    print(results)
+
+    # print("Gain:            "+str(find_dc_gain(2*results["ac"].data["v(xtop.sig_out)"])))
+    # print("UGBW:            "+str(find_ugbw(results["ac"].freq,2*results["ac"].data["v(xtop.sig_out)"])))
+    # print("Phase margin:    "+str(find_phm(results["ac"].freq,2*results["ac"].data["v(xtop.sig_out)"])))
+    # print("Ivdd:            "+str(find_I_vdd(results["ac"].data["i(v.xtop.vvdc)"])))
 
 
 
-
-def find_I_vdd(vout:numpy.array) -> float:
-    return numpy.abs(vout)[0]
-
-def find_dc_gain(vout:numpy.array) -> float:
-    return numpy.abs(vout)[0]
-
-def find_ugbw(freq:numpy.array, vout:numpy.array) -> float:
-    gain = numpy.abs(vout)
-    ugbw_index, valid = _get_best_crossing(gain, val=1)
-    if valid:
-        return freq[ugbw_index]
-    else:
-        return freq[0]
-
-def find_phm(freq:numpy.array, vout:numpy.array) -> float:
-    gain = numpy.abs(vout)
-    phase = numpy.angle(vout, deg=False)
-    phase = numpy.unwrap(phase)  # unwrap the discontinuity
-    phase = numpy.rad2deg(phase)  # convert to degrees
-
-    ugbw_index, valid = _get_best_crossing(gain, val=1)
-    if valid:
-        if phase[ugbw_index] > 0:
-            return -180 + phase[ugbw_index]
-        else:
-            return 180 + phase[ugbw_index]
-    else:
-        return -180
-
-def _get_best_crossing(yvec:numpy.array, val:float) -> tuple[int, bool]:
-    zero_crossings = numpy.where(numpy.diff(numpy.sign(yvec-val)))[0]
-    if len(zero_crossings)==0:
-        return 0, False
-    if abs((yvec-val)[zero_crossings[0]]) < abs((yvec-val)[zero_crossings[0]+1]):
-        return zero_crossings[0], True
-    else:
-        return (zero_crossings[0]+1), True
 
 
 if __name__ == "__main__":
