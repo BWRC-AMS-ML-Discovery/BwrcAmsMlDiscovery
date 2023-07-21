@@ -198,9 +198,37 @@ def auto_ckt_sim_hdl21(inp: AutoCktInput) -> AutoCktOutput:
     if not vsp.ngspice.available():
         raise RuntimeError
 
+    class OpAmpParams:
+        """Parameter class"""
+
+        wp1 = h.Param(dtype=int, desc="Width of PMOS mp1", default=10)
+        wp2 = h.Param(dtype=int, desc="Width of PMOS mp2", default=10)
+        wp3 = h.Param(dtype=int, desc="Width of PMOS mp3", default=4)
+        wn1 = h.Param(dtype=int, desc="Width of NMOS mn1", default=38)
+        wn2 = h.Param(dtype=int, desc="Width of NMOS mn2", default=38)
+        wn3 = h.Param(dtype=int, desc="Width of NMOS mn3", default=9)
+        wn4 = h.Param(dtype=int, desc="Width of NMOS mn4", default=20)
+        wn5 = h.Param(dtype=int, desc="Width of NMOS mn5", default=60)
+        VDD = h.Param(dtype=h.Scalar, desc="VDD voltage", default=1.2)
+        CL = h.Param(dtype=h.Scalar, desc="CL capacitance", default=1e-11)
+        Cc = h.Param(dtype=h.Scalar, desc="Cc capacitance", default=3e-12)
+        ibias = h.Param(dtype=h.Scalar, desc="ibias current", default=3e-5)
+
+        def __init__(self, wp1, wn1, wp3, wn3, wn4, wn5, Cc, wp2, wn2) -> None:
+            self.wp1 = wp1
+            self.wn1 = wn1
+            self.wp3 = wp3
+            self.wn3 = wn3
+            self.wn4 = wn4
+            self.wn5 = wn5
+            self.Cc = Cc
+            self.wp2 = wp2
+            self.wn2 = wn2
+
     # Convert our input into `OpAmpParams`
     # FIXME Is this correct?
     # ! FIXME this is not how hdl21 handles inputs
+    TwoStageOpAmpParams = OpAmpParams
     params = TwoStageOpAmpParams(
         wp1=inp.mp1,
         wn1=inp.mn1,
