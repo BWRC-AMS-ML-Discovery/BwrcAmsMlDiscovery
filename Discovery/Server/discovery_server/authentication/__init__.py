@@ -9,8 +9,8 @@ from .user import User
 # Get current file directory
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 
-DEV = True
-if not DEV:
+
+def dev_start():
     _cred = credentials.Certificate(DIR_PATH + "/firebase_admin_sdk.json")
     firebase_admin.initialize_app(_cred)
 

@@ -16,7 +16,7 @@ ds.start_server()
 """
 
 # Std-Lib Imports
-from typing import Annotated
+from typing import Annotated, Optional
 
 # PyPi Imports
 from fastapi import FastAPI, Body, Depends
@@ -24,7 +24,7 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 import uvicorn
 
 # Workspace Imports
-from discovery_server.authentication import verify_credentials
+from discovery_server.authentication import verify_credentials, dev_start
 from discovery_shared.git import GitInfo
 
 
@@ -52,6 +52,7 @@ class Config:
 
     port: int = 8000
     host: str = "127.0.0.1"
+    dev: Optional[bool] = True
 
 
 # Create the module-scope configuration
@@ -71,7 +72,7 @@ def configure(cfg: Config) -> None:
 
 def start_server():
     """starts the server using the given config and sets up local rpcs"""
-    _setup_server_rpcs()
+    _setup_server_rpcs(config.dev)
     uvicorn.run(app, port=config.port, host=config.host)
 
 
@@ -95,7 +96,7 @@ async def version() -> GitInfo:
     return GitInfo.get()
 
 
-def _setup_server_rpcs():
+def _setup_server_rpcs(dev: bool):
     """# Set up server RPCs"""
     from discovery_shared.rpc import rpcs
 
@@ -115,6 +116,10 @@ def _setup_server_rpcs():
             rpc=rpc,
         ) -> rpc.return_type:
             # FIXME Perhaps we want to use this User?
+
+            if dev:
+                dev_start()
+
             user = verify_credentials(credentials)
 
             return rpc.func(arg)
