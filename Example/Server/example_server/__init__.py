@@ -200,6 +200,7 @@ def auto_ckt_sim_hdl21(inp: AutoCktInput) -> AutoCktOutput:
 
     # Convert our input into `OpAmpParams`
     # FIXME Is this correct?
+    # ! FIXME this is not how hdl21 handles inputs
     params = TwoStageOpAmpParams(
         wp1=inp.mp1,
         wn1=inp.mn1,
