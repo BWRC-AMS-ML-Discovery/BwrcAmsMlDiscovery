@@ -25,7 +25,6 @@ import uvicorn
 
 # Workspace Imports
 from discovery_server.authentication import verify_credentials
-from discovery_shared.git import GitInfo
 
 
 app = FastAPI(
@@ -86,13 +85,6 @@ async def alive() -> str:
     Just an indication that the server is alive and can be reached."""
 
     return "bwrc_ams_ml_discovery_server_alive"
-
-
-@app.get("/version")
-async def version() -> GitInfo:
-    """# Get the server git version info"""
-
-    return GitInfo.get()
 
 
 def _setup_server_rpcs():
