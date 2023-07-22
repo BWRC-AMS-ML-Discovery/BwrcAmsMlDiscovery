@@ -11,7 +11,11 @@
 
  In `bwrc_discovery_client`, function called `_setup_server_rpcs` correctly registers these rpc classes to the server and instantiate/register them. 
 
-### Example: Example contains three public packages that are `example_client`, `example_server`, and `example_shared`. 
+`bwrc_discovery_server` handles authentication, server_start.
+
+### Example: Example contains three public packages that are `example_client`, `example_server`, and `example_shared`.
+
+Example is a use case of bwrc_discovery.
 
 `example_shared` contains data classes for rpcs and defined rpc classes that are used for registering in the `discovery_shared`, which in terms of example AutoCkt, would be:
 ```sh
@@ -24,7 +28,27 @@ auto_ckt_sim_hdl21 = Rpc(
 ```
 where AutoCktInput and AutoCktOutput are also contained in here.
 
-`example_server` 
+`example_client` creates a call for client to send to `example_server`, in terms of autockt, it is called `test_autockt_sim`. 
+
+`example_server` handles the input sent from the client side, using a server function defined here. In terms of autockt, it would be:
+```sh
+@auto_ckt_sim_hdl21.impl
+def auto_ckt_sim_hdl21(inp: AutoCktInput) -> AutoCktOutput:
+    """
+    AutoCkt Simulation
+    """
+```
+which correctly uses the rpcs registered in the previous step in `bwrc_discovery`
+
+### Autockt: autockt contains three packages, autockt_auto, autockt_ckt, and autockt_shared
+
+Currently hosted on our server. Autockt is a service that uses Keertana's auto circuit RL setup to find the optimal OpAmp design. 
+
+We defined OpenAI Gym environment in `autockt_auto`, for RL training. 
+
+In `autockt_ckt`, we defined methods to calculate FOM for a given set of design params. We use these methods to calculate RL rewards.
+
+In `autockt_shared`, we defined supporting data classes for RL, which includes data classes like "Range". 
 
 ## Installation
 
