@@ -25,10 +25,10 @@ setup(
     author="The Regents of the University of California",
     author_email="FIXME",
     packages=find_packages(),
-    python_requires=">=3.7, <4",
+    python_requires=">=3.7, <3.11",
     install_requires=[
-        "python-dotenv==1.0.0",
-        "fastapi==0.99.1",
+        "python-dotenv~=1.0",
+        "fastapi~=0.99.1",
         "GitPython>=3.1.31",
         "uvicorn>=0.20.0",
         "firebase_admin>=6.0.1",
