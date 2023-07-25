@@ -25,9 +25,9 @@ setup(
     author="The Regents of the University of California",
     author_email="FIXME",
     packages=find_packages(),
-    python_requires=">=3.7, <4",
+    python_requires=">=3.7, <3.11",
     install_requires=[
-        "pydantic==1.9.1",
+        "pydantic>=1.9.0,<1.11",
     ],
     extras_require={
         "dev": [
