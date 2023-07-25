@@ -37,7 +37,7 @@ from .auto_ckt_sim_lib import (
     simulate,
     translate_result,
 )
-from .mocks.TwoStageOpAmp import (
+from .TwoStageOpAmp import (
     OpAmpParams as TwoStageOpAmpParams,
     OpAmpSim,
     find_dc_gain,
