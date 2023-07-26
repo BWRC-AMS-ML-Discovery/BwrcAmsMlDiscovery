@@ -151,6 +151,8 @@ def main():
     results = LatchSim.run(opts)
 
     print(results)
+    print("====================")
+    print(results["tr"])
 
     # print("Gain:            "+str(find_dc_gain(2*results["ac"].data["v(xtop.sig_out)"])))
     # print("UGBW:            "+str(find_ugbw(results["ac"].freq,2*results["ac"].data["v(xtop.sig_out)"])))
