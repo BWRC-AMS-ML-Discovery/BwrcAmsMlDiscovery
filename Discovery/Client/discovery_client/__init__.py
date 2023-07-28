@@ -37,6 +37,7 @@ class Config:
     """# Server Configuration"""
 
     server_url: str = "localhost:8000"
+    enable_https: bool = True
 
 
 # Create the module-scope configuration

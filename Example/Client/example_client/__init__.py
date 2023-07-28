@@ -30,20 +30,17 @@ from example_shared import (
 import discovery_client as dc
 from discovery_client import Config
 
-# FIXME Maybe put this variable somewhere else?
-ENABLE_HTTP = False
-if not ENABLE_HTTP:
-    dc.client_start = lambda: None
-    # Short-circuiting by directly calling server functions
-    import example_server as _
-
 
 def example_client_start(cfg: Config):
     """retrieve values from .env file then configure nad start the client"""
 
-    # set server_url
     dc.configure(cfg)
-    dc.client_start()
+
+    if cfg.enable_https:
+        dc.client_start()
+    else:
+        # Short-circuiting by directly calling server functions
+        import example_server as _
 
 
 """
