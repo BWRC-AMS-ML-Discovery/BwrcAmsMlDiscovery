@@ -28,6 +28,7 @@ setup(
     python_requires=">=3.7, <4",
     install_requires=[
         "pydantic==1.9.1",
+        "GitPython>=3.1.31",
     ],
     extras_require={
         "dev": [
