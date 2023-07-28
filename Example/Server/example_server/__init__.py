@@ -10,6 +10,7 @@ import hdl21 as h
 import vlsirtools.spice as vsp
 
 import discovery_server as ds
+from discovery_server import Config
 from dotenv import dotenv_values
 
 # Workspace Imports
@@ -47,20 +48,10 @@ from .mocks.TwoStageOpAmp import (
 )
 
 
-def example_server_start():
+def example_server_start(cfg: Config):
     """Retrieve values from .env and then configure and start the server"""
 
-    env = dotenv_values()
-
-    THE_SERVER_HOST = env.get("THE_SERVER_HOST", None)
-    if not THE_SERVER_HOST:
-        raise ValueError("THE_SERVER_HOST not set in .env file")
-
-    THE_SERVER_PORT = env.get("THE_SERVER_PORT", None)
-    if not THE_SERVER_PORT:
-        raise ValueError("THE_SERVER_PORT not set in .env file")
-
-    ds.configure(ds.Config(port=THE_SERVER_PORT, host=THE_SERVER_HOST))
+    ds.configure(cfg)
     ds.start_server()
 
 
