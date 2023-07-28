@@ -98,8 +98,8 @@ def _setup_client_rpcs():
                 url,
                 json=asdict(inp),
                 auth=(
-                    os.environ["DISCOVERY_USERNAME"],
-                    os.environ["DISCOVERY_API_KEY"],
+                    os.environ.get("DISCOVERY_USERNAME"),
+                    os.environ.get("DISCOVERY_API_KEY"),
                 ),
             )
             return rpc.return_type(**resp.json())
