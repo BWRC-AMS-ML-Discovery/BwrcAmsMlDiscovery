@@ -11,7 +11,6 @@ from example_shared import (
     inverter_beta_ratio,
     InverterBetaRatioInput,
     InverterBetaRatioOutput,
-    simulate_on_the_server,
     auto_ckt_sim,
     auto_ckt_sim_hdl21,
     AutoCktInput,
