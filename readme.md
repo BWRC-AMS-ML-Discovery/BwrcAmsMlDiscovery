@@ -93,5 +93,5 @@ pytest
 
 ## Authentication Token
 
-1. To register and obtain the auth token, go to [website](https://bwrc-ams-ml-discovery-firebase-save.vercel.app/enter).
+1. To register and obtain the auth token, go to [website](https://cktgym-1.web.app/).
 2. Put the auth token in the `.env` file as `DISCOVERY_AUTH_TOKEN`.
