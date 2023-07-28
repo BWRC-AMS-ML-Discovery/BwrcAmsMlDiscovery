@@ -28,7 +28,7 @@ from example_shared import (
 
 # The client library will create client stubs for all defined RPCs, including all those functions above.
 import discovery_client as dc
-
+from discovery_client import Config
 
 # FIXME Maybe put this variable somewhere else?
 ENABLE_HTTP = False
@@ -38,19 +38,11 @@ if not ENABLE_HTTP:
     import example_server as _
 
 
-def example_client_start():
+def example_client_start(cfg: Config):
     """retrieve values from .env file then configure nad start the client"""
 
-    # Load the .env file
-    env = dotenv_values()
-
-    # And get the server URL
-    THE_SERVER_URL = env.get("THE_SERVER_URL", None)
-    if not THE_SERVER_URL:
-        raise ValueError("THE_SERVER_URL not set in .env file")
-
     # set server_url
-    dc.configure(dc.Config(server_url=THE_SERVER_URL))
+    dc.configure(cfg)
     dc.client_start()
 
 
