@@ -16,19 +16,21 @@ long_description = "" if not readme.exists() else readme.read_text(encoding="utf
 
 
 setup(
-    name="discovery_shared",
+    name="sample_client",
     version="0.0.1",
-    description="BWRC AMS ML Discovery Shared",
+    description="Sample Discovery Client",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="FIXME",
     author="The Regents of the University of California",
     author_email="FIXME",
     packages=find_packages(),
-    python_requires=">=3.7, <3.11",
+    python_requires=">=3.7, <4",
     install_requires=[
-        "GitPython>=3.1.31",
-        "pydantic>=1.9.0,<1.11",
+        "hdl21>=4.0.0",
+        "python-dotenv==1.0.0",
+        "discovery_client==0.0.1",
+        "sample_shared==0.0.1",
     ],
     extras_require={
         "dev": [
