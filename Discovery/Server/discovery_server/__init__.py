@@ -24,7 +24,7 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 import uvicorn
 
 # Workspace Imports
-from discovery_server.authentication import verify_credentials, dev_start
+from discovery_server.authentication import verify_credentials, start_firebase_auth
 
 from discovery_shared.git import GitInfo
 
@@ -53,7 +53,7 @@ class Config:
 
     port: int = 8000
     host: str = "127.0.0.1"
-    dev: Optional[bool] = True
+    enable_firebase_auth: bool = False
 
 
 # Create the module-scope configuration
@@ -73,7 +73,9 @@ def configure(cfg: Config) -> None:
 
 def start_server():
     """starts the server using the given config and sets up local rpcs"""
-    _setup_server_rpcs(config.dev)
+    if config.enable_firebase_auth:
+        start_firebase_auth()
+    _setup_server_rpcs(config.enable_firebase_auth)
     uvicorn.run(app, port=config.port, host=config.host)
 
 
@@ -97,7 +99,7 @@ async def version() -> GitInfo:
     return GitInfo.get()
 
 
-def _setup_server_rpcs(dev: bool):
+def _setup_server_rpcs(enable_firebase_auth: bool):
     """# Set up server RPCs"""
     from discovery_shared.rpc import rpcs
 
@@ -117,11 +119,8 @@ def _setup_server_rpcs(dev: bool):
             rpc=rpc,
         ) -> rpc.return_type:
             # FIXME Perhaps we want to use this User?
-
-            if dev:
-                dev_start()
-
-            user = verify_credentials(credentials)
+            if enable_firebase_auth:
+                user = verify_credentials(credentials)
 
             return rpc.func(arg)
 
