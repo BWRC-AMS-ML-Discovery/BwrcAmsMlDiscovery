@@ -16,14 +16,6 @@ from sample_shared import (
     OpAmpParams,
     VlsirProtoBufKind,
     VlsirProtoBufBinary,
-    inverter_beta_ratio,
-    InverterBetaRatioInput,
-    InverterBetaRatioOutput,
-    simulate_on_the_server,
-    auto_ckt_sim,
-    auto_ckt_sim_hdl21,
-    AutoCktInput,
-    AutoCktOutput,
 )
 
 # The client library will create client stubs for all defined RPCs, including all those functions above.
@@ -46,13 +38,6 @@ def sample_client_start(cfg: Config):
 """
 Now we can just call the RPCs as though they were implemented locally.
 """
-
-
-def test_auto_ckt():
-    """testing auto ckt rpcs"""
-    to_test = AutoCktInput(3, 3, 3, 3, 3, 3, 1e-12)
-    test = auto_ckt_sim(to_test)
-    return test
 
 
 def do_simple_sample():
@@ -126,13 +111,3 @@ def elaborate_that_opamp_here_and_simulate_on_the_server(
     # Got some data back! Decode it from protobuf into a `SimResultProto`.
     sim_result = h.sim.SimResultProto.ParseFromString(from_the_server.proto_bytes)
     return sim_result
-
-
-def local_inverter_beta_ratio(inp: InverterBetaRatioInput):
-    wp = inp.wp
-    wn = inp.wn
-    output = (wp - 23) ** 2 + (wn - 4) ** 2
-    return InverterBetaRatioOutput(
-        trise=output / 2,
-        tfall=output / 2,
-    )
