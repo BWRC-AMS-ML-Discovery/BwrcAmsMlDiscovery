@@ -56,46 +56,6 @@ secret_spice = Rpc(
 )
 
 
-@dataclass
-class InverterBetaRatioInput:
-    # def __init__(self, wp, wn):
-    #   self.wp = wp
-    #    self.wn = wn
-    wp: Optional[float] = None
-    wn: Optional[float] = None
-
-    def __init__(self, params):
-        if params:
-            assert (
-                len(params) == 2
-            ), f"Number of parameters must be 2, currently there are {len(params)}"
-            self.wp = params[0]
-            self.wn = params[1]
-
-    def to_vec(self) -> list:
-        return [self.wp, self.wn]
-
-
-@dataclass
-class InverterBetaRatioOutput:
-    trise: float
-    tfall: float
-
-    def to_vec(self) -> list:
-        return [self.trise, self.tfall]
-
-
-inverter_beta_ratio = Rpc(
-    name="inverter_beta_ratio",
-    input_type=InverterBetaRatioInput,
-    return_type=InverterBetaRatioOutput,
-    docstring="Inverter Beta Ratio",
-)
-
-
-# TODO Ask Dan if he made changes to these
-# Because these were lost due to a merge conflict,
-# and I manually copied them from a previous commit.
 class VlsirProtoBufKind(Enum):
     """# VLSIR ProtoBuf Kind
     Enumerated types for `VlsirProtoBufBinary` data."""
@@ -144,47 +104,5 @@ simulate_on_the_server = Rpc(
     name="simulate_on_the_server",
     input_type=VlsirProtoBufBinary,
     return_type=VlsirProtoBufBinary,
-    docstring="Simulation on the Server",
-)
-
-
-@dataclass
-class AutoCktInput:
-    """
-    Input type for AutoCkt library, a state of result
-    """
-
-    mp1: int  # number of units of specific pmos transistor
-    mn1: int  # number of units of specific nmos transistor
-    mp3: int  # number of units of specific pmos transistor
-    mn3: int  # number of units of specific nmos transistor
-    mn4: int  # number of units of specific nmos transistor
-    mn5: int  # number of units of specific nmos transistor
-    cc: float  # Or maybe `str`, or the Hdl21/ VLSIR `Prefixed` fixed-point type
-
-
-@dataclass
-class AutoCktOutput:
-    """
-    Output type for AutoCkt library, a spec of circuit design
-    """
-
-    gain: float
-    ugbw: float
-    phm: float
-    ibias: float
-
-
-auto_ckt_sim = Rpc(
-    name="auto_ckt_sim",
-    input_type=AutoCktInput,
-    return_type=AutoCktOutput,
-    docstring="Simulation on the Server",
-)
-
-auto_ckt_sim_hdl21 = Rpc(
-    name="auto_ckt_sim_hdl21",
-    input_type=AutoCktInput,
-    return_type=AutoCktOutput,
     docstring="Simulation on the Server",
 )
