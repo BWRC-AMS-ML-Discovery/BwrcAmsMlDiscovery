@@ -21,7 +21,10 @@ class AutoCktParamsManager:
         # Convert to a numpy array and flatten it if it's not already 1D
         for idx, (name, _) in enumerate(self.cur_params.items()):
             action_idx = cur_action[name]
-            step_update = self.cur_params[name] + self.actions_per_param[action_idx]
+            step_update = (
+                self.cur_params[name]
+                + self.actions_per_param[action_idx] * self.params_ranges[idx].step
+            )
 
             if step_update > self.params_ranges[idx].range.max:
                 step_update = self.params_ranges[idx].range.max

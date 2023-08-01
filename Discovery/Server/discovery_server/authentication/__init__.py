@@ -10,8 +10,8 @@ from .user import User
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
-_cred = credentials.Certificate(DIR_PATH + "/firebase_admin_sdk.json")
-firebase_admin.initialize_app(_cred)
+# _cred = credentials.Certificate(DIR_PATH + "/firebase_admin_sdk.json")
+firebase_admin.initialize_app()
 
 
 def verify_credentials(credentials) -> User:

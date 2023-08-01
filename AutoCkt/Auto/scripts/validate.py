@@ -18,12 +18,30 @@ import argparse
 import numpy as np
 import gym
 import ray
-from ray.rllib.agents.registry import get_agent_class
+from ray.rllib.algorithms.ppo import PPOConfig
+from ray.rllib.algorithms import Algorithm
 from ray.tune.registry import register_env
 
 # Workspace Imports
 from autockt.envs.ngspice_vanilla_opamp import TwoStageAmp
+from autockt.autockt_gym import AutoCktGym
 
+from autockt.autockt_gym_env_config import (
+    AutoCktCircuitOptimization,
+    AutoCktGymEnvConfig,
+    AutoCktParams,
+    AutoCktParam,
+    AutoCktSpecs,
+    AutoCktSpec,
+)
+from example_client import (
+    AutoCktInput,
+    AutoCktOutput,
+    auto_ckt_sim,
+)
+from eval_engines.rewards import (
+    settaluri_reward,
+)
 
 EXAMPLE_USAGE = """
 Example Usage via RLlib CLI:
@@ -39,6 +57,55 @@ Example Usage via executable:
 # ModelCatalog.register_custom_model("pa_model", ParametricActionsModel)
 # register_env("pa_cartpole", lambda _: ParametricActionCartpole(10))
 register_env("opamp-v0", lambda config: TwoStageAmp(config))
+register_env("autockt", lambda config: AutoCktGym(config))
+
+circuit_optimization = AutoCktCircuitOptimization(
+    params=AutoCktParams(
+        [
+            AutoCktParam("mp1", (1, 100), step=1, init=34),
+            AutoCktParam("mn1", (1, 100), step=1, init=34),
+            AutoCktParam("mp3", (1, 100), step=1, init=34),
+            AutoCktParam("mn3", (1, 100), step=1, init=34),
+            AutoCktParam("mn4", (1, 100), step=1, init=34),
+            AutoCktParam("mn5", (1, 100), step=1, init=15),
+            AutoCktParam("cc", (0.1e-12, 10.0e-12), step=0.1e-12, init=2.1e-12),
+        ]
+    ),
+    specs=AutoCktSpecs(  # FIXME Numbers right?
+        [
+            AutoCktSpec("gain", (200, 400), normalize=350),
+            AutoCktSpec("ugbw", (1.0e6, 2.5e7), normalize=9.5e5),
+            AutoCktSpec("phm", (60, 60.0000001), normalize=60),
+            AutoCktSpec("ibias", (0.0001, 0.01), normalize=0.001),
+        ]
+    ),
+    input_type=AutoCktInput,
+    output_type=AutoCktOutput,
+    simulation=auto_ckt_sim,
+    reward=settaluri_reward,
+)
+
+gym_env_config = AutoCktGymEnvConfig(
+    circuit_optimization=circuit_optimization,
+    actions_per_param=[-1, 0, 2],
+)
+
+config_train = {
+    # "sample_batch_size": 200,
+    "train_batch_size": 1200,
+    # "sgd_minibatch_size": 1200,
+    # "num_sgd_iter": 3,
+    # "lr":1e-3,
+    # "vf_loss_coeff": 0.5,
+    "horizon": 30,
+    "num_gpus": 0,
+    "model": {
+        "fcnet_hiddens": [64, 64],
+    },
+    "num_workers": 6,
+    "env_config": gym_env_config,  # a kwarg to the env constructor
+    # "disable_env_checking": True,
+}
 
 
 def create_parser(parser_creator=None):
@@ -111,6 +178,7 @@ def run(args, parser):
     if not config:
         # Load configuration from file
         config_dir = os.path.dirname(args.checkpoint)
+        print(config_dir)
         config_path = os.path.join(config_dir, "params.json")
         if not os.path.exists(config_path):
             config_path = os.path.join(config_dir, "../params.json")
@@ -131,9 +199,23 @@ def run(args, parser):
 
     ray.init()
 
-    cls = get_agent_class(args.run)
-    agent = cls(env=args.env, config=config)
+    # cls = get_algoritm_class(args.run)
+    # agent = cls(env=args.env, config=config)
+    # agent.restore(args.checkpoint)
+
+    # print(config)
+    ppoconfig = PPOConfig().environment(env=args.env)
+    ppoconfig.env_config = gym_env_config
+    ppoconfig.horizon = 30
+    ppoconfig.model = {
+        "fcnet_hiddens": [64, 64],
+    }
+    ppoconfig.num_gpus = 0
+    ppoconfig.train_batch_size = 1200
+    ppoconfig.num_workers = 6
+    agent = ppoconfig.build()
     agent.restore(args.checkpoint)
+
     num_steps = int(args.steps)
     rollout(agent, args.env, num_steps, args.out, args.no_render)
 
@@ -154,12 +236,15 @@ def rollout(agent, env_name, num_steps, out="assdf", no_render=True):
         }
         if env_name == "opamp-v0":
             env = TwoStageAmp(env_config=env_config)
+        elif env_name == "autockt":
+            env = AutoCktGym(env_config=env_config)
     else:
-        env = gym.make(env_name)
+        # env = gym.make(env_name)
+        env = AutoCktGym(env_config=gym_env_config)
 
     # get unnormlaized specs
-    norm_spec_ref = env.global_g
-    spec_num = len(env.specs)
+    norm_spec_ref = env.spec_manager.get_global_norm()
+    spec_num = len(env.spec_manager.get_specs())
 
     if hasattr(agent, "local_evaluator"):
         state_init = agent.local_evaluator.policy_map["default"].get_initial_state()
