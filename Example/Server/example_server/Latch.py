@@ -129,7 +129,7 @@ class LatchSim:
     # Simulation Stimulus
     op = hs.Op()
     # ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
-    tr = hs.Tran(tstop=11 * NANO, tstep=1 * h.prefix.p , name="mytran")
+    tr = hs.Tran(tstop=21 * NANO, tstep=1 * h.prefix.p , name="mytran")
     mod = hs.Include("../45nm_bulk.txt")
 
 
@@ -153,6 +153,38 @@ def main():
     print(results)
     print("====================")
     print(results["tr"])
+    print("====================")
+    print(results["tr"].data["time"])
+    print("====================")
+    print(results["tr"].data["v(xtop.sig_out)"])
+    print("====================")
+    print("v(xtop.clk_p)")
+    print(results["tr"].data["v(xtop.clk_p)"])
+    print("====================")
+    print("v(xtop.vin_p)")
+    print(results["tr"].data["v(xtop.vin_p)"])
+    print("====================")
+    print(type(results["tr"].data["v(xtop.sig_out)"]))
+    print("====================")
+    # print(results["tr"].data["time"].transpose()+results["tr"].data["v(xtop.sig_out)"].transpose())
+    table1 = numpy.vstack((results["tr"].data["time"], results["tr"].data["v(xtop.sig_out)"], results["tr"].data["v(xtop.clk_p)"], results["tr"].data["v(xtop.vin_p)"]))
+    print(table1)
+    print("====================")
+    table2 = table1.T
+    print(table2)
+    print("====================")
+    table3 = numpy.vstack((["time", "v(xtop.sig_out)", "v(xtop.clk_p)", "v(xtop.vin_p)"], table2))
+    print(table3)
+    numpy.savetxt("Latch.csv", table2, delimiter=",")
+
+    from matplotlib import pyplot as plt
+
+    plt.plot(results["tr"].data["time"], results["tr"].data["v(xtop.sig_out)"], label='sig_out') 
+    plt.plot(results["tr"].data["time"], results["tr"].data["v(xtop.clk_p)"], label='clk_p') 
+    plt.plot(results["tr"].data["time"], results["tr"].data["v(xtop.vin_p)"], label='vin_p') 
+    plt.legend()
+    plt.show()
+    plt.savefig('Latch_sim.png')
 
     # print("Gain:            "+str(find_dc_gain(2*results["ac"].data["v(xtop.sig_out)"])))
     # print("UGBW:            "+str(find_ugbw(results["ac"].freq,2*results["ac"].data["v(xtop.sig_out)"])))
