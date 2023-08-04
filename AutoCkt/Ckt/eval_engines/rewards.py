@@ -28,18 +28,24 @@ def settaluri_reward(
             )
         pos_val = []
         reward = 0.0
-        for key in output_relative:
-            rel_spec = output_relative[key]
-            if key == "ibias":
-                rel_spec = rel_spec * -1.0  # /10.0
-            if rel_spec < 0:
-                reward += rel_spec
-                pos_val.append(0)
-            else:
-                pos_val.append(1)
+        fom_calculator(output_relative, pos_val, reward)
 
         # TODO this 10 seems pretty arbitrary
-        return reward if reward < -0.02 else 10  ##FOM fix here
+        return reward if reward < -0.02 else 10
 
     # run the reward function
     return reward(curr_output, target_output)
+
+
+def fom_calculator(output_relative, pos_val=[], reward=0.0):
+    # TODO this fom can be changed to other fom metrics
+    for key in output_relative:
+        rel_spec = output_relative[key]
+        if key == "ibias":
+            rel_spec = rel_spec * -1.0  # /10.0
+        if rel_spec < 0:
+            reward += rel_spec
+            pos_val.append(0)
+        else:
+            pos_val.append(1)
+    return reward
