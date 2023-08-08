@@ -42,7 +42,7 @@ def fom_calculator(output_relative, pos_val=[], reward=0.0):
     for key in output_relative:
         rel_spec = output_relative[key]
         if key == "ibias":
-            rel_spec = rel_spec * -1.0  # /10.0
+            rel_spec = (rel_spec * -1.0) / 10.0
         if rel_spec < 0:
             reward += rel_spec
             pos_val.append(0)
