@@ -4,7 +4,9 @@
 Highlights the capacity to use `Diff` signals and `Pair`s of instances 
 for differential circuits. 
 
-This LDO is based on the schematic of Fig2.10 in Keertana's article
+This LDO is based on the schematic of Fig2.10 in Keertana's article.
+Here is url for the article: 
+https://www2.eecs.berkeley.edu/Pubs/TechRpts/2022/EECS-2022-27.pdf
 
 """
 
@@ -75,7 +77,7 @@ class LDOParams:
 
 
 @h.generator
-def OpAmp(p: LDOParams) -> h.Module:
+def LDO_1(p: LDOParams) -> h.Module:
     """# LDO """
 
     @h.module
@@ -163,7 +165,7 @@ class MosDcopSim:
         sig_n = h.Vdc(dc=0.6, ac=-0.5)(p=dcin.n,n=VSS)
         Isource = h.Isrc(dc = 3e-5)(p = vdc.p, n = i_bias)
         
-        inst=OpAmp()(VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out)
+        inst=LDO_1()(VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out)
 
     # Simulation Stimulus
     op = hs.Op()

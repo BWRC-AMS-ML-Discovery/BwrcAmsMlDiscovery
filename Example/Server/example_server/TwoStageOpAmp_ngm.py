@@ -4,7 +4,9 @@
 Highlights the capacity to use `Diff` signals and `Pair`s of instances 
 for differential circuits. 
 
-In this file, we use the schematic of Fig2.18 in Keertana's article
+In this file, we use the schematic of Fig2.18 in Keertana's article.
+Here is the link to the article:
+https://www2.eecs.berkeley.edu/Pubs/TechRpts/2022/EECS-2022-27.pdf
 
 """
 
