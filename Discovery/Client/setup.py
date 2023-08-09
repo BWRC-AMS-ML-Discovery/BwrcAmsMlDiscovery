@@ -25,9 +25,9 @@ setup(
     author="The Regents of the University of California",
     author_email="FIXME",
     packages=find_packages(),
-    python_requires=">=3.7, <4",
+    python_requires=">=3.7, <3.11",
     install_requires=[
-        "python-dotenv==1.0.0",
+        "python-dotenv~=1.0",
         "httpx>=0.23.3",
         "discovery_shared==0.0.1",
     ],

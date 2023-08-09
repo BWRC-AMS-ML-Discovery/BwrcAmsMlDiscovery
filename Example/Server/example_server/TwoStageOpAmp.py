@@ -148,13 +148,13 @@ def OpAmpSim(params: OpAmpParams) -> h.sim.Sim:
             """# Basic Mos Testbench"""
 
             VSS = h.Port()  # The testbench interface: sole port VSS
-            vdc = h.Vdc(dc=1.2)(n=VSS)  # A DC voltage source
+            vdc = h.Vdc(dc=params.VDD)(n=VSS)  # A DC voltage source
             dcin = h.Diff()
             sig_out = h.Signal()
             i_bias = h.Signal()
-            sig_p = h.Vdc(dc=0.6, ac=0.5)(p=dcin.p, n=VSS)
-            sig_n = h.Vdc(dc=0.6, ac=-0.5)(p=dcin.n, n=VSS)
-            Isource = h.Isrc(dc=3e-5)(p=vdc.p, n=i_bias)
+            sig_p = h.Vdc(dc=params.VDD / 2, ac=0.5)(p=dcin.p, n=VSS)
+            sig_n = h.Vdc(dc=params.VDD / 2, ac=-0.5)(p=dcin.n, n=VSS)
+            Isource = h.Isrc(dc=params.ibias)(p=vdc.p, n=i_bias)
 
             inst = OpAmp(params)(
                 VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out

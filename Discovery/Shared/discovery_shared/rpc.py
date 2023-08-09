@@ -92,6 +92,8 @@ class Rpc:
         Dispatches to the inner callable.
         This would only be invoked if directly importing from the shared version, but should remain handy.
         Our return-type annotation here is pseudo-code, but you get the point."""
+        if self.func is None:
+            raise NotImplementedError
         return self.func(*args, **kwargs)
 
     def impl(self, f: Callable) -> "Rpc":
