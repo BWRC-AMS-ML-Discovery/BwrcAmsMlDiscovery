@@ -14,6 +14,7 @@ def start_firebase_auth():
     _cred = credentials.Certificate(DIR_PATH + "/firebase_admin_sdk.json")
     firebase_admin.initialize_app(_cred)
 
+
 def verify_credentials(credentials) -> User:
     username = credentials.username
     token = credentials.password
