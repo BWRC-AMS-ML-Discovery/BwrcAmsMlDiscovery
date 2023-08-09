@@ -3,11 +3,6 @@
 FIXME: description here! 
 """
 
-
-if __name__ != "__main__":
-    raise Exception("This is a SCRIPT and should be run as __main__!")
-
-
 # Std-Lib Imports
 import os
 import json
@@ -26,23 +21,6 @@ from ray.tune.registry import register_env
 from autockt.envs.ngspice_vanilla_opamp import TwoStageAmp
 from autockt.autockt_gym import AutoCktGym
 
-from autockt.autockt_gym_env_config import (
-    AutoCktCircuitOptimization,
-    AutoCktGymEnvConfig,
-    AutoCktParams,
-    AutoCktParam,
-    AutoCktSpecs,
-    AutoCktSpec,
-)
-from example_client import (
-    AutoCktInput,
-    AutoCktOutput,
-    auto_ckt_sim,
-)
-from eval_engines.rewards import (
-    settaluri_reward,
-)
-
 EXAMPLE_USAGE = """
 Example Usage via RLlib CLI:
     rllib rollout /tmp/ray/checkpoint_dir/checkpoint-0 --run DQN
@@ -58,54 +36,6 @@ Example Usage via executable:
 # register_env("pa_cartpole", lambda _: ParametricActionCartpole(10))
 register_env("opamp-v0", lambda config: TwoStageAmp(config))
 register_env("autockt", lambda config: AutoCktGym(config))
-
-circuit_optimization = AutoCktCircuitOptimization(
-    params=AutoCktParams(
-        [
-            AutoCktParam("mp1", (1, 100), step=1, init=34),
-            AutoCktParam("mn1", (1, 100), step=1, init=34),
-            AutoCktParam("mp3", (1, 100), step=1, init=34),
-            AutoCktParam("mn3", (1, 100), step=1, init=34),
-            AutoCktParam("mn4", (1, 100), step=1, init=34),
-            AutoCktParam("mn5", (1, 100), step=1, init=15),
-            AutoCktParam("cc", (0.1e-12, 10.0e-12), step=0.1e-12, init=2.1e-12),
-        ]
-    ),
-    specs=AutoCktSpecs(  # FIXME Numbers right?
-        [
-            AutoCktSpec("gain", (200, 400), normalize=350),
-            AutoCktSpec("ugbw", (1.0e6, 2.5e7), normalize=9.5e5),
-            AutoCktSpec("phm", (60, 60.0000001), normalize=60),
-            AutoCktSpec("ibias", (0.0001, 0.01), normalize=0.001),
-        ]
-    ),
-    input_type=AutoCktInput,
-    output_type=AutoCktOutput,
-    simulation=auto_ckt_sim,
-    reward=settaluri_reward,
-)
-
-gym_env_config = AutoCktGymEnvConfig(
-    circuit_optimization=circuit_optimization,
-    actions_per_param=[-1, 0, 2],
-)
-
-config_train = {
-    # "sample_batch_size": 200,
-    "train_batch_size": 1200,
-    # "sgd_minibatch_size": 1200,
-    # "num_sgd_iter": 3,
-    # "lr":1e-3,
-    # "vf_loss_coeff": 0.5,
-    "horizon": 30,
-    "num_gpus": 0,
-    "model": {
-        "fcnet_hiddens": [64, 64],
-    },
-    "num_workers": 6,
-    "env_config": gym_env_config,  # a kwarg to the env constructor
-    # "disable_env_checking": True,
-}
 
 
 def create_parser(parser_creator=None):
@@ -174,24 +104,29 @@ def create_parser(parser_creator=None):
     return parser
 
 
-def run(args, parser, params):
-    config = args.config
-    if not config:
-        # Load configuration from file
-        config_dir = os.path.dirname(args.checkpoint)
-        print(config_dir)
-        config_path = os.path.join(config_dir, "params.json")
-        if not os.path.exists(config_path):
-            config_path = os.path.join(config_dir, "../params.json")
-        if not os.path.exists(config_path):
-            raise ValueError(
-                "Could not find params.json in either the checkpoint dir or "
-                "its parent directory."
-            )
-        with open(config_path) as f:
-            config = json.load(f)
-        if "num_workers" in config:
-            config["num_workers"] = 0  # min(2, config["num_workers"])
+def run(params):
+    parser = create_parser()
+    args = parser.parse_args()
+
+    # no longer needed, we are loading params programatically
+    # config = args.config
+    # if not config:
+    #     # Load configuration from file
+    #     config_dir = os.path.dirname(args.checkpoint)
+    #     print(config_dir)
+    #     no longer needed as we are doing manual loading of params
+    #     config_path = os.path.join(config_dir, "params.json")
+    #     if not os.path.exists(config_path):
+    #         config_path = os.path.join(config_dir, "../params.json")
+    #     if not os.path.exists(config_path):
+    #         raise ValueError(
+    #             "Could not find params.json in either the checkpoint dir or "
+    #             "its parent directory."
+    #         )
+    #     with open(config_path) as f:
+    #         config = json.load(f)
+    #     if "num_workers" in config:
+    #         config["num_workers"] = 0  # min(2, config["num_workers"])
 
     if not args.env:
         if not config.get("env"):
@@ -200,11 +135,6 @@ def run(args, parser, params):
 
     ray.init()
 
-    # cls = get_algoritm_class(args.run)
-    # agent = cls(env=args.env, config=config)
-    # agent.restore(args.checkpoint)
-
-    # print(config)
     ppoconfig = PPOConfig().environment(env=args.env)
     ppoconfig.env_config = params["env_config"]
     ppoconfig.model = params["model"]
@@ -212,7 +142,15 @@ def run(args, parser, params):
     agent.restore(args.checkpoint)
 
     num_steps = int(args.steps)
-    rollout(agent, args.env, num_steps, args.out, args.no_render)
+    rollout(
+        agent,
+        args.env,
+        params["env_config"],
+        args,
+        num_steps,
+        args.out,
+        args.no_render,
+    )
 
 
 def unlookup(norm_spec, goal_spec):
@@ -220,7 +158,7 @@ def unlookup(norm_spec, goal_spec):
     return spec
 
 
-def rollout(agent, env_name, num_steps, out="assdf", no_render=True):
+def rollout(agent, env_name, env_config, args, num_steps, out="assdf", no_render=True):
     if hasattr(agent, "local_evaluator"):
         # env = agent.local_evaluator.env
         env_config = {
@@ -235,7 +173,7 @@ def rollout(agent, env_name, num_steps, out="assdf", no_render=True):
             env = AutoCktGym(env_config=env_config)
     else:
         # env = gym.make(env_name)
-        env = AutoCktGym(env_config=gym_env_config)
+        env = AutoCktGym(env_config=env_config)
 
     # get unnormlaized specs
     norm_spec_ref = env.spec_manager.get_global_norm()
@@ -311,7 +249,7 @@ def rollout(agent, env_name, num_steps, out="assdf", no_render=True):
     print("Num specs reached: " + str(reached_spec) + "/" + str(args.num_val_specs))
 
 
-if __name__ == "__main__":
-    parser = create_parser()
-    args = parser.parse_args()
-    run(args, parser, config_train)
+# if __name__ == "__main__":
+#     parser = create_parser()
+#     args = parser.parse_args()
+#     run(args, parser, config_train)
