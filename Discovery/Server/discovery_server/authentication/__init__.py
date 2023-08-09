@@ -9,6 +9,7 @@ from .user import User
 # Get current file directory
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 
+
 def start_firebase_auth():
     _cred = credentials.Certificate(DIR_PATH + "/firebase_admin_sdk.json")
     firebase_admin.initialize_app(_cred)
