@@ -11,21 +11,11 @@ def settaluri_reward(
     """
     Reward: doesn't penalize for overshooting spec, is negative
     """
-    # FIXME a func here, unbounded
-    if (
-        curr_output.ugbw > something
-    ):  # constraints like this, need to be randomly generated
-        return -reward
-    fom = (
-        np.log(curr_output.ugbw)
-        * curr_output.phm
-        * curr_output.gain
-        / curr_output.ibias
-        * (-1.0)
-    )
 
     def calc_relative(curr: Number, ideal: Number):
         # ideal = float(ideal)  # Not sure if this is necessary
+        if curr - ideal == 0:
+            return (curr) / (curr + ideal)
         relative = (curr - ideal) / (curr + ideal)
         return relative
 
@@ -40,18 +30,36 @@ def settaluri_reward(
                 target_output[key],
             )
         pos_val = []
-        reward = 0.0
         for key in output_relative:
             rel_spec = output_relative[key]
 
             if key == "ibias":
                 rel_spec = rel_spec * -1.0
-                # /10.0
             if rel_spec < 0:
-                reward += rel_spec
                 pos_val.append(0)
             else:
                 pos_val.append(1)
+
+        fom = (
+            (output_relative["ugbw"])
+            * output_relative["phm"]
+            * output_relative["gain"]
+            / output_relative["ibias"]
+            * (-1.0)
+        )
+
+        reward = fom
+        # for key in output_relative:
+        #     rel_spec = output_relative[key]
+
+        #     if key == "ibias":
+        #         rel_spec = rel_spec * -1.0
+        #         # /10.0
+        #     if rel_spec < 0:
+        #         reward += rel_spec
+        #         pos_val.append(0)
+        #     else:
+        #         pos_val.append(1)
         # reward, pos_val = fom_calculator(output_relative, pos_val, reward)
 
         # TODO this 10 seems pretty arbitrary
@@ -59,20 +67,3 @@ def settaluri_reward(
 
     # run the reward function
     return reward(curr_output, target_output)
-
-
-def fom_calculator(output_relative, pos_val=[], reward=0.0):
-    # TODO this fom can be changed to other fom metrics
-    for key in output_relative:
-        rel_spec = output_relative[key]
-
-        if key == "ibias":
-            rel_spec = rel_spec * -1.0
-            # /10.0
-        if rel_spec < 0:
-            reward += rel_spec
-            pos_val.append(0)
-        else:
-            pos_val.append(1)
-    # log for bandwidth
-    return reward, pos_val
