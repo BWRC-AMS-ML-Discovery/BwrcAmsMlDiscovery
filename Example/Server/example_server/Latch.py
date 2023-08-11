@@ -12,6 +12,14 @@ from hdl21.external_module import SpiceType
 from hdl21.prefix import µ, NANO
 import numpy
 
+def _get_best_crossing(yvec: numpy.array, val: float) -> tuple[int, bool]:
+    zero_crossings = numpy.where(numpy.diff(numpy.sign(yvec - val)))[0]
+    if len(zero_crossings) == 0:
+        return 0, False
+    if abs((yvec - val)[zero_crossings[0]]) < abs((yvec - val)[zero_crossings[0] + 1]):
+        return zero_crossings[0], True
+    else:
+        return (zero_crossings[0] + 1), True
 
 """
 Create a small "PDK" consisting of an externally-defined Nmos and Pmos transistor.
@@ -78,12 +86,12 @@ def LatchGen(p: LatchParams) -> h.Module:
         QB = h.Signal()
 
         # Input Inverter
-        in_inv_mn  = nmos(m=p.w1)(d=QB, g=D, s=ckb_gnd, b=ckb_gnd) # NMOS of input Inv
-        in_inv_mp  = pmos(m=p.w2)(d=QB, g=D, s=clk_vdd, b=clk_vdd) # PMOS of input Inv
+        in_inv_mn  = nmos(m=p.w1)(d=QB, g=D, s=clk_gnd, b=clk_gnd) # NMOS of input Inv
+        in_inv_mp  = pmos(m=p.w2)(d=QB, g=D, s=ckb_vdd, b=ckb_vdd) # PMOS of input Inv
 
         # Output Inverter
-        out_inv_mn = nmos(m=p.w3)(d=QB, g=Q, s=clk_gnd, b=clk_gnd) # NMOS of output Inv
-        out_inv_mp = pmos(m=p.w4)(d=QB, g=Q, s=ckb_vdd, b=ckb_vdd) # PMOS of output Inv
+        out_inv_mn = nmos(m=p.w3)(d=QB, g=Q, s=ckb_gnd, b=ckb_gnd) # NMOS of output Inv
+        out_inv_mp = pmos(m=p.w4)(d=QB, g=Q, s=clk_vdd, b=clk_vdd) # PMOS of output Inv
 
         # QB -> Q Inverter
         qb_inv_mn  = nmos(m=p.w5)(d=Q, g=QB, s=VSS, b=VSS) # NMOS of QB Inv
@@ -117,8 +125,8 @@ class LatchSim:
         input_params = h.PulseVoltageSourceParams(delay=2*NANO, v1=1.2, v2=0, period=10*NANO, width=5*NANO, fall=0, rise=0)
         vin = h.PulseVoltageSource(input_params)(n=VSS)
 
-        clock_params = h.PulseVoltageSourceParams(delay=1*NANO, v1=1.2, v2=0, period=20*NANO, width=10*NANO, fall=0, rise=0)
-        clk_b_params = h.PulseVoltageSourceParams(delay=1*NANO, v1=0, v2=1.2, period=20*NANO, width=10*NANO, fall=0, rise=0)
+        clock_params = h.PulseVoltageSourceParams(delay=1*NANO, v1=0, v2=1.2, period=20*NANO, width=10*NANO, fall=0, rise=0)
+        clk_b_params = h.PulseVoltageSourceParams(delay=1*NANO, v1=1.2, v2=0, period=20*NANO, width=10*NANO, fall=0, rise=0)
         CLK = h.PulseVoltageSource(clock_params)(n=VSS)
         CKB = h.PulseVoltageSource(clk_b_params)(n=VSS)
 
@@ -129,7 +137,7 @@ class LatchSim:
     # Simulation Stimulus
     op = hs.Op()
     # ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
-    tr = hs.Tran(tstop=21 * NANO, tstep=1 * h.prefix.p , name="mytran")
+    tr = hs.Tran(tstop=31 * NANO, tstep=1 * h.prefix.p , name="mytran")
     mod = hs.Include("../45nm_bulk.txt")
 
 
@@ -186,6 +194,13 @@ def main():
     plt.show()
     plt.savefig('Latch_sim.png')
 
+    print("====================")
+    out_crossing = numpy.where(numpy.diff(numpy.sign(results["tr"].data["v(xtop.sig_out)"] - 0.6)))[0]
+    print("out_crossing:    "+str(out_crossing))
+    vin_crossing = numpy.where(numpy.diff(numpy.sign(results["tr"].data["v(xtop.vin_p)"] - 0.6)))[0]
+    print("vin_crossing:    "+str(vin_crossing))
+    
+
     # print("Gain:            "+str(find_dc_gain(2*results["ac"].data["v(xtop.sig_out)"])))
     # print("UGBW:            "+str(find_ugbw(results["ac"].freq,2*results["ac"].data["v(xtop.sig_out)"])))
     # print("Phase margin:    "+str(find_phm(results["ac"].freq,2*results["ac"].data["v(xtop.sig_out)"])))
@@ -197,3 +212,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
