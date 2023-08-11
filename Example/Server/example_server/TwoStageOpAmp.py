@@ -1,19 +1,23 @@
 """ 
-# Fully Differential OTA Example 
-
-Highlights the capacity to use `Diff` signals and `Pair`s of instances 
-for differential circuits. 
-
+# Two Stage Op Amp
 """
 
-import sys
+import os
+from pathlib import Path
 from copy import deepcopy
+from dataclasses import asdict
+
+import numpy
+
 import hdl21 as h
 import hdl21.sim as hs
 import vlsirtools.spice as vsp
 from hdl21.external_module import SpiceType
 from hdl21.prefix import µ, NANO
-import numpy
+
+
+CURRENT_PATH = Path(os.path.dirname(os.path.abspath(__file__)))
+SPICE_MODEL_45NM_BULK_PATH = CURRENT_PATH / "45nm_bulk.txt"
 
 
 """ 
@@ -21,10 +25,6 @@ Create a small "PDK" consisting of an externally-defined Nmos and Pmos transisto
 Real versions will have some more parameters; these just have multiplier "m". 
 """
 
-
-@h.paramclass
-class MosParams:
-    m = h.Param(dtype=int, desc="Transistor Multiplier")
 
 @h.paramclass
 class PdkMosParams:
@@ -49,9 +49,11 @@ pmos = h.ExternalModule(
     spicetype=SpiceType.MOS,
 )
 
+
 @h.paramclass
 class OpAmpParams:
     """Parameter class"""
+
     wp1 = h.Param(dtype=int, desc="Width of PMOS mp1", default=10)
     wp2 = h.Param(dtype=int, desc="Width of PMOS mp2", default=10)
     wp3 = h.Param(dtype=int, desc="Width of PMOS mp3", default=4)
@@ -68,14 +70,14 @@ class OpAmpParams:
 
 @h.generator
 def OpAmp(p: OpAmpParams) -> h.Module:
-    """# Two stage OpAmp """
+    """# Two stage OpAmp"""
 
     @h.module
     class DiffOta:
         # IO Interface
         VDD, VSS = 2 * h.Input()
         ibias = h.Input()
-        
+
         inp = h.Diff(desc="Differential Input", port=True, role=h.Diff.Roles.SINK)
         out = h.Output()
 
@@ -83,22 +85,28 @@ def OpAmp(p: OpAmpParams) -> h.Module:
         net3, net4, net5 = h.Signals(3)
 
         # Input Stage
-        mp1 = pmos(m=p.wp1)(d=net4, g=net4, s=VDD, b=VDD) # Current mirror within the input stage
-        mp2 = pmos(m=p.wp2)(d=net5, g=net4, s=VDD, b=VDD) # Current mirror within the input stage
-        mn1 = nmos(m=p.wn1)(d=net4, g=inp.n, s=net3, b=net3) # Input MOS pair
-        mn2 = nmos(m=p.wn2)(d=net5, g=inp.p, s=net3, b=net3) # Input MOS pair
-        mn3 = nmos(m=p.wn3)(d=net3, g=ibias, s=VSS, b=VSS) # Mirrored current source
+        mp1 = pmos(m=p.wp1)(
+            d=net4, g=net4, s=VDD, b=VDD
+        )  # Current mirror within the input stage
+        mp2 = pmos(m=p.wp2)(
+            d=net5, g=net4, s=VDD, b=VDD
+        )  # Current mirror within the input stage
+        mn1 = nmos(m=p.wn1)(d=net4, g=inp.n, s=net3, b=net3)  # Input MOS pair
+        mn2 = nmos(m=p.wn2)(d=net5, g=inp.p, s=net3, b=net3)  # Input MOS pair
+        mn3 = nmos(m=p.wn3)(d=net3, g=ibias, s=VSS, b=VSS)  # Mirrored current source
 
         # Output Stage
-        mp3 = pmos(m=p.wp3)(d=out, g=net5, s=VDD, b=VDD) # Output inverter
-        mn5 = nmos(m=p.wn5)(d = out, g = ibias, s = VSS, b = VSS) # Output inverter
-        CL = h.Cap(c=p.CL)(p = out, n = VSS) # Load capacitance
+        mp3 = pmos(m=p.wp3)(d=out, g=net5, s=VDD, b=VDD)  # Output inverter
+        mn5 = nmos(m=p.wn5)(d=out, g=ibias, s=VSS, b=VSS)  # Output inverter
+        CL = h.Cap(c=p.CL)(p=out, n=VSS)  # Load capacitance
 
         # Biasing
-        mn4 = nmos(m=p.wn4)(d = ibias, g = ibias, s = VSS, b = VSS) # Current mirror co-operating with mn3
+        mn4 = nmos(m=p.wn4)(
+            d=ibias, g=ibias, s=VSS, b=VSS
+        )  # Current mirror co-operating with mn3
 
         # Compensation Network
-        Cc = h.Cap(c = p.Cc)(p = net5, n = out) # Miller Capacitance
+        Cc = h.Cap(c=p.Cc)(p=net5, n=out)  # Miller Capacitance
 
     return DiffOta
 
@@ -128,35 +136,42 @@ class Compensation:
     c = CapCell(p=r.n, n=b, VDD=VDD, VSS=VSS)
 
 
-@hs.sim
-class MosDcopSim:
-    """# Mos Dc Operating Point Simulation Input"""
-    # def __init__(params):
-        
+def OpAmpSim(params: OpAmpParams) -> h.sim.Sim:
+    """# Op Amp Simulation Input"""
 
-    @h.module
-    class Tb:
-        """# Basic Mos Testbench"""
+    @hs.sim
+    class MosDcopSim:
+        """# Mos Dc Operating Point Simulation Input"""
 
-        VSS = h.Port()  # The testbench interface: sole port VSS
-        vdc = h.Vdc(dc=1.2)(n=VSS)  # A DC voltage source
-        dcin = h.Diff()
-        sig_out = h.Signal()
-        i_bias = h.Signal()
-        sig_p = h.Vdc(dc=0.6, ac=0.5)(p=dcin.p,n=VSS)
-        sig_n = h.Vdc(dc=0.6, ac=-0.5)(p=dcin.n,n=VSS)
-        Isource = h.Isrc(dc = 3e-5)(p = vdc.p, n = i_bias)
-        
-        inst=OpAmp()(VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out)
+        @h.module
+        class Tb:
+            """# Basic Mos Testbench"""
 
-    # Simulation Stimulus
-    op = hs.Op()
-    ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
-    mod = hs.Include("../45nm_bulk.txt")
+            VSS = h.Port()  # The testbench interface: sole port VSS
+            vdc = h.Vdc(dc=params.VDD)(n=VSS)  # A DC voltage source
+            dcin = h.Diff()
+            sig_out = h.Signal()
+            i_bias = h.Signal()
+            sig_p = h.Vdc(dc=params.VDD / 2, ac=0.5)(p=dcin.p, n=VSS)
+            sig_n = h.Vdc(dc=params.VDD / 2, ac=-0.5)(p=dcin.n, n=VSS)
+            Isource = h.Isrc(dc=params.ibias)(p=vdc.p, n=i_bias)
 
+            inst = OpAmp(params)(
+                VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out
+            )
+
+        # Simulation Stimulus
+        op = hs.Op()
+        ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
+        mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
+
+    return MosDcopSim
 
 
 def main():
+    """
+    @deprecated: I think MosDcopSim has been changed to OpAmpSim
+    """
     # h.netlist(OpAmp(), sys.stdout)
 
     opts = vsp.SimOptions(
@@ -171,20 +186,41 @@ def main():
     # Run the simulation!
     results = MosDcopSim.run(opts)
 
+    print(
+        "Gain:            "
+        + str(
+            find_dc_gain(2 * results["ac"].data["v(xtop.sig_out)"]),
+        )
+    )
+    print(
+        "UGBW:            "
+        + str(
+            find_ugbw(results["ac"].freq, 2 * results["ac"].data["v(xtop.sig_out)"]),
+        )
+    )
+    print(
+        "Phase margin:    "
+        + str(
+            find_phm(results["ac"].freq, 2 * results["ac"].data["v(xtop.sig_out)"]),
+        )
+    )
+    print(
+        "Ivdd:            "
+        + str(
+            find_I_vdd(results["ac"].data["i(v.xtop.vvdc)"]),
+        )
+    )
 
-    print("Gain:            "+str(find_dc_gain(2*results["ac"].data["v(xtop.sig_out)"])))
-    print("UGBW:            "+str(find_ugbw(results["ac"].freq,2*results["ac"].data["v(xtop.sig_out)"])))
-    print("Phase margin:    "+str(find_phm(results["ac"].freq,2*results["ac"].data["v(xtop.sig_out)"])))
-    print("Ivdd:            "+str(find_I_vdd(results["ac"].data["i(v.xtop.vvdc)"])))
-    
 
-def find_I_vdd(vout:numpy.array) -> float:
+def find_I_vdd(vout: numpy.array) -> float:
     return numpy.abs(vout)[0]
 
-def find_dc_gain(vout:numpy.array) -> float:
+
+def find_dc_gain(vout: numpy.array) -> float:
     return numpy.abs(vout)[0]
 
-def find_ugbw(freq:numpy.array, vout:numpy.array) -> float:
+
+def find_ugbw(freq: numpy.array, vout: numpy.array) -> float:
     gain = numpy.abs(vout)
     ugbw_index, valid = _get_best_crossing(gain, val=1)
     if valid:
@@ -192,7 +228,8 @@ def find_ugbw(freq:numpy.array, vout:numpy.array) -> float:
     else:
         return freq[0]
 
-def find_phm(freq:numpy.array, vout:numpy.array) -> float:
+
+def find_phm(freq: numpy.array, vout: numpy.array) -> float:
     gain = numpy.abs(vout)
     phase = numpy.angle(vout, deg=False)
     phase = numpy.unwrap(phase)  # unwrap the discontinuity
@@ -207,15 +244,12 @@ def find_phm(freq:numpy.array, vout:numpy.array) -> float:
     else:
         return -180
 
-def _get_best_crossing(yvec:numpy.array, val:float) -> tuple[int, bool]:
-    zero_crossings = numpy.where(numpy.diff(numpy.sign(yvec-val)))[0]
-    if len(zero_crossings)==0:
+
+def _get_best_crossing(yvec: numpy.array, val: float) -> tuple[int, bool]:
+    zero_crossings = numpy.where(numpy.diff(numpy.sign(yvec - val)))[0]
+    if len(zero_crossings) == 0:
         return 0, False
-    if abs((yvec-val)[zero_crossings[0]]) < abs((yvec-val)[zero_crossings[0]+1]):
+    if abs((yvec - val)[zero_crossings[0]]) < abs((yvec - val)[zero_crossings[0] + 1]):
         return zero_crossings[0], True
     else:
-        return (zero_crossings[0]+1), True
-
-
-if __name__ == "__main__":
-    main()
+        return (zero_crossings[0] + 1), True

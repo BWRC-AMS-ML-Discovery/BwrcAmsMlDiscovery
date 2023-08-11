@@ -15,11 +15,17 @@ ds.start_server()
 ```
 """
 
+# Std-Lib Imports
+from typing import Annotated, Optional
+
 # PyPi Imports
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, Depends
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 import uvicorn
 
 # Workspace Imports
+from discovery_server.authentication import verify_credentials, start_firebase_auth
+
 from discovery_shared.git import GitInfo
 
 
@@ -29,6 +35,8 @@ app = FastAPI(
     description="BWRC AMS ML Discovery CktGym",
     version="0.0.1",
 )
+
+security = HTTPBasic()
 
 
 # Local Imports
@@ -45,6 +53,7 @@ class Config:
 
     port: int = 8000
     host: str = "127.0.0.1"
+    enable_firebase_auth: bool = False
 
 
 # Create the module-scope configuration
@@ -64,7 +73,9 @@ def configure(cfg: Config) -> None:
 
 def start_server():
     """starts the server using the given config and sets up local rpcs"""
-    _setup_server_rpcs()
+    if config.enable_firebase_auth:
+        start_firebase_auth()
+    _setup_server_rpcs(config.enable_firebase_auth)
     uvicorn.run(app, port=config.port, host=config.host)
 
 
@@ -88,7 +99,7 @@ async def version() -> GitInfo:
     return GitInfo.get()
 
 
-def _setup_server_rpcs():
+def _setup_server_rpcs(enable_firebase_auth: bool):
     """# Set up server RPCs"""
     from discovery_shared.rpc import rpcs
 
@@ -101,7 +112,16 @@ def _setup_server_rpcs():
         # Create the server endpoint
         # FIXME type annotations incorrect, can use a function generator to fix.
         # rpc needs to be evaluated at create time not run time.
-        async def f(arg: rpc.input_type = Body(...), *, rpc=rpc) -> rpc.return_type:
+        async def f(
+            credentials: Annotated[HTTPBasicCredentials, Depends(security)],
+            arg: rpc.input_type = Body(...),
+            *,
+            rpc=rpc,
+        ) -> rpc.return_type:
+            # FIXME Perhaps we want to use this User?
+            if enable_firebase_auth:
+                user = verify_credentials(credentials)
+
             return rpc.func(arg)
 
         # Give it the server-function's metadata

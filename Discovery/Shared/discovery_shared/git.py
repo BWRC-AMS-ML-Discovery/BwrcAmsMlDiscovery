@@ -29,10 +29,10 @@ class GitInfo:
 
 """
 # Non-docstring comment:
-# 
-# Note the GitPython library includes some admonitions to *not* use it in a long-running process, 
-# (kinda like our web server!). This is largely about resource management and clean-up. 
-# We only monitor one repo - the one containing this file. 
+#
+# Note the GitPython library includes some admonitions to *not* use it in a long-running process,
+# (kinda like our web server!). This is largely about resource management and clean-up.
+# We only monitor one repo - the one containing this file.
 # So, load it up at import time, and then just copy the `GitInfo` object for the rest of the process.
 """
 

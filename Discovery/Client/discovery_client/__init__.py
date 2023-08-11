@@ -16,10 +16,11 @@ ds.start_server()
 """
 
 # Std-Lib Imports
+import os
 from dataclasses import asdict
 
 # PyPi Imports
-from dotenv import dotenv_values
+import dotenv
 import httpx
 
 # Workspace Imports
@@ -27,11 +28,16 @@ from discovery_shared.git import GitInfo
 from pydantic.dataclasses import dataclass
 
 
+# FIXME Probably should be Config?
+dotenv.load_dotenv()
+
+
 @dataclass
 class Config:
     """# Server Configuration"""
 
     server_url: str = "localhost:8000"
+    enable_https: bool = True
 
 
 # Create the module-scope configuration
@@ -89,7 +95,14 @@ def _setup_client_rpcs():
         # rpc needs to be evaluated at create time not run time.
         def f(inp: rpc.input_type, *, rpc=rpc) -> rpc.return_type:
             url = f"http://{config.server_url}/{rpc.name}"
-            resp = httpx.post(url, json=asdict(inp))
+            resp = httpx.post(
+                url,
+                json=asdict(inp),
+                auth=(
+                    os.environ.get("DISCOVERY_USERNAME"),
+                    os.environ.get("DISCOVERY_API_KEY"),
+                ),
+            )
             return rpc.return_type(**resp.json())
 
         # Give it the same name as the RPC

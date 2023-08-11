@@ -1,5 +1,6 @@
 # StdLib Imports
-import os
+import os, tempfile
+from pathlib import Path
 import re
 import random
 import copy
@@ -27,18 +28,13 @@ _raw_file.close()
 
 
 def _mkdir():
-    while True:
-        try:
-            design_folder = IO_BASE_DIR + "out/" + str(random.randint(0, 1_000_000))
-            os.makedirs(design_folder)
-            return design_folder
-        except OSError:
-            pass
+    tmpdir = tempfile.TemporaryDirectory()
+    rundir = Path(tmpdir.name).absolute()
+    return (tmpdir, rundir)
 
 
 def create_design(state: AutoCktInput):
-    design_folder = _mkdir()
-
+    tmpdir, design_folder = _mkdir()
     fpath = os.path.join(design_folder, ".cir")
 
     lines = copy.deepcopy(_tmp_lines)
@@ -72,7 +68,7 @@ def create_design(state: AutoCktInput):
     with open(fpath, "w") as f:
         f.writelines(lines)
         f.close()
-    return design_folder, fpath
+    return tmpdir, design_folder, fpath
 
 
 def simulate(fpath):
@@ -89,7 +85,7 @@ def simulate(fpath):
     return info
 
 
-def translate_result(output_path):
+def translate_result(tmpdir, output_path):
     """
 
     :param output_path:
@@ -110,6 +106,7 @@ def translate_result(output_path):
         ibias=ibias,
     )
 
+    tmpdir.cleanup()
     return spec
 
 
