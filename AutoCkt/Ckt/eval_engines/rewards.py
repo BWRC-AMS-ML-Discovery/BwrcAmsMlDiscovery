@@ -40,7 +40,7 @@ def settaluri_reward(
             else:
                 pos_val.append(1)
 
-        fom = (
+        fom = np.log(
             (output_relative["ugbw"])
             * output_relative["phm"]
             * output_relative["gain"]
