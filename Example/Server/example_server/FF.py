@@ -17,11 +17,11 @@ import Latch
 @h.paramclass
 class FFParams:
     """Parameter class"""
-    L1 = Latch.LatchParams()
-    L2 = Latch.LatchParams()
+    # L1 = Latch.LatchParams()
+    # L2 = Latch.LatchParams()
 
-    # L1 = h.Param(dtype=Latch.LatchParams(), desc="params of Latch1")
-    # L2 = h.Param(dtype=Latch.LatchParams(), desc="params of Latch2")
+    L1 = h.Param(dtype=Latch.LatchParams, desc="params of Latch1", default=Latch.LatchParams())
+    L2 = h.Param(dtype=Latch.LatchParams, desc="params of Latch2", default=Latch.LatchParams())
 
 
 @h.generator
@@ -47,7 +47,7 @@ def FFgen(p: FFParams) -> h.Module:
 
     return FF
 
-@hs.sim
+# @hs.sim
 
 # FIXME: Need to get
 # (i) settling time;
@@ -82,7 +82,7 @@ def FFgen(p: FFParams) -> h.Module:
 
 
 def main():
-    h.netlist(FFGen(), sys.stdout)
+    h.netlist(FFgen(), sys.stdout)
     # h.netlist(LatchGen(LatchParams()), sys.stdout)
 
 
