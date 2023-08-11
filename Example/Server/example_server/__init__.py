@@ -15,6 +15,21 @@ from dotenv import dotenv_values
 
 # Workspace Imports
 from example_shared import (
+    FlipFlopInput,
+    FlipFlopOutput,
+    FoldedCascodeInput,
+    FoldedCascodeOutput,
+    LDOInput,
+    LDOOutput,
+    LatchInput,
+    LatchOutput,
+    TwoStageOpAmpNgmInput,
+    TwoStageOpAmpNgmOutput,
+    latch_sim,
+    flip_flop_sim,
+    folded_cascode_sim,
+    ldo_sim,
+    two_stage_op_amp_ngm_sim,
     example,
     Example,
     inverter_beta_ratio,
@@ -145,3 +160,43 @@ def auto_ckt_sim_hdl21(inp: AutoCktInput) -> AutoCktOutput:
         phm=phm,
         ibias=ibias,
     )
+
+
+@latch_sim.impl
+def latch_sim(inp: LatchInput) -> LatchOutput:
+    """
+    Latch Simulation
+    """
+    # TODO implement
+
+
+@flip_flop_sim.impl
+def flip_flop_sim(inp: FlipFlopInput) -> FlipFlopOutput:
+    """
+    FlipFlop Simulation
+    """
+    # TODO implement
+
+
+@folded_cascode_sim.impl
+def folded_cascode_sim(inp: FoldedCascodeInput) -> FoldedCascodeOutput:
+    """
+    FoldedCascode Simulation
+    """
+    # TODO implement
+
+
+@ldo_sim.impl
+def ldo_sim(inp: LDOInput) -> LDOOutput:
+    """
+    LDO Simulation
+    """
+    # TODO implement
+
+
+@two_stage_op_amp_ngm_sim.impl
+def two_stage_op_amp_ngm_sim(inp: TwoStageOpAmpNgmInput) -> TwoStageOpAmpNgmOutput:
+    """
+    TwoStageOpAmpNgm Simulation
+    """
+    # TODO implement

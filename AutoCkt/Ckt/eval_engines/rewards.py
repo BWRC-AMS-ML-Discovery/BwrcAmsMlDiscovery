@@ -1,4 +1,11 @@
 from example_client import AutoCktOutput
+from example_shared import (
+    FlipFlopOutput,
+    FoldedCascodeOutput,
+    LDOOutput,
+    LatchOutput,
+    TwoStageOpAmpNgmOutput,
+)
 from shared.typing import Number
 
 
@@ -43,3 +50,48 @@ def settaluri_reward(
 
     # run the reward function
     return reward(curr_output, target_output)
+
+
+def latch_reward(
+    curr_output: LatchOutput,  # This is from simulation
+    target_output: dict[str, Number],  # This is from Specs
+):
+    """
+    TODO Implement
+    """
+
+
+def flip_flop_reward(
+    curr_output: FlipFlopOutput,  # This is from simulation
+    target_output: dict[str, Number],  # This is from Specs
+):
+    """
+    TODO Implement
+    """
+
+
+def folded_cascode_reward(
+    curr_output: FoldedCascodeOutput,  # This is from simulation
+    target_output: dict[str, Number],  # This is from Specs
+):
+    """
+    TODO Implement
+    """
+
+
+def ldo_reward(
+    curr_output: LDOOutput,  # This is from simulation
+    target_output: dict[str, Number],  # This is from Specs
+):
+    """
+    TODO Implement
+    """
+
+
+def two_stage_op_amp_ngm_reward(
+    curr_output: TwoStageOpAmpNgmOutput,  # This is from simulation
+    target_output: dict[str, Number],  # This is from Specs
+):
+    """
+    TODO Implement
+    """

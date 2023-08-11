@@ -107,3 +107,157 @@ auto_ckt_sim_hdl21 = Rpc(
     return_type=AutoCktOutput,
     docstring="Simulation on the Server",
 )
+
+
+@dataclass
+class LatchInput:
+    """
+    TODO What do we wanna vary?
+    """
+
+    w1: int
+    w2: int
+    w3: int
+    w4: int
+    w5: int
+    w6: int
+    w7: int
+    w8: int
+    w9: int
+    w10: int
+
+
+@dataclass
+class LatchOutput:
+    """
+    TODO What do we get out?
+    """
+
+
+latch_sim = Rpc(
+    name="latch_sim",
+    input_type=LatchInput,
+    return_type=LatchOutput,
+    docstring="Latch simulation",
+)
+
+
+@dataclass
+class FlipFlopInput:
+    """
+    TODO Is this correct?
+    """
+
+    l1: LatchInput
+    l2: LatchInput
+
+
+@dataclass
+class FlipFlopOutput:
+    """
+    TODO What do we get out?
+    """
+
+
+flip_flop_sim = Rpc(
+    name="flip_flop_sim",
+    input_type=FlipFlopInput,
+    return_type=FlipFlopOutput,
+    docstring="FlipFlop simulation",
+)
+
+
+@dataclass
+class FoldedCascodeInput:
+    """
+    TODO What do we wanna vary?
+    """
+
+    w15_16: int
+    w5_6: int
+    w2_8: int
+    w9_10: int
+    w11_12: int
+    w13_14: int
+    w17: int
+    w1_2: int
+    w7_8: int
+    w18: int
+
+
+@dataclass
+class FoldedCascodeOutput:
+    """
+    TODO What do we get out?
+    """
+
+
+folded_cascode_sim = Rpc(
+    name="folded_cascode_sim",
+    input_type=FoldedCascodeInput,
+    return_type=FoldedCascodeOutput,
+    docstring="FoldedCascode simulation",
+)
+
+
+@dataclass
+class LDOInput:
+    """
+    TODO What do we wanna vary?
+    """
+
+    w1a: int
+    w1b: int
+    w2a: int
+    w2b: int
+    w3: int
+    w4a: int
+    w4b: int
+
+
+@dataclass
+class LDOOutput:
+    """
+    TODO What do we get out?
+    """
+
+
+ldo_sim = Rpc(
+    name="ldo_sim",
+    input_type=LDOInput,
+    return_type=LDOOutput,
+    docstring="LDO simulation",
+)
+
+
+@dataclass
+class TwoStageOpAmpNgmInput:
+    """
+    TODO What do we wanna vary?
+    """
+
+    wtail1: int
+    wtail2: int
+    wcm: int
+    win: int
+    wref: int
+    wd1: int
+    wd: int
+    wn_gm: int
+    wtail: int
+    wtailr: int
+
+
+@dataclass
+class TwoStageOpAmpNgmOutput:
+    """
+    TODO What do we get out?
+    """
+
+
+two_stage_op_amp_ngm_sim = Rpc(
+    name="two_stage_op_amp_ngm_sim",
+    input_type=TwoStageOpAmpNgmInput,
+    return_type=TwoStageOpAmpNgmOutput,
+    docstring="TwoStageOpAmpNgm simulation",
+)
