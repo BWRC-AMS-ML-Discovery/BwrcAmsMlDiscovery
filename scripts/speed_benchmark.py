@@ -21,7 +21,7 @@ def main():
     THE_SERVER_URL = env.get("THE_SERVER_URL", None)
     if not THE_SERVER_URL:
         raise ValueError("THE_SERVER_URL not set in .env file")
-    cfg = Config(server_url=THE_SERVER_URL, enable_https=ENABLE_HTTPS)
+    cfg = Config(server_url="34.83.44.225", enable_https=ENABLE_HTTPS)
 
     example_client_start(cfg)
 
