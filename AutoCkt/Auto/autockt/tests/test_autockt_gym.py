@@ -19,7 +19,7 @@ from example_client import (
 )
 
 
-def test() -> AutoCktGym:
+def _test_https() -> AutoCktGym:
     env = dotenv_values()
 
     # And get the server URL
@@ -80,7 +80,7 @@ def test() -> AutoCktGym:
 
 
 def main():
-    env = test()
+    env = _test_https()
 
     IPython.embed()
 
