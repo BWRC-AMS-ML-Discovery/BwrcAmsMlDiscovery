@@ -12,5 +12,5 @@ if not THE_SERVER_PORT:
     raise ValueError("THE_SERVER_PORT not set in .env file")
 
 # Create the module-scope configuration
-cfg = Config(port="80", host="0.0.0.0", enable_firebase_auth=True)
+cfg = Config(port=THE_SERVER_PORT, host=THE_SERVER_HOST, enable_firebase_auth=False)
 example_server_start(cfg)
