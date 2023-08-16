@@ -21,7 +21,7 @@ setup(
     description="Sample Discovery User Shared Code",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="FIXME",
+    url="https://github.com/BWRC-AMS-ML-Discovery",
     author="The Regents of the University of California",
     author_email="haohanw@eecs.berkeley.edu",
     packages=find_packages(),

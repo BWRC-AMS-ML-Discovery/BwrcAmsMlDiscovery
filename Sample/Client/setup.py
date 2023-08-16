@@ -17,11 +17,11 @@ long_description = "" if not readme.exists() else readme.read_text(encoding="utf
 
 setup(
     name="cktgym_sample_client",
-    version="0.0.1",
+    version="0.0.4",
     description="Sample Discovery Client",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="FIXME",
+    url="https://github.com/BWRC-AMS-ML-Discovery",
     author="The Regents of the University of California",
     author_email="haohanw@eecs.berkeley.edu",
     packages=find_packages(),
