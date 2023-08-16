@@ -16,8 +16,8 @@ long_description = "" if not readme.exists() else readme.read_text(encoding="utf
 
 
 setup(
-    name="discovery_client",
-    version="0.0.1",
+    name="cktgym_discovery_client",
+    version="0.0.3",
     description="BWRC AMS ML Discovery Client",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -29,7 +29,7 @@ setup(
     install_requires=[
         "python-dotenv~=1.0",
         "httpx>=0.23.3",
-        "discovery_shared==0.0.1",
+        "cktgym_discovery_shared==0.0.1",
     ],
     extras_require={
         "dev": [
