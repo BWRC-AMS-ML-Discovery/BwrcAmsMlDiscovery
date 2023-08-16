@@ -16,21 +16,21 @@ long_description = "" if not readme.exists() else readme.read_text(encoding="utf
 
 
 setup(
-    name="sample_client",
+    name="cktgym_sample_client",
     version="0.0.1",
     description="Sample Discovery Client",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="FIXME",
     author="The Regents of the University of California",
-    author_email="FIXME",
+    author_email="haohanw@eecs.berkeley.edu",
     packages=find_packages(),
     python_requires=">=3.7, <4",
     install_requires=[
         "hdl21>=4.0.0",
         "python-dotenv==1.0.0",
-        "discovery_client==0.0.1",
-        "sample_shared==0.0.1",
+        "cktgym_discovery_client",
+        "cktgym_sample_shared",
     ],
     extras_require={
         "dev": [
