@@ -17,7 +17,7 @@ long_description = "" if not readme.exists() else readme.read_text(encoding="utf
 
 setup(
     name="cktgym_discovery_shared",
-    version="0.0.3",
+    version="0.0.4",
     description="BWRC AMS ML Discovery Shared",
     long_description=long_description,
     long_description_content_type="text/markdown",
