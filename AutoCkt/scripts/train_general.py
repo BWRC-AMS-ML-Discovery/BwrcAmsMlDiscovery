@@ -19,6 +19,7 @@ from autockt.autockt_gym_env_config import (
     AutoCktParam,
     AutoCktSpecs,
     AutoCktSpec,
+    AutoCktInit,
 )
 from example_client import (
     AutoCktInput,
@@ -62,6 +63,7 @@ def main():
                 AutoCktParam("cc", (0.1e-12, 10.0e-12), step=0.1e-12, init=2.1e-12),
             ]
         ),
+        params_init=AutoCktInit(34),
         specs=AutoCktSpecs(  # FIXME Numbers right?
             [
                 AutoCktSpec("gain", (200, 400), normalize=350),

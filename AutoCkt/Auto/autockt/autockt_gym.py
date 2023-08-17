@@ -40,6 +40,7 @@ class AutoCktGym(gym.Env):
                 match circuit_optimization:
                     case AutoCktCircuitOptimization(
                         params=params,
+                        params_init=params_init,
                         specs=specs,
                         input_type=input_type,
                         output_type=output_type,
@@ -54,7 +55,9 @@ class AutoCktGym(gym.Env):
         self.reward = reward
 
         # create managers
-        self.params_manager = AutoCktParamsManager(params, actions_per_param)
+        self.params_manager = AutoCktParamsManager(
+            params, params_init, actions_per_param
+        )
         self.spec_manager = SpecManager(specs)
 
         # Necessary for the gym.Env API

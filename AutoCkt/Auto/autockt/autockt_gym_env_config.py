@@ -24,6 +24,11 @@ class AutoCktParam:
     init: Number
 
 
+@dataclass
+class AutoCktInit:
+    mn1: Number
+
+
 AutoCktParams = list[AutoCktParam]
 """
 Why not define a dataclass when we want to use different parameters?
@@ -50,6 +55,7 @@ when we simply want to control which specs to achieve.
 @dataclass
 class AutoCktCircuitOptimization:
     params: AutoCktParams
+    params_init: AutoCktInit
     specs: AutoCktSpecs
     input_type: type
     output_type: type
