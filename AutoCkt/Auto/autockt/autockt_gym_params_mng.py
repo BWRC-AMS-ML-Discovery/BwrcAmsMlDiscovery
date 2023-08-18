@@ -10,12 +10,9 @@ class AutoCktParamsManager(Generic[InputType]):
     def __init__(
         self,
         params_ranges: AutoCktParams,
-        params: InputType,
         actions_per_param: list[int],
     ):
         self.params_ranges = params_ranges
-        self.flatten_init = self.flatten(params)
-        print(f"-------------FLATTENED {self.flatten_init}--------------")
         self.actions_per_param = actions_per_param
 
     def reset_to_init(self):
@@ -59,6 +56,7 @@ class AutoCktParamsManager(Generic[InputType]):
         for (key, val) in d.items():
             if isinstance(val, dict):
                 self.flatten_dict(val, arr)
+            # todo from sequence to list and tuple
             elif isinstance(val, Sequence) and not isinstance(
                 val, str
             ):  # List, tuple, etc

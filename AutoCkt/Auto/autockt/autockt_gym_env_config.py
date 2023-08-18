@@ -48,18 +48,8 @@ when we simply want to control which specs to achieve.
 
 
 @dataclass
-class AutoCktTestInput:
-    range: Range
-    l: list[Number]
-    d: dict
-    num: Number
-    rl: list[Range]
-
-
-@dataclass
 class AutoCktCircuitOptimization:
     params: AutoCktParams
-    input: AutoCktTestInput
     specs: AutoCktSpecs
     input_type: type
     output_type: type
