@@ -10,11 +10,12 @@ class AutoCktParamsManager(Generic[InputType]):
     def __init__(
         self,
         params_ranges: AutoCktParams,
-        params_init: InputType,
+        params: InputType,
         actions_per_param: list[int],
     ):
         self.params_ranges = params_ranges
-        self.flatten_init = self.flatten(params_init)
+        self.flatten_init = self.flatten(params)
+        print(f"-------------FLATTENED {self.flatten_init}--------------")
         self.actions_per_param = actions_per_param
 
     def reset_to_init(self):
@@ -53,9 +54,8 @@ class AutoCktParamsManager(Generic[InputType]):
         # And return the list
         return arr
 
-    def flatten_dict(self, d: dict[str, any], arr: list[AutoCktParam]):
+    def flatten_dict(self, d: dict[str, any], arr: list[Number]):
         """Flatten dictionary `d` into result array `arr`"""
-        print(d)
         for (key, val) in d.items():
             if isinstance(val, dict):
                 self.flatten_dict(val, arr)
@@ -68,13 +68,14 @@ class AutoCktParamsManager(Generic[InputType]):
             else:
                 raise TypeError  # Non-numeric primitive, fail
 
-    def flatten_seq(self, seq: Sequence, arr: list[AutoCktParam]):
+    def flatten_seq(self, seq: Sequence, arr: list[Number]):
         """Flatten Sequence `seq` into result array `arr`"""
-        print(seq)
         for val in seq:
             if isinstance(val, Sequence) and not isinstance(val, str):
                 self.flatten_seq(val, arr)
             elif isinstance(val, dict):
                 self.flatten_dict(val, arr)
+            elif isinstance(val, (int, float)):
+                arr.append(val)
             else:
                 raise TypeError
