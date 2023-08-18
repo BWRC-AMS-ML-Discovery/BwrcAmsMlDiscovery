@@ -19,7 +19,6 @@ from autockt.autockt_gym_env_config import (
     AutoCktParam,
     AutoCktSpecs,
     AutoCktSpec,
-    AutoCktTestInput,
 )
 from example_client import (
     AutoCktInput,
@@ -62,9 +61,6 @@ def main():
                 AutoCktParam("mn5", (1, 100), step=1, init=15),
                 AutoCktParam("cc", (0.1e-12, 10.0e-12), step=0.1e-12, init=2.1e-12),
             ]
-        ),
-        input=AutoCktTestInput(
-            (1, 100), [1, 2, 3], {"a": 1, "b": 1, "c": 3}, 1, [(1, 99), (2, 33)]
         ),
         specs=AutoCktSpecs(  # FIXME Numbers right?
             [
