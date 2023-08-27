@@ -27,9 +27,8 @@ setup(
     packages=find_packages(),
     python_requires=">=3.7, <4",
     install_requires=[
-        "hdl21>=3.0.1",
         "python-dotenv==1.0.0",
-        "discovery_client==0.0.1",
+        "cktgym_discovery_client",
         "example_shared==0.0.1",
     ],
     extras_require={

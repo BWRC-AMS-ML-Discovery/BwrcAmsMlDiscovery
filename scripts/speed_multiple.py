@@ -29,24 +29,8 @@ from eval_engines.rewards import (
     settaluri_reward,
 )
 
-from dotenv import dotenv_values
-from example_client import (
-    example_client_start,
-    Config,
-)
-
 
 def main():
-    # Load the .env file
-    env = dotenv_values()
-
-    # And get the server URL
-    THE_SERVER_URL = env.get("THE_SERVER_URL", None)
-    if not THE_SERVER_URL:
-        raise ValueError("THE_SERVER_URL not set in .env file")
-    cfg = Config(server_url=THE_SERVER_URL, enable_https=True)
-    example_client_start(cfg)
-
     experiment_name = "train_45nm_ngspice"
     num_workers = 1
 

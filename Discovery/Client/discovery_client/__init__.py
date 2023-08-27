@@ -37,6 +37,7 @@ class Config:
     """# Server Configuration"""
 
     server_url: str = "localhost:8000"
+    enable_https: bool = True
 
 
 # Create the module-scope configuration
@@ -98,8 +99,8 @@ def _setup_client_rpcs():
                 url,
                 json=asdict(inp),
                 auth=(
-                    os.environ["DISCOVERY_USERNAME"],
-                    os.environ["DISCOVERY_API_KEY"],
+                    os.environ.get("DISCOVERY_USERNAME"),
+                    os.environ.get("DISCOVERY_API_KEY"),
                 ),
             )
             return rpc.return_type(**resp.json())
