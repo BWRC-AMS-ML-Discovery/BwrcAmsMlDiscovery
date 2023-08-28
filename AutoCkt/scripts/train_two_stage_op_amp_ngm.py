@@ -17,21 +17,26 @@ circuit_optimization = AutoCktCircuitOptimization(
     params=AutoCktParams(
         # TODO Change these
         [
-            AutoCktParam("mp1", (1, 100), step=1, init=34),
-            AutoCktParam("mn1", (1, 100), step=1, init=34),
-            AutoCktParam("mp3", (1, 100), step=1, init=34),
-            AutoCktParam("mn3", (1, 100), step=1, init=34),
-            AutoCktParam("mn4", (1, 100), step=1, init=34),
-            AutoCktParam("mn5", (1, 100), step=1, init=15),
-            AutoCktParam("cc", (0.1e-12, 10.0e-12), step=0.1e-12, init=2.1e-12),
+            AutoCktParam("wtail1", (4, 20), step=2, init=10),
+            AutoCktParam("wtail2", (4, 20), step=2, init=10),
+            AutoCktParam("wcm", (4, 20), step=2, init=10),
+            AutoCktParam("win", (4, 20), step=2, init=10),
+            AutoCktParam("wref", (4, 20), step=2, init=10),
+            AutoCktParam("wd1", (4, 20), step=2, init=10),
+            AutoCktParam("wd", (4, 20), step=2, init=10),
+            AutoCktParam("wn_gm", (4, 20), step=2, init=10),
+            AutoCktParam("wtail", (4, 20), step=2, init=10),
+            AutoCktParam("wtailr", (4, 20), step=2, init=10),
+            AutoCktParam("Cc", (10e-15, 150e-15), step=5e-15, init=10e-15),
+            AutoCktParam("Rf", (0.1e3, 6e3), step=0.1e3, init=1e3),
         ]
     ),
     specs=AutoCktSpecs(
         # TODO Change these
         [
-            AutoCktSpec("gain", (200, 400), normalize=350),
+            AutoCktSpec("gain", (1, 40), normalize=10),
             AutoCktSpec("ugbw", (1.0e6, 2.5e7), normalize=9.5e5),
-            AutoCktSpec("phm", (60, 60.0000001), normalize=60),
+            AutoCktSpec("phm", (60, 75), normalize=60),
             AutoCktSpec("ibias", (0.0001, 0.01), normalize=0.001),
         ]
     ),
