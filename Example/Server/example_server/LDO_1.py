@@ -11,6 +11,8 @@ https://www2.eecs.berkeley.edu/Pubs/TechRpts/2022/EECS-2022-27.pdf
 """
 
 import sys
+import os
+from pathlib import Path
 from copy import deepcopy
 import hdl21 as h
 import hdl21.sim as hs
@@ -19,6 +21,8 @@ from hdl21.external_module import SpiceType
 from hdl21.prefix import µ, NANO
 import numpy
 
+CURRENT_PATH = Path(os.path.dirname(os.path.abspath(__file__)))
+SPICE_MODEL_45NM_BULK_PATH = CURRENT_PATH / "45nm_bulk.txt"
 
 """ 
 Create a small "PDK" consisting of an externally-defined Nmos and Pmos transistor. 
@@ -56,7 +60,7 @@ pmos = h.ExternalModule(
 
 
 @h.paramclass
-class LDOParams:
+class LDO_Params:
     """Parameter class"""
 
     w1 = h.Param(dtype=int, desc="Width of m1", default=10)
@@ -80,7 +84,7 @@ class LDOParams:
 
 
 @h.generator
-def LDO_1(p: LDOParams) -> h.Module:
+def LDO_1(p: LDO_Params) -> h.Module:
     """# LDO"""
 
     @h.module
@@ -149,32 +153,36 @@ class Compensation:
     c = CapCell(p=r.n, n=b, VDD=VDD, VSS=VSS)
 
 
-# FIXME: no sim yet
-@hs.sim
-class MosDcopSim:
-    """# Mos Dc Operating Point Simulation Input"""
+def LDO_Sim(params: LDO_Params) -> h.sim.Sim:
+    """# Op Amp Simulation Input"""
 
-    # def __init__(params):
+    @hs.sim
+    class MosDcopSim:
+        """# Mos Dc Operating Point Simulation Input"""
 
-    @h.module
-    class Tb:
-        """# Basic Mos Testbench"""
+        @h.module
+        class Tb:
+            """# Basic Mos Testbench"""
 
-        VSS = h.Port()  # The testbench interface: sole port VSS
-        vdc = h.Vdc(dc=1.2)(n=VSS)  # A DC voltage source
-        dcin = h.Diff()
-        sig_out = h.Signal()
-        i_bias = h.Signal()
-        sig_p = h.Vdc(dc=0.6, ac=0.5)(p=dcin.p, n=VSS)
-        sig_n = h.Vdc(dc=0.6, ac=-0.5)(p=dcin.n, n=VSS)
-        Isource = h.Isrc(dc=3e-5)(p=vdc.p, n=i_bias)
+            VSS = h.Port()  # The testbench interface: sole port VSS
+            vdc = h.Vdc(dc=params.VDD)(n=VSS)  # A DC voltage source
+            dcin = h.Diff()
+            sig_out = h.Signal()
+            i_bias = h.Signal()
+            sig_ac = h.Vdc(dc=0, ac=0.5)(n=vdc.p)
+            Isource = h.Isrc(dc=params.ibias)(p=vdc.p, n=i_bias)
+            dangling = h.Signal()
 
-        inst = LDO_1()(VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out)
+            inst = LDO_1(params)(
+                VDD=sig_ac.p, VSS=VSS, ibias=i_bias, vref=dangling, vout=sig_out
+            )
 
-    # Simulation Stimulus
-    op = hs.Op()
-    ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
-    mod = hs.Include("../45nm_bulk.txt")
+        # Simulation Stimulus
+        op = hs.Op()
+        ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
+        mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
+
+    return MosDcopSim
 
 
 def main():
@@ -190,7 +198,8 @@ def main():
         return
 
     # Run the simulation!
-    results = MosDcopSim.run(opts)
+    params = LDO_Params()
+    results = LDO_Sim(params).run(opts)
 
     print(
         "Gain:            "
