@@ -169,7 +169,7 @@ class MosDcopSim:
         sig_n = h.Vdc(dc=0.6, ac=-0.5)(p=dcin.n, n=VSS)
         Isource = h.Isrc(dc=3e-5)(p=vdc.p, n=i_bias)
 
-        inst = LDO_1()(VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out)
+        inst = LDO_1()(VDD=vdc.p, VSS=VSS, ibias=i_bias, vref=dcin, vout=sig_out)
 
     # Simulation Stimulus
     op = hs.Op()
