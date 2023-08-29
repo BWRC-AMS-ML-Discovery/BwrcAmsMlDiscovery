@@ -16,8 +16,23 @@ from AutoCkt.Ckt.eval_engines.rewards import ldo_reward
 circuit_optimization = AutoCktCircuitOptimization(
     params=AutoCktParams(
         # TODO Change these
+        # TODO Action space for length of MOS (14nm, 100nm, 200nm)
         [
-            AutoCktParam("mp1", (1, 100), step=1, init=34),
+            AutoCktParam("w1", (1, 100), step=1, init=10),
+            AutoCktParam("w2", (1, 100), step=1, init=10),
+            AutoCktParam("w3", (1, 100), step=1, init=10),
+            AutoCktParam("w4", (1, 100), step=1, init=10),
+            AutoCktParam("w5", (1, 100), step=1, init=10),
+            AutoCktParam("w6", (1, 100), step=1, init=10),
+            AutoCktParam("w7r", (1, 100), step=1, init=10),
+            AutoCktParam("w8", (1, 100), step=1, init=10),
+            AutoCktParam("w9", (1, 100), step=1, init=10),
+            AutoCktParam("w10", (1, 100), step=1, init=10),
+            AutoCktParam("wpass", (1, 100), step=1, init=10),
+            AutoCktParam("w1", (1, 100), step=1, init=10),
+            AutoCktParam("w1", (1, 100), step=1, init=10),
+            AutoCktParam("w1", (1, 100), step=1, init=10),
+            AutoCktParam("w1", (1, 100), step=1, init=10),
             AutoCktParam("mn1", (1, 100), step=1, init=34),
             AutoCktParam("mp3", (1, 100), step=1, init=34),
             AutoCktParam("mn3", (1, 100), step=1, init=34),

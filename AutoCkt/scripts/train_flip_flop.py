@@ -29,10 +29,10 @@ circuit_optimization = AutoCktCircuitOptimization(
     specs=AutoCktSpecs(
         # TODO Change these
         [
-            AutoCktSpec("gain", (200, 400), normalize=350),
-            AutoCktSpec("ugbw", (1.0e6, 2.5e7), normalize=9.5e5),
-            AutoCktSpec("phm", (60, 60.0000001), normalize=60),
-            AutoCktSpec("ibias", (0.0001, 0.01), normalize=0.001),
+            AutoCktSpec("delay", (0, 10e-9), normalize=1e-9),
+            AutoCktSpec("setup_time", (0, 10e-9), normalize=1e-9),
+            AutoCktSpec("hold_time", (0, 10e-9), normalize=1e-9),
+            AutoCktSpec("ibias", (0, 1), normalize=1e-3),
         ]
     ),
     input_type=FlipFlopInput,

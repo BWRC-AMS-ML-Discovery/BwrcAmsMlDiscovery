@@ -1,8 +1,5 @@
 """ 
-# Fully Differential OTA Example 
-
-Highlights the capacity to use `Diff` signals and `Pair`s of instances 
-for differential circuits. 
+# LDO
 
 This LDO is based on the schematic of Fig2.10 in Keertana's article.
 Here is url for the article: 
