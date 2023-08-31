@@ -1,6 +1,6 @@
 from dotenv import dotenv_values
 from example_client import (
-    do_example_stuff,
+    do_simple_example,
     example_client_start,
     Config,
 )
@@ -18,7 +18,7 @@ def main():
     example_client_start(cfg)
 
     try:
-        do_example_stuff()
+        do_simple_example()
     except RecursionError:
         print("RecursionError: needs renaming to avoid the same function name")
         pass

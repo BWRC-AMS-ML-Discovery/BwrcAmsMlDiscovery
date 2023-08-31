@@ -3,6 +3,9 @@ from typing import Callable, Generic, TypeVar
 from dataclasses import asdict
 import random
 import numpy as np
+import pickle
+from collections import OrderedDict
+
 
 # PyPI imports
 from pydantic.dataclasses import dataclass
@@ -15,12 +18,6 @@ from .autockt_gym_env_config import (
     AutoCktParams,
     Number,
 )
-
-
-# FIXME This lib was an adapter to use auto_ckt_sim for Keerthana's code
-# We should use the auto_ckt_sim directly, since if you look into this lib,
-# it's not generalizable
-from .envs.create_design_and_simulate_lib import create_design_and_simulate
 
 
 @dataclass
@@ -36,6 +33,9 @@ class SpecManager:
     spec_id: list[str]
     # what spec is initially generated to
     ideal_spec: dict[str, Number]
+
+    ideal_specs: list[dict[str, Number]]
+
     # the current spec value
     cur_spec: dict[str, Number]
     # ideal norm is calculate from ideal_spec and normalized values
@@ -48,8 +48,16 @@ class SpecManager:
         self.init_spec = init_spec
 
         self.spec_id = [spec.name for spec in init_spec]
-        self.ideal_spec = self.gen_spec()
-        self.ideal_norm = self.normalize(self.ideal_spec)
+
+        self.global_norm = {}
+        for spec in init_spec:
+            self.global_norm[spec.name] = spec.normalize
+
+        self.num_specs = 350
+
+        self.ideal_specs = []
+        for i in range(self.num_specs):
+            self.ideal_specs.append(self.gen_spec())
 
         zeros = np.zeros(len(self.spec_id))
         self.cur_spec = dict(zip(self.spec_id, zeros))
@@ -72,7 +80,9 @@ class SpecManager:
 
         returns the normalied values of the current spec and the ideal spec
         """
-        self.ideal_spec = self.gen_spec()
+        idx = random.randint(0, self.num_specs - 1)
+        self.ideal_spec = self.ideal_specs[idx]
+
         self.ideal_norm = self.normalize(self.ideal_spec)
 
         cur_norm = self.normalize(self.cur_spec)
@@ -83,7 +93,7 @@ class SpecManager:
         """
         simulates on the given param values and returns a spec dict
         """
-        # print(f"{simulated}")
+
         self.cur_spec = simulated
 
     def normalize(self, specs: dict[str, Number]) -> dict[str, Number]:
@@ -93,12 +103,10 @@ class SpecManager:
         relative = {}
 
         for spec in self.init_spec:
-            to_normalize = specs[spec.name]
+            to_normalize = float(specs[spec.name])
             rel = (to_normalize - spec.normalize) / (to_normalize + spec.normalize)
             relative[spec.name] = rel
 
-        # print(f"{relative}")
-        # spec_norm = dict(zip(self.spec_id, relative))
         return relative
 
     def gen_spec(self):
@@ -108,6 +116,7 @@ class SpecManager:
         spec_values = []
         for spec in self.init_spec:
             range = spec.range
+            # print(spec)
             if isinstance(range.min, int):
                 val = random.randint(int(range.min), int(range.max))
             else:
@@ -115,4 +124,11 @@ class SpecManager:
             spec_values.append(val)
 
         cur_spec = dict(zip(self.spec_id, spec_values))
+
         return cur_spec
+
+    def get_global_norm(self):
+        return self.global_norm
+
+    def get_specs(self):
+        return self.ideal_specs
