@@ -1,29 +1,40 @@
 """ 
-# Two Stage Op Amp
+# Fully Differential OTA Example 
+
+Highlights the capacity to use `Diff` signals and `Pair`s of instances 
+for differential circuits. 
+
+In this file, we use the schematic of Fig2.18 in Keertana's article.
+Here is the link to the article:
+https://www2.eecs.berkeley.edu/Pubs/TechRpts/2022/EECS-2022-27.pdf
+
 """
 
+import sys
 import os
 from pathlib import Path
 from copy import deepcopy
-from dataclasses import asdict
-
-import numpy
-
 import hdl21 as h
 import hdl21.sim as hs
 import vlsirtools.spice as vsp
 from hdl21.external_module import SpiceType
 from hdl21.prefix import µ, NANO
-
+import numpy
 
 CURRENT_PATH = Path(os.path.dirname(os.path.abspath(__file__)))
-SPICE_MODEL_45NM_BULK_PATH = CURRENT_PATH / "45nm_bulk.txt"
+# SPICE_MODEL_NGM_PATH = CURRENT_PATH / FIXIT
+SPICE_MODEL_NGM_PATH = CURRENT_PATH / "45nm_bulk.txt"
 
 
 """ 
 Create a small "PDK" consisting of an externally-defined Nmos and Pmos transistor. 
 Real versions will have some more parameters; these just have multiplier "m". 
 """
+
+
+@h.paramclass
+class MosParams:
+    m = h.Param(dtype=int, desc="Transistor Multiplier")
 
 
 @h.paramclass
@@ -51,25 +62,29 @@ pmos = h.ExternalModule(
 
 
 @h.paramclass
-class OpAmpParams:
+class ngmOpAmpParams:
     """Parameter class"""
 
-    wp1 = h.Param(dtype=int, desc="Width of PMOS mp1", default=10)
-    wp2 = h.Param(dtype=int, desc="Width of PMOS mp2", default=10)
-    wp3 = h.Param(dtype=int, desc="Width of PMOS mp3", default=4)
-    wn1 = h.Param(dtype=int, desc="Width of NMOS mn1", default=38)
-    wn2 = h.Param(dtype=int, desc="Width of NMOS mn2", default=38)
-    wn3 = h.Param(dtype=int, desc="Width of NMOS mn3", default=9)
-    wn4 = h.Param(dtype=int, desc="Width of NMOS mn4", default=20)
-    wn5 = h.Param(dtype=int, desc="Width of NMOS mn5", default=60)
+    wtail1 = h.Param(dtype=int, desc="Width of PMOS Mtial1", default=10)
+    wtail2 = h.Param(dtype=int, desc="Width of PMOS Mtial2", default=10)
+    wcm = h.Param(dtype=int, desc="width of PMOS Mcm", default=10)
+    win = h.Param(dtype=int, desc="width od PMOS Min", default=10)
+    wref = h.Param(dtype=int, desc="Width of PMOS Mref", default=10)
+    wd1 = h.Param(dtype=int, desc="Width of NMOS Md1", default=10)
+    wd = h.Param(dtype=int, desc="Width of NMOS Md", default=10)
+    wn_gm = h.Param(dtype=int, desc="Width of NMOS Mn_gm", default=10)
+    wtail = h.Param(dtype=int, desc="Width of PMOS Mtial", default=10)
+    wtailr = h.Param(dtype=int, desc="Width of PMOS Mtailr", default=10)
     VDD = h.Param(dtype=h.Scalar, desc="VDD voltage", default=1.2)
-    CL = h.Param(dtype=h.Scalar, desc="CL capacitance", default=1e-11)
-    Cc = h.Param(dtype=h.Scalar, desc="Cc capacitance", default=3e-12)
-    ibias = h.Param(dtype=h.Scalar, desc="ibias current", default=3e-5)
+    Cc = h.Param(dtype=h.Scalar, desc="Cc capacitance", default=1e-14)
+    Rf = h.Param(dtype=h.Scalar, desc="Rf resistor", default=100)
+    Vcm = h.Param(dtype=h.Scalar, desc="Vcm input voltage", default=0.6)
+    Vref = h.Param(dtype=h.Scalar, desc="Vref input voltage", default=0.8)
+    ibias = h.Param(dtype=h.Scalar, desc="ibias current", default=2e-6)
 
 
 @h.generator
-def OpAmp(p: OpAmpParams) -> h.Module:
+def ngmOpAmp(p: ngmOpAmpParams) -> h.Module:
     """# Two stage OpAmp"""
 
     @h.module
@@ -79,34 +94,39 @@ def OpAmp(p: OpAmpParams) -> h.Module:
         ibias = h.Input()
 
         inp = h.Diff(desc="Differential Input", port=True, role=h.Diff.Roles.SINK)
-        out = h.Output()
+        cm = h.Input()
+        ref = h.Input()
+        v5 = h.Output()
+        v6 = h.Output()
 
         # Internal Signals
-        net3, net4, net5 = h.Signals(3)
+        v1, v2, v3, v4, v7, v8, v9 = h.Signals(7)
 
-        # Input Stage
-        mp1 = pmos(m=p.wp1)(
-            d=net4, g=net4, s=VDD, b=VDD
-        )  # Current mirror within the input stage
-        mp2 = pmos(m=p.wp2)(
-            d=net5, g=net4, s=VDD, b=VDD
-        )  # Current mirror within the input stage
-        mn1 = nmos(m=p.wn1)(d=net4, g=inp.n, s=net3, b=net3)  # Input MOS pair
-        mn2 = nmos(m=p.wn2)(d=net5, g=inp.p, s=net3, b=net3)  # Input MOS pair
-        mn3 = nmos(m=p.wn3)(d=net3, g=ibias, s=VSS, b=VSS)  # Mirrored current source
+        # Input & Output Stage
+        Mcm_1 = pmos(m=p.wcm)(d=v3, g=cm, s=VDD, b=VDD)
+        Mcm_2 = pmos(m=p.wcm)(d=v9, g=cm, s=VDD, b=VDD)
+        Md1_1 = nmos(m=p.wd1)(d=v3, g=v5, s=VSS, b=VSS)
+        Md1_2 = nmos(m=p.wd1)(d=v9, g=v6, s=VSS, b=VSS)
 
-        # Output Stage
-        mp3 = pmos(m=p.wp3)(d=out, g=net5, s=VDD, b=VDD)  # Output inverter
-        mn5 = nmos(m=p.wn5)(d=out, g=ibias, s=VSS, b=VSS)  # Output inverter
-        CL = h.Cap(c=p.CL)(p=out, n=VSS)  # Load capacitance
+        Min_1 = pmos(m=p.win)(d=v7, g=inp.p, s=v5, b=v5)
+        Min_2 = pmos(m=p.win)(d=v7, g=inp.n, s=v6, b=v6)
+        Md_1 = nmos(m=p.wd1)(d=v5, g=v5, s=VSS, b=VSS)
+        Md_2 = nmos(m=p.wd1)(d=v6, g=v6, s=VSS, b=VSS)
+        Mn_gm_1 = nmos(m=p.wn_gm)(d=v5, g=v6, s=VSS, b=VSS)
+        Mn_gm_2 = nmos(m=p.wn_gm)(d=v6, g=v5, s=VSS, b=VSS)
 
         # Biasing
-        mn4 = nmos(m=p.wn4)(
-            d=ibias, g=ibias, s=VSS, b=VSS
-        )  # Current mirror co-operating with mn3
+        Mref = pmos(m=p.wref)(d=v1, g=ref, s=v2, b=v2)
+        Mtailr = pmos(m=p.wtailr)(d=v2, g=v1, s=VDD, b=VDD)
+        Mtail = pmos(m=p.wtail)(d=v7, g=v1, s=VDD, b=VDD)
+        Mtail1 = pmos(m=p.wtail1)(d=v3, g=v1, s=VDD, b=VDD)
+        Mtail2 = pmos(m=p.wtail2)(d=v9, g=v1, s=VDD, b=VDD)
 
         # Compensation Network
-        Cc = h.Cap(c=p.Cc)(p=net5, n=out)  # Miller Capacitance
+        Cc_1 = h.Cap(c=p.Cc)(p=v4, n=v5)  # Miller Capacitance
+        Cc_2 = h.Cap(c=p.Cc)(p=v8, n=v6)
+        Rf_1 = h.Res(r=p.Rf)(p=v3, n=v4)
+        Rf_2 = h.Res(r=p.Rf)(p=v9, n=v8)
 
     return DiffOta
 
@@ -136,7 +156,7 @@ class Compensation:
     c = CapCell(p=r.n, n=b, VDD=VDD, VSS=VSS)
 
 
-def OpAmpSim(params: OpAmpParams) -> h.sim.Sim:
+def ngmOpAmpSim(params: ngmOpAmpParams) -> h.sim.Sim:
     """# Op Amp Simulation Input"""
 
     @hs.sim
@@ -155,23 +175,30 @@ def OpAmpSim(params: OpAmpParams) -> h.sim.Sim:
             sig_p = h.Vdc(dc=params.VDD / 2, ac=0.5)(p=dcin.p, n=VSS)
             sig_n = h.Vdc(dc=params.VDD / 2, ac=-0.5)(p=dcin.n, n=VSS)
             Isource = h.Isrc(dc=params.ibias)(p=vdc.p, n=i_bias)
+            vcm = h.Vdc(dc=params.Vcm)(n=VSS)
+            vref = h.Vdc(dc=params.Vref)(n=VSS)
+            dangling = h.Signal()
 
-            inst = OpAmp(params)(
-                VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out
+            inst = ngmOpAmp(params)(
+                VDD=vdc.p,
+                VSS=VSS,
+                ibias=i_bias,
+                inp=dcin,
+                v5=sig_out,
+                v6=dangling,
+                cm=vcm.p,
+                ref=vref.p,
             )
 
         # Simulation Stimulus
         op = hs.Op()
         ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
-        mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
+        mod = hs.Include(SPICE_MODEL_NGM_PATH)
 
     return MosDcopSim
 
 
 def main():
-    """
-    @deprecated: I think MosDcopSim has been changed to OpAmpSim
-    """
     # h.netlist(OpAmp(), sys.stdout)
 
     opts = vsp.SimOptions(
@@ -184,32 +211,22 @@ def main():
         return
 
     # Run the simulation!
-    results = MosDcopSim.run(opts)
+    params = ngmOpAmpParams()
+    results = ngmOpAmpSim(params).run(opts)
 
     print(
         "Gain:            "
-        + str(
-            find_dc_gain(2 * results["ac"].data["v(xtop.sig_out)"]),
-        )
+        + str(find_dc_gain(2 * results["ac"].data["v(xtop.sig_out)"]))
     )
     print(
         "UGBW:            "
-        + str(
-            find_ugbw(results["ac"].freq, 2 * results["ac"].data["v(xtop.sig_out)"]),
-        )
+        + str(find_ugbw(results["ac"].freq, 2 * results["ac"].data["v(xtop.sig_out)"]))
     )
     print(
         "Phase margin:    "
-        + str(
-            find_phm(results["ac"].freq, 2 * results["ac"].data["v(xtop.sig_out)"]),
-        )
+        + str(find_phm(results["ac"].freq, 2 * results["ac"].data["v(xtop.sig_out)"]))
     )
-    print(
-        "Ivdd:            "
-        + str(
-            find_I_vdd(results["ac"].data["i(v.xtop.vvdc)"]),
-        )
-    )
+    print("Ivdd:            " + str(find_I_vdd(results["ac"].data["i(v.xtop.vvdc)"])))
 
 
 def find_I_vdd(vout: numpy.array) -> float:
@@ -253,3 +270,7 @@ def _get_best_crossing(yvec: numpy.array, val: float) -> tuple[int, bool]:
         return zero_crossings[0], True
     else:
         return (zero_crossings[0] + 1), True
+
+
+if __name__ == "__main__":
+    main()
