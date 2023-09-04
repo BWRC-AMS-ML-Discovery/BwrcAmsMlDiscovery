@@ -17,13 +17,16 @@ circuit_optimization = AutoCktCircuitOptimization(
     params=AutoCktParams(
         # TODO Change these
         [
-            AutoCktParam("mp1", (1, 100), step=1, init=34),
-            AutoCktParam("mn1", (1, 100), step=1, init=34),
-            AutoCktParam("mp3", (1, 100), step=1, init=34),
-            AutoCktParam("mn3", (1, 100), step=1, init=34),
-            AutoCktParam("mn4", (1, 100), step=1, init=34),
-            AutoCktParam("mn5", (1, 100), step=1, init=15),
+            AutoCktParam("w1_2", (2, 24), step=2, init=10),
+            AutoCktParam("w5_6", (2, 24), step=2, init=10),
+            AutoCktParam("w7_8", (2, 24), step=2, init=10),
+            AutoCktParam("w9_10", (2, 24), step=2, init=10),
+            AutoCktParam("w11_12", (2, 24), step=2, init=10),
+            AutoCktParam("w13_14", (2, 24), step=2, init=10),
+            AutoCktParam("w15_16", (2, 24), step=2, init=10),
+            AutoCktParam("cl", (8e-15, 30e-15), step=2e-15, init=10e-15),
             AutoCktParam("cc", (0.1e-12, 10.0e-12), step=0.1e-12, init=2.1e-12),
+            AutoCktParam("rc", (0.1e-12, 10.0e-12), step=0.1e-12, init=2.1e-12),
         ]
     ),
     specs=AutoCktSpecs(

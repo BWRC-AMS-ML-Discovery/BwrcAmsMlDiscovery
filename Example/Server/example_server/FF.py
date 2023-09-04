@@ -230,7 +230,7 @@ def main():
     print("min shift:       " + str(float(shift_min)))
     print("==============================")
 
-    while (shift_max - shift_min) > 1 * FEMTO:
+    while (shift_max - shift_min) > 0.1 * PICO:
         if ifwork == False:
             shift_max = cursor
         elif temp_delay > 1.05 * output_delay:
@@ -263,7 +263,7 @@ def main():
     print("min shift:       " + str(float(shift_min)))
     print("==============================")
 
-    while (shift_min - shift_max) > 1 * FEMTO:
+    while (shift_min - shift_max) > 0.1 * PICO:
         if ifwork == False:
             shift_max = cursor
         elif temp_delay > 1.05 * output_delay:
