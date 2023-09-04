@@ -54,6 +54,7 @@ pmos = h.ExternalModule(
     spicetype=SpiceType.MOS,
 )
 
+# fmt: off
 
 @h.paramclass
 class FoldedCascodeGenParams:
