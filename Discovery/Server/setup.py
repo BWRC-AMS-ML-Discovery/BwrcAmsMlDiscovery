@@ -16,14 +16,14 @@ long_description = "" if not readme.exists() else readme.read_text(encoding="utf
 
 
 setup(
-    name="discovery_server",
-    version="0.0.1",
+    name="cktgym_discovery_server",
+    version="0.0.4",
     description="BWRC AMS ML Discovery Server",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="FIXME",
+    url="https://github.com/BWRC-AMS-ML-Discovery",
     author="The Regents of the University of California",
-    author_email="FIXME",
+    author_email="haohanw@eecs.berkeley.edu",
     packages=find_packages(),
     python_requires=">=3.7, <3.11",
     install_requires=[
@@ -32,7 +32,7 @@ setup(
         "GitPython>=3.1.31",
         "uvicorn>=0.20.0",
         "firebase_admin>=6.0.1",
-        "discovery_shared==0.0.1",
+        "cktgym_discovery_shared",
     ],
     extras_require={
         "dev": [

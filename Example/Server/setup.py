@@ -30,7 +30,7 @@ setup(
         "hdl21>=4.0.0",
         "scipy==1.10.1",
         "python-dotenv==1.0.0",
-        "discovery_server==0.0.1",
+        "cktgym_discovery_server",
         "example_shared==0.0.1",
     ],
     extras_require={

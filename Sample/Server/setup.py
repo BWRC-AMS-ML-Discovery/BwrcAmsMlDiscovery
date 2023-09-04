@@ -16,22 +16,22 @@ long_description = "" if not readme.exists() else readme.read_text(encoding="utf
 
 
 setup(
-    name="sample_server",
-    version="0.0.1",
+    name="cktgym_sample_server",
+    version="0.0.4",
     description="Sample Discovery Server",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="FIXME",
+    url="https://github.com/BWRC-AMS-ML-Discovery",
     author="The Regents of the University of California",
-    author_email="FIXME",
+    author_email="haohanw@eecs.berkeley.edu",
     packages=find_packages(),
     python_requires=">=3.7, <4",
     install_requires=[
         "hdl21>=4.0.0",
         "scipy==1.10.1",
         "python-dotenv==1.0.0",
-        "discovery_server==0.0.1",
-        "sample_shared==0.0.1",
+        "cktgym_discovery_server",
+        "cktgym_sample_shared",
     ],
     extras_require={
         "dev": [

@@ -54,9 +54,10 @@ pmos = h.ExternalModule(
     spicetype=SpiceType.MOS,
 )
 
+# fmt: off
 
 @h.paramclass
-class OpAmpParams:
+class FoldedCascodeGenParams:
     """Parameter class"""
 
     w15_16 = h.Param(dtype=int, desc="Width of M15/16", default=10)
@@ -74,9 +75,32 @@ class OpAmpParams:
     cc = h.Param(dtype=h.Scalar, desc="cc capacitance", default=1e-14)
     rc = h.Param(dtype=h.Scalar, desc="rc resistor", default=100)
 
+    wb0 = h.Param(dtype=int, desc="Width of MB0 ", default=10)
+    wb1 = h.Param(dtype=int, desc="Width of MB1 ", default=10)
+    wb2 = h.Param(dtype=int, desc="Width of MB2 ", default=10)
+    wb3 = h.Param(dtype=int, desc="Width of MB3 ", default=10)
+    wb4 = h.Param(dtype=int, desc="Width of MB4 ", default=10)
+    wb5 = h.Param(dtype=int, desc="Width of MB5 ", default=10)
+    wb6 = h.Param(dtype=int, desc="Width of MB6 ", default=10)
+    wb7 = h.Param(dtype=int, desc="Width of MB7 ", default=10)
+    wb8 = h.Param(dtype=int, desc="Width of MB8 ", default=10)
+    wb9 = h.Param(dtype=int, desc="Width of MB9 ", default=10)
+    wb10 = h.Param(dtype=int, desc="Width of MB10", default=10)
+    wb11 = h.Param(dtype=int, desc="Width of MB11", default=10)
+    wb12 = h.Param(dtype=int, desc="Width of MB12", default=10)
+    wb13 = h.Param(dtype=int, desc="Width of MB13", default=10)
+    wb14 = h.Param(dtype=int, desc="Width of MB14", default=10)
+    wb15 = h.Param(dtype=int, desc="Width of MB15", default=10)
+    wb16 = h.Param(dtype=int, desc="Width of MB16", default=10)
+    wb17 = h.Param(dtype=int, desc="Width of MB17", default=10)
+    wb18 = h.Param(dtype=int, desc="Width of MB18", default=10)
+    wb19 = h.Param(dtype=int, desc="Width of MB19", default=10)
+
+    ibias = h.Param(dtype=h.Scalar, desc="ibias current", default=30e-6)
+
 
 @h.generator
-def OpAmp(p: OpAmpParams) -> h.Module:
+def FoldedCascodeGen(p: FoldedCascodeGenParams) -> h.Module:
     """# Two stage OpAmp"""
 
     @h.module
@@ -90,11 +114,14 @@ def OpAmp(p: OpAmpParams) -> h.Module:
         # ref = h.Input()
         v9 = h.Output()
         v10 = h.Output()
-        v_nmbias = h.Input()
-        v_nbbias = h.Input()
-        v_bbias = h.Input()
+        # v_nmbias = h.Input()
+        # v_nbbias = h.Input()
+        # v_bbias = h.Input()
         v_cm = h.Input()
-        v_cs = h.Input()
+        # v_cs = h.Input()
+        v_cs = h.Signal()
+
+        v_nmbias, v_nbbias, v_bbias, v_pcas = h.Signals(4)
 
         # Internal Signals
         v1, v2, v3, v4, v5, v6, v7, v8, v11, v12 = h.Signals(10)
@@ -126,6 +153,36 @@ def OpAmp(p: OpAmpParams) -> h.Module:
         Cc_2 = h.Cap(c=p.cc)(p=v10, n=v8)
         Rc_1 = h.Res(r=p.rc)(p=v7, n=v5)
         Rc_2 = h.Res(r=p.rc)(p=v8, n=v6)
+
+        # Bias generator
+        vbias2 = h.Signal()
+        b1, b2, b3, b4, b5, b6, b7, b8, b9 = h.Signals(9)
+
+        MB0 = nmos(m=p.wb0)(d=ibias, g=ibias, s=vbias2, b=vbias2)
+        MB1 = nmos(m=p.wb1)(d=v_pcas, g=ibias, s=b1, b=b1)
+        MB2 = nmos(m=p.wb2)(d=vbias2, g=vbias2, s=VSS, b=VSS)
+        MB3 = nmos(m=p.wb3)(d=b1, g=vbias2, s=VSS, b=VSS)
+
+        MB4 = pmos(m=p.wb4)(d=v_bbias, g=v_bbias, s=VDD, b=VDD)
+        MB5 = pmos(m=p.wb5)(d=v_pcas, g=v_pcas, s=v_bbias, b=v_bbias)
+        MB6 = pmos(m=p.wb6)(d=b2, g=v_bbias, s=VDD, b=VDD)
+        MB7 = pmos(m=p.wb7)(d=b3, g=v_pcas, s=b2, b=b2)
+
+        MB8 = nmos(m=p.wb8)(d=b3, g=v_nmbias, s=b4, b=b4)
+        MB9 = nmos(m=p.wb9)(d=b4, g=v_nmbias, s=b5, b=b5)
+        MB10 = nmos(m=p.wb10)(d=b5, g=v_nmbias, s=b6, b=b6)
+        MB11 = nmos(m=p.wb11)(d=b6, g=v_nmbias, s=VSS, b=VSS)
+
+        MB12 = pmos(m=p.wb12)(d=b7, g=v_bbias, s=VDD, b=VDD)
+        MB13 = pmos(m=p.wb13)(d=v_nbbias, g=v_pcas, s=b7, b=b7)
+        MB14 = nmos(m=p.wb14)(
+            d=v_nbbias, g=v_nmbias, s=b8, b=b8
+        )  # TODO: check where the gate should connect to
+        MB15 = nmos(m=p.wb15)(d=b8, g=v_nbbias, s=VSS, b=VSS)
+
+        MB16 = pmos(m=p.wb16)(d=v_cs, g=v_cs, s=VDD, b=VDD)
+        MB14 = nmos(m=p.wb14)(d=v_cs, g=vbias2, s=b9, b=b9)
+        MB15 = nmos(m=p.wb15)(d=b9, g=vbias2, s=VSS, b=VSS)
 
     return FoldedCascode
 
@@ -173,12 +230,20 @@ class MosDcopSim:
         dcin = h.Diff()
         sig_out = h.Signal()
         i_bias = h.Signal()
+        dangling = h.Signal()
         sig_p = h.Vdc(dc=0.6, ac=0.5)(p=dcin.p, n=VSS)
         sig_n = h.Vdc(dc=0.6, ac=-0.5)(p=dcin.n, n=VSS)
         Isource = h.Isrc(dc=3e-5)(p=vdc.p, n=i_bias)
+        vcm = h.Vdc(dc=1)(n=VSS)  # TODO: update this
 
-        inst = OpAmp()(
-            VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, v9=sig_out.p, v10=sig_out.n
+        inst = FoldedCascodeGen()(
+            VDD=vdc.p,
+            VSS=VSS,
+            ibias=i_bias,
+            inp=dcin,
+            v9=sig_out,
+            v10=dangling,
+            v_cm=vcm.p,
         )
 
     # Simulation Stimulus
