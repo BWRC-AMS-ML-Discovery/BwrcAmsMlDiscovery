@@ -212,9 +212,6 @@ class Compensation:
     c = CapCell(p=r.n, n=b, VDD=VDD, VSS=VSS)
 
 
-# FIXME: no sim yet
-
-
 @hs.sim
 class MosDcopSim:
     """# Mos Dc Operating Point Simulation Input"""
