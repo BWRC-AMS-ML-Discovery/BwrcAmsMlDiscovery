@@ -59,6 +59,7 @@ def latch_reward(
     """
     TODO Implement
     """
+
     def calc_relative(curr: Number, ideal: Number):
         # ideal = float(ideal)  # Not sure if this is necessary
         relative = curr / ideal
@@ -89,6 +90,7 @@ def flip_flop_reward(
     """
     TODO Implement
     """
+
     def calc_relative(curr: Number, ideal: Number):
         # ideal = float(ideal)  # Not sure if this is necessary
         relative = curr / ideal
@@ -119,6 +121,7 @@ def folded_cascode_reward(
     """
     TODO Implement
     """
+
     def calc_relative(curr: Number, ideal: Number):
         # ideal = float(ideal)  # Not sure if this is necessary
         relative = curr / ideal
@@ -149,6 +152,7 @@ def ldo_reward(
     """
     TODO Implement
     """
+
     def calc_relative(curr: Number, ideal: Number):
         # ideal = float(ideal)  # Not sure if this is necessary
         relative = curr / ideal
@@ -179,6 +183,7 @@ def two_stage_op_amp_ngm_reward(
     """
     TODO Implement
     """
+
     def calc_relative(curr: Number, ideal: Number):
         # ideal = float(ideal)  # Not sure if this is necessary
         relative = curr / ideal
