@@ -113,7 +113,9 @@ def LatchGen(p: LatchParams) -> h.Module:
     return Latch
 
 
-def _get_Latch_delay(out: numpy.array, clk: numpy.array, time: numpy.array) -> float:
+def _get_Latch_delay(
+    out: numpy.array, clk: numpy.array, time: numpy.array, ifdebug=False
+) -> float:
     VDD_voltage = 1.2
     out_crossing = numpy.where(numpy.diff(numpy.sign(out - 0.5 * VDD_voltage)))[0]
     out_crossing_time = []
@@ -128,10 +130,11 @@ def _get_Latch_delay(out: numpy.array, clk: numpy.array, time: numpy.array) -> f
     #     print("time[y]:            "+str(time[y]))
     # print("clk_crossing_time:       "+str(out_crossing_time))
 
-    print("out_crossing:            " + str(out_crossing))
-    print("out_crossing_time:       " + str(out_crossing_time))
-    print("clk_crossing:            " + str(clk_crossing))
-    print("clk_crossing_time:       " + str(clk_crossing_time))
+    if ifdebug:
+        print("out_crossing:            " + str(out_crossing))
+        print("out_crossing_time:       " + str(out_crossing_time))
+        print("clk_crossing:            " + str(clk_crossing))
+        print("clk_crossing_time:       " + str(clk_crossing_time))
 
     crossing_count = 0
     crossing_sum = 0
@@ -143,7 +146,8 @@ def _get_Latch_delay(out: numpy.array, clk: numpy.array, time: numpy.array) -> f
         else:
             clk_time_to_subtract = clk_crossing_time[crossing_index[0][0]]
         crossing_sum += t - clk_time_to_subtract
-        print(str(clk_time_to_subtract) + " -> " + str(t))
+        if ifdebug:
+            print(str(clk_time_to_subtract) + " -> " + str(t))
     delay = crossing_sum / crossing_count
 
     return delay
@@ -203,7 +207,7 @@ def LatchSim(params: LatchParams, input_shift: float) -> h.sim.Sim:
 
             sig_out = h.Signal()
 
-            inst = LatchGen()(
+            inst = LatchGen(params)(
                 VDD=vdc.p, VSS=VSS, D=vin.p, CLK=CLK.p, CKB=CKB.p, Q=sig_out
             )
 
@@ -217,7 +221,7 @@ def LatchSim(params: LatchParams, input_shift: float) -> h.sim.Sim:
 
 
 def Latch_inner(
-    params: LatchParams, input_shift: float, round: int
+    params: LatchParams, input_shift: float, round: int, ifdebug=False
 ) -> tuple[bool, float, float]:
     """# Latch Generation & Simulation
     Inner implementation. Also used for testing."""
@@ -238,36 +242,42 @@ def Latch_inner(
     # Run the simulation!
     results = sim_input.run(opts)
 
-    from matplotlib import pyplot as plt
+    if ifdebug:
+        from matplotlib import pyplot as plt
 
-    plt.cla()
-    plt.plot(
-        results["tr"].data["time"],
-        results["tr"].data["v(xtop.sig_out)"],
-        label="sig_out",
-    )
-    plt.plot(
-        results["tr"].data["time"], results["tr"].data["v(xtop.clk_p)"], label="clk_p"
-    )
-    plt.plot(
-        results["tr"].data["time"], results["tr"].data["v(xtop.vin_p)"], label="vin_p"
-    )
-    plt.legend()
-    plt.show()
-    plt.savefig("Latch_sim_" + str(round) + ".png")
+        plt.cla()
+        plt.plot(
+            results["tr"].data["time"],
+            results["tr"].data["v(xtop.sig_out)"],
+            label="sig_out",
+        )
+        plt.plot(
+            results["tr"].data["time"],
+            results["tr"].data["v(xtop.clk_p)"],
+            label="clk_p",
+        )
+        plt.plot(
+            results["tr"].data["time"],
+            results["tr"].data["v(xtop.vin_p)"],
+            label="vin_p",
+        )
+        plt.legend()
+        plt.show()
+        plt.savefig("Latch_sim_" + str(round) + ".png")
 
-    if results["tr"].data["v(xtop.sig_out)"][15000] > 0.12:
-        return False, 0, 0
-    if results["tr"].data["v(xtop.sig_out)"][35000] < 1.08:
-        return False, 0, 0
-    if results["tr"].data["v(xtop.sig_out)"][55000] > 0.12:
-        return False, 0, 0
+        if results["tr"].data["v(xtop.sig_out)"][15000] > 0.12:
+            return False, 0, 0
+        if results["tr"].data["v(xtop.sig_out)"][35000] < 1.08:
+            return False, 0, 0
+        if results["tr"].data["v(xtop.sig_out)"][55000] > 0.12:
+            return False, 0, 0
 
     # Extract our metrics from those results
     output_delay = _get_Latch_delay(
         results["tr"].data["v(xtop.sig_out)"],
         results["tr"].data["v(xtop.vin_p)"],
         results["tr"].data["time"],
+        ifdebug,
     )
     power = _get_Latch_power(results["tr"].data["i(v.xtop.vvdc)"], 1.2)
 
@@ -291,6 +301,8 @@ def main():
     # Run the simulation!
     params = LatchParams()
     results = LatchSim(params, 5 * NANO).run(opts)
+
+    ifdebug = False
 
     """ print(results)
     print("====================")
@@ -328,59 +340,69 @@ def main():
     print(table3)
     numpy.savetxt("Latch.csv", table2, delimiter=",") """
 
-    from matplotlib import pyplot as plt
+    if ifdebug:
+        from matplotlib import pyplot as plt
 
-    plt.plot(
-        results["tr"].data["time"],
-        results["tr"].data["v(xtop.sig_out)"],
-        label="sig_out",
-    )
-    plt.plot(
-        results["tr"].data["time"], results["tr"].data["v(xtop.clk_p)"], label="clk_p"
-    )
-    plt.plot(
-        results["tr"].data["time"], results["tr"].data["v(xtop.vin_p)"], label="vin_p"
-    )
-    plt.legend()
-    plt.show()
-    plt.savefig("Latch_sim.png")
+        plt.plot(
+            results["tr"].data["time"],
+            results["tr"].data["v(xtop.sig_out)"],
+            label="sig_out",
+        )
+        plt.plot(
+            results["tr"].data["time"],
+            results["tr"].data["v(xtop.clk_p)"],
+            label="clk_p",
+        )
+        plt.plot(
+            results["tr"].data["time"],
+            results["tr"].data["v(xtop.vin_p)"],
+            label="vin_p",
+        )
+        plt.legend()
+        plt.show()
+        plt.savefig("Latch_sim.png")
 
-    print("====================")
+    if ifdebug:
+        print("====================")
     out_crossing = numpy.where(
         numpy.diff(numpy.sign(results["tr"].data["v(xtop.sig_out)"] - 0.6))
     )[0]
-    print("out_crossing:    " + str(out_crossing))
+    if ifdebug:
+        print("out_crossing:    " + str(out_crossing))
     vin_crossing = numpy.where(
         numpy.diff(numpy.sign(results["tr"].data["v(xtop.vin_p)"] - 0.6))
     )[0]
-    print("vin_crossing:    " + str(vin_crossing))
-    print(
-        "delay:   "
-        + str(
-            _get_Latch_delay(
-                results["tr"].data["v(xtop.sig_out)"],
-                results["tr"].data["v(xtop.vin_p)"],
-                results["tr"].data["time"],
+    if ifdebug:
+        print("vin_crossing:    " + str(vin_crossing))
+        print(
+            "delay:   "
+            + str(
+                _get_Latch_delay(
+                    results["tr"].data["v(xtop.sig_out)"],
+                    results["tr"].data["v(xtop.vin_p)"],
+                    results["tr"].data["time"],
+                    ifdebug,
+                )
             )
         )
-    )
 
     params = LatchParams()
-    ifwork, output_delay, power = Latch_inner(params, 5 * NANO, 0)
-    print("clk->q delay:    " + str(output_delay))
-    print("power:           " + str(power))
-    print("==============================")
+    ifwork, output_delay, power = Latch_inner(params, 5 * NANO, 0, ifdebug)
+    if ifdebug:
+        print("clk->q delay:    " + str(output_delay))
+        print("power:           " + str(power))
+        print("==============================")
     shift_min = 5 * NANO
     shift_max = 11 * NANO
     cursor = (shift_min + shift_max) / 2
-    ifwork, temp_delay, power_null = Latch_inner(params, cursor, 1)
+    ifwork, temp_delay, power_null = Latch_inner(params, cursor, 1, ifdebug)
     round = 1
-
-    print("round:           " + str(round))
-    print("clk->q delay:    " + str(temp_delay))
-    print("max shift:       " + str(float(shift_max)))
-    print("min shift:       " + str(float(shift_min)))
-    print("==============================")
+    if ifdebug:
+        print("round:           " + str(round))
+        print("clk->q delay:    " + str(temp_delay))
+        print("max shift:       " + str(float(shift_max)))
+        print("min shift:       " + str(float(shift_min)))
+        print("==============================")
 
     while (shift_max - shift_min) > 0.1 * PICO:
         if ifwork == False:
@@ -393,13 +415,13 @@ def main():
             shift_min = cursor
         cursor = (shift_min + shift_max) / 2
         round += 1
-        ifwork, temp_delay, power_null = Latch_inner(params, cursor, round)
-
-        print("round:           " + str(round))
-        print("clk->q delay:    " + str(temp_delay))
-        print("max shift:       " + str(float(shift_max)))
-        print("min shift:       " + str(float(shift_min)))
-        print("==============================")
+        ifwork, temp_delay, power_null = Latch_inner(params, cursor, round, ifdebug)
+        if ifdebug:
+            print("round:           " + str(round))
+            print("clk->q delay:    " + str(temp_delay))
+            print("max shift:       " + str(float(shift_max)))
+            print("min shift:       " + str(float(shift_min)))
+            print("==============================")
 
     setup_time = 10 * NANO - cursor
 
