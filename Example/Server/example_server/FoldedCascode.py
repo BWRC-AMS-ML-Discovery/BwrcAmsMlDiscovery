@@ -19,6 +19,11 @@ from hdl21.external_module import SpiceType
 from hdl21.prefix import µ, NANO
 import numpy
 
+import os
+from pathlib import Path
+
+CURRENT_PATH = Path(os.path.dirname(os.path.abspath(__file__)))
+SPICE_MODEL_45NM_BULK_PATH = CURRENT_PATH / "45nm_bulk.txt"
 
 """ 
 Create a small "PDK" consisting of an externally-defined Nmos and Pmos transistor. 
@@ -57,7 +62,7 @@ pmos = h.ExternalModule(
 # fmt: off
 
 @h.paramclass
-class FoldedCascodeGenParams:
+class FoldedCascodeParams:
     """Parameter class"""
 
     w15_16 = h.Param(dtype=int, desc="Width of M15/16", default=10)
@@ -97,10 +102,10 @@ class FoldedCascodeGenParams:
     wb19 = h.Param(dtype=int, desc="Width of MB19", default=10)
 
     ibias = h.Param(dtype=h.Scalar, desc="ibias current", default=30e-6)
-
+    Vcm = h.Param(dtype=h.Scalar, desc="Vcm", default=1)
 
 @h.generator
-def FoldedCascodeGen(p: FoldedCascodeGenParams) -> h.Module:
+def FoldedCascodeGen(p: FoldedCascodeParams) -> h.Module:
     """# Two stage OpAmp"""
 
     @h.module
@@ -212,42 +217,43 @@ class Compensation:
     c = CapCell(p=r.n, n=b, VDD=VDD, VSS=VSS)
 
 
-@hs.sim
-class MosDcopSim:
-    """# Mos Dc Operating Point Simulation Input"""
+def FoldedCascodeSim(params: FoldedCascodeParams) -> h.sim.Sim:
+    """# Op Amp Simulation Input"""
 
-    # def __init__(params):
+    @hs.sim
+    class MosDcopSim:
+        """# Mos Dc Operating Point Simulation Input"""
 
-    @h.module
-    class Tb:
-        """# Basic Mos Testbench"""
+        @h.module
+        class Tb:
+            """# Basic Mos Testbench"""
+            VSS = h.Port()  # The testbench interface: sole port VSS
+            vdc = h.Vdc(dc=params.VDD)(n=VSS)  # A DC voltage source
+            dcin = h.Diff()
+            sig_out = h.Signal()
+            i_bias = h.Signal()
+            dangling = h.Signal()
+            sig_p = h.Vdc(dc=params.VDD / 2, ac=0.5)(p=dcin.p, n=VSS)
+            sig_n = h.Vdc(dc=params.VDD / 2, ac=-0.5)(p=dcin.n, n=VSS)
+            Isource = h.Isrc(dc=params.ibias)(p=vdc.p, n=i_bias)
+            vcm = h.Vdc(dc=params.Vcm)(n=VSS)
 
-        VSS = h.Port()  # The testbench interface: sole port VSS
-        vdc = h.Vdc(dc=1.2)(n=VSS)  # A DC voltage source
-        dcin = h.Diff()
-        sig_out = h.Signal()
-        i_bias = h.Signal()
-        dangling = h.Signal()
-        sig_p = h.Vdc(dc=0.6, ac=0.5)(p=dcin.p, n=VSS)
-        sig_n = h.Vdc(dc=0.6, ac=-0.5)(p=dcin.n, n=VSS)
-        Isource = h.Isrc(dc=3e-5)(p=vdc.p, n=i_bias)
-        vcm = h.Vdc(dc=1)(n=VSS)  # TODO: update this
+            inst = FoldedCascodeGen(params)(
+                VDD=vdc.p,
+                VSS=VSS,
+                ibias=i_bias,
+                inp=dcin,
+                v9=sig_out,
+                v10=dangling,
+                v_cm=vcm.p,
+            )
 
-        inst = FoldedCascodeGen()(
-            VDD=vdc.p,
-            VSS=VSS,
-            ibias=i_bias,
-            inp=dcin,
-            v9=sig_out,
-            v10=dangling,
-            v_cm=vcm.p,
-        )
+        # Simulation Stimulus
+        op = hs.Op()
+        ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
+        mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
 
-    # Simulation Stimulus
-    op = hs.Op()
-    ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
-    mod = hs.Include("../45nm_bulk.txt")
-
+    return MosDcopSim
 
 def main():
     # h.netlist(OpAmp(), sys.stdout)
@@ -262,7 +268,8 @@ def main():
         return
 
     # Run the simulation!
-    results = MosDcopSim.run(opts)
+    params = FoldedCascodeParams()
+    results = FoldedCascodeSim(params).run(opts)
 
     print(
         "Gain:            "

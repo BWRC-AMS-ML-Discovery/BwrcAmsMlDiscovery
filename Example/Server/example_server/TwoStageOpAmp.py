@@ -184,7 +184,7 @@ def main():
         return
 
     # Run the simulation!
-    results = MosDcopSim.run(opts)
+    results = OpAmpSim.run(opts)
 
     print(
         "Gain:            "
