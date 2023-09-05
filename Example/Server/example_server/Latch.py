@@ -401,12 +401,12 @@ def main():
         print("min shift:       " + str(float(shift_min)))
         print("==============================")
 
-    hold_time = 5 * NANO + cursor
+    setup_time = 10 * NANO - cursor
 
     print("Final Results:")
     print("clk->q delay:    " + str(output_delay * 1e9) + " ns")
     print("power:           " + str(power))
-    print("hold time:       " + str(float(hold_time * 1e9)) + " ns")
+    print("setup time:       " + str(float(setup_time * 1e9)) + " ns")
 
     # print("Gain:            "+str(find_dc_gain(2*results["ac"].data["v(xtop.sig_out)"])))
     # print("UGBW:            "+str(find_ugbw(results["ac"].freq,2*results["ac"].data["v(xtop.sig_out)"])))

@@ -15,7 +15,7 @@ from AutoCkt.Ckt.eval_engines.rewards import two_stage_op_amp_ngm_reward
 
 circuit_optimization = AutoCktCircuitOptimization(
     params=AutoCktParams(
-        # TODO Change these
+        # TODO Double Check these
         [
             AutoCktParam("wtail1", (4, 20), step=2, init=10),
             AutoCktParam("wtail2", (4, 20), step=2, init=10),
@@ -32,7 +32,7 @@ circuit_optimization = AutoCktCircuitOptimization(
         ]
     ),
     specs=AutoCktSpecs(
-        # TODO Change these
+        # TODO Double Check these
         [
             AutoCktSpec("gain", (1, 40), normalize=10),
             AutoCktSpec("ugbw", (1.0e6, 2.5e7), normalize=9.5e5),
