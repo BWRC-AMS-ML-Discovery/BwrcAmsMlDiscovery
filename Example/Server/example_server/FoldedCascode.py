@@ -64,21 +64,20 @@ pmos = h.ExternalModule(
 @h.paramclass
 class FoldedCascodeParams:
     """Parameter class"""
-
-    w15_16 = h.Param(dtype=int, desc="Width of M15/16", default=10)
+    w1_2 = h.Param(dtype=int, desc="Width of M1/2", default=10)
     w5_6 = h.Param(dtype=int, desc="Width of M5/6", default=10)
-    w2_8 = h.Param(dtype=int, desc="width of M2/8", default=10)
+    w7_8 = h.Param(dtype=int, desc="Width of M7/8", default=10)
     w9_10 = h.Param(dtype=int, desc="width of M9/10", default=10)
     w11_12 = h.Param(dtype=int, desc="Width of M11/12", default=10)
     w13_14 = h.Param(dtype=int, desc="Width of M13/14", default=10)
+    w15_16 = h.Param(dtype=int, desc="Width of M15/16", default=10)
     w17 = h.Param(dtype=int, desc="Width of M17", default=10)
-    w1_2 = h.Param(dtype=int, desc="Width of M1/2", default=10)
-    w7_8 = h.Param(dtype=int, desc="Width of M7/8", default=10)
     w18 = h.Param(dtype=int, desc="width of M18", default=10)
-    VDD = h.Param(dtype=h.Scalar, desc="VDD voltage", default=1.2)
+    
     cl = h.Param(dtype=h.Scalar, desc="cl capacitance", default=1e-14)
     cc = h.Param(dtype=h.Scalar, desc="cc capacitance", default=1e-14)
     rc = h.Param(dtype=h.Scalar, desc="rc resistor", default=100)
+    VDD = h.Param(dtype=h.Scalar, desc="VDD voltage", default=1.2)
 
     wb0 = h.Param(dtype=int, desc="Width of MB0 ", default=10)
     wb1 = h.Param(dtype=int, desc="Width of MB1 ", default=10)

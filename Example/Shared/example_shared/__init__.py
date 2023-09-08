@@ -170,17 +170,16 @@ flip_flop_sim = Rpc(
 @dataclass
 class FoldedCascodeInput:
 
-    w15_16: int
+    w1_2: int
     w5_6: int
-    w2_8: int
+    w7_8: int
     w9_10: int
     w11_12: int
     w13_14: int
+    w15_16: int
     w17: int
-    w1_2: int
-    w7_8: int
     w18: int
-    VDD: h.Scalar
+
     cl: h.Scalar
     cc: h.Scalar
     rc: h.Scalar
@@ -207,6 +206,7 @@ class FoldedCascodeInput:
     wb19: int
 
     ibias: h.Scalar
+    Vcm: h.Scalar
 
 
 @dataclass
@@ -279,6 +279,10 @@ class TwoStageOpAmpNgmInput:
     wtailr: int
     Cc: float
     Rf: float
+    VDD: float
+    Vcm: float
+    Vref: float
+    ibias: float
 
 
 @dataclass

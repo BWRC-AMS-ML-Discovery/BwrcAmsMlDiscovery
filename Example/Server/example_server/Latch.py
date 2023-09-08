@@ -4,6 +4,9 @@
 """
 
 import sys
+import os
+from pathlib import Path
+
 from copy import deepcopy
 import hdl21 as h
 import hdl21.sim as hs
@@ -11,6 +14,9 @@ import vlsirtools.spice as vsp
 from hdl21.external_module import SpiceType
 from hdl21.prefix import µ, NANO, PICO
 import numpy
+
+CURRENT_PATH = Path(os.path.dirname(os.path.abspath(__file__)))
+SPICE_MODEL_45NM_BULK_PATH = CURRENT_PATH / "45nm_bulk.txt"
 
 
 def _get_best_crossing(yvec: numpy.array, val: float) -> tuple[int, bool]:
@@ -215,7 +221,7 @@ def LatchSim(params: LatchParams, input_shift: float) -> h.sim.Sim:
         op = hs.Op()
         # ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
         tr = hs.Tran(tstop=80 * NANO, tstep=1 * h.prefix.p, name="mytran")
-        mod = hs.Include("../45nm_bulk.txt")
+        mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
 
     return LatchSimGen
 

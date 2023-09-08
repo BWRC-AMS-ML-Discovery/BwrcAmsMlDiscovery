@@ -11,7 +11,9 @@ import vlsirtools.spice as vsp
 from hdl21.external_module import SpiceType
 from hdl21.prefix import µ, NANO, PICO, FEMTO
 import numpy
-import Latch
+
+# import Latch
+from .Latch import LatchParams, LatchGen
 
 
 def _get_delay(
@@ -63,12 +65,8 @@ class FFParams:
     # L1 = Latch.LatchParams()
     # L2 = Latch.LatchParams()
 
-    L1 = h.Param(
-        dtype=Latch.LatchParams, desc="params of Latch1", default=Latch.LatchParams()
-    )
-    L2 = h.Param(
-        dtype=Latch.LatchParams, desc="params of Latch2", default=Latch.LatchParams()
-    )
+    L1 = h.Param(dtype=LatchParams, desc="params of Latch1", default=LatchParams())
+    L2 = h.Param(dtype=LatchParams, desc="params of Latch2", default=LatchParams())
 
 
 @h.generator
@@ -86,12 +84,12 @@ def FFgen(p: FFParams) -> h.Module:
         intermediate_signal = h.Signal()
 
         # Sampling latch
-        Sampling_latch = Latch.LatchGen(p.L1)(
+        Sampling_latch = LatchGen(p.L1)(
             VDD=VDD, VSS=VSS, CLK=CKB, CKB=CLK, D=D, Q=intermediate_signal
         )
 
         # Holding latch
-        Holding_latch = Latch.LatchGen(p.L2)(
+        Holding_latch = LatchGen(p.L2)(
             VDD=VDD, VSS=VSS, CLK=CLK, CKB=CKB, D=intermediate_signal, Q=Q
         )
 
