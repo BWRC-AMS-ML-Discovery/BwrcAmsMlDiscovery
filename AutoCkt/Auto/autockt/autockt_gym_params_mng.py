@@ -1,11 +1,11 @@
-from .autockt_gym_env_config import AutoCktParams
+from .autockt_gym_env_config import ParamSpecs
 from shared.typing import Number
 
 
-class AutoCktParamsManager:
+class ParamSpecsManager:
     def __init__(
         self,
-        params_ranges: AutoCktParams,
+        params_ranges: ParamSpecs,
         actions_per_param: list[int],
     ):
         self.params_ranges = params_ranges
