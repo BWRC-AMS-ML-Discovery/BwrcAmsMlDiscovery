@@ -12,10 +12,10 @@ from pydantic.dataclasses import dataclass
 
 # local imports
 from .autockt_gym_env_config import (
-    MetricSpec,
-    MetricSpecs,
-    ParamSpec,
-    ParamSpecs,
+    AutoCktSpec,
+    AutoCktSpecs,
+    AutoCktParam,
+    AutoCktParams,
     Number,
 )
 
@@ -27,7 +27,7 @@ class SpecManager:
     """
 
     # the inital specs used to create the spec manager
-    init_spec: MetricSpecs
+    init_spec: AutoCktSpecs
 
     # list if ids the spec has
     spec_id: list[str]
