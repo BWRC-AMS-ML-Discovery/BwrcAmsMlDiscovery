@@ -166,12 +166,16 @@ def LDO_Sim(params: LDO_Params) -> h.sim.Sim:
             dcin = h.Diff()
             sig_out = h.Signal()
             i_bias = h.Signal()
-            sig_ac = h.Vdc(dc=0, ac=0.5)(n=vdc.p)
+            sig_ac = h.Vdc(dc=1.8, ac=0.3)(n=vdc.p)
             Isource = h.Isrc(dc=params.ibias)(p=vdc.p, n=i_bias)
             dangling = h.Signal()
 
             inst = LDO_1(params)(
-                VDD=sig_ac.p, VSS=VSS, ibias=i_bias, vref=dangling, vout=sig_out
+                VDD=sig_ac.p, 
+                VSS=VSS, 
+                ibias=i_bias, 
+                vref=dangling, 
+                vout=sig_out
             )
 
         # Simulation Stimulus
