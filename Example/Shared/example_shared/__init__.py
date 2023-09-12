@@ -4,8 +4,7 @@ Shared server-client code
 """
 
 # Std-Lib Imports
-from typing import Optional
-
+...
 
 # PyPi Imports
 
@@ -27,43 +26,6 @@ example = Rpc(
     input_type=Example,
     return_type=Example,
     docstring="Example RPC",
-)
-
-
-@dataclass
-class InverterBetaRatioInput:
-    # def __init__(self, wp, wn):
-    #   self.wp = wp
-    #    self.wn = wn
-    wp: Optional[float] = None
-    wn: Optional[float] = None
-
-    def __init__(self, params):
-        if params:
-            assert (
-                len(params) == 2
-            ), f"Number of parameters must be 2, currently there are {len(params)}"
-            self.wp = params[0]
-            self.wn = params[1]
-
-    def to_vec(self) -> list:
-        return [self.wp, self.wn]
-
-
-@dataclass
-class InverterBetaRatioOutput:
-    trise: float
-    tfall: float
-
-    def to_vec(self) -> list:
-        return [self.trise, self.tfall]
-
-
-inverter_beta_ratio = Rpc(
-    name="inverter_beta_ratio",
-    input_type=InverterBetaRatioInput,
-    return_type=InverterBetaRatioOutput,
-    docstring="Inverter Beta Ratio",
 )
 
 
