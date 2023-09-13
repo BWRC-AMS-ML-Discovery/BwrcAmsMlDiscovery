@@ -1,8 +1,12 @@
-from .autockt_gym_env_config import AutoCktParams
+from .autockt_gym_env_config import AutoCktParams, AutoCktParam
+from typing import TypeVar, Generic, Sequence
+from dataclasses import asdict, is_dataclass
 from shared.typing import Number
 
+InputType = TypeVar("InputType")
 
-class AutoCktParamsManager:
+
+class AutoCktParamsManager(Generic[InputType]):
     def __init__(
         self,
         params_ranges: AutoCktParams,
@@ -33,5 +37,43 @@ class AutoCktParamsManager:
 
             self.cur_params[name] = step_update
 
-    def get_cur_params(self) -> dict[str, Number]:
+    def get_cur_params(self):
         return self.cur_params
+
+    def flatten(self, i: InputType) -> list:  # Or maybe list
+        if not is_dataclass(i):
+            raise Exception  # Maybe make a few other such checks, here or elsewhere
+
+        # Initialize the result list
+        arr = []
+        # Kick off our recursive flatteners
+        self.flatten_dict(asdict(i), arr)
+        # And return the list
+        return arr
+
+    def flatten_dict(self, d: dict[str, any], arr: list[Number]):
+        """Flatten dictionary `d` into result array `arr`"""
+        for (key, val) in d.items():
+            if isinstance(val, dict):
+                self.flatten_dict(val, arr)
+            # todo from sequence to list and tuple
+            elif isinstance(val, Sequence) and not isinstance(
+                val, str
+            ):  # List, tuple, etc
+                self.flatten_seq(val, arr)
+            elif isinstance(val, (int, float)):
+                arr.append(val)
+            else:
+                raise TypeError  # Non-numeric primitive, fail
+
+    def flatten_seq(self, seq: Sequence, arr: list[Number]):
+        """Flatten Sequence `seq` into result array `arr`"""
+        for val in seq:
+            if isinstance(val, Sequence) and not isinstance(val, str):
+                self.flatten_seq(val, arr)
+            elif isinstance(val, dict):
+                self.flatten_dict(val, arr)
+            elif isinstance(val, (int, float)):
+                arr.append(val)
+            else:
+                raise TypeError
