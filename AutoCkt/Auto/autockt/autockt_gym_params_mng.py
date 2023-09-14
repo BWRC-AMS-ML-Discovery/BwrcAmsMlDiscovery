@@ -14,12 +14,12 @@ class AutoCktParamsManager(Generic[InputType]):
         actions_per_param: list[int],
     ):
         self.params_template = deepcopy(params_ranges)
-        self.params_ranges = self.flatten(params_ranges)
+        self.params_ranges = self.flatten_init(params_ranges)
         self.actions_per_param = actions_per_param
 
     def reset_to_init(self):
         """returns the init params dict for resetting the env"""
-        params_init_dict = {param.name: param.init for param in self.params_ranges}
+        params_init_dict = {param.name: param.init for param in self.params_template}
         self.cur_params = params_init_dict
 
     def step(self, cur_action):
@@ -29,18 +29,24 @@ class AutoCktParamsManager(Generic[InputType]):
             action_idx = cur_action[name]
             step_update = (
                 self.cur_params[name]
-                + self.actions_per_param[action_idx] * self.params_ranges[idx].step
+                + self.actions_per_param[action_idx] * self.params_template[idx].step
             )
 
-            if step_update > self.params_ranges[idx].range.max:
-                step_update = self.params_ranges[idx].range.max
-            elif step_update < self.params_ranges[idx].range.min:
-                step_update = self.params_ranges[idx].range.min
+            if step_update > self.params_template[idx].range.max:
+                step_update = self.params_template[idx].range.max
+            elif step_update < self.params_template[idx].range.min:
+                step_update = self.params_template[idx].range.min
 
             self.cur_params[name] = step_update
 
     def get_cur_params(self):
         return self.cur_params
+
+    def flatten_init(self, l: list) -> list:
+        res = []
+        for ele in l:
+            res.append(self.flatten(ele))
+        return res
 
     def flatten(self, i: InputType) -> list:  # Or maybe list
         if not is_dataclass(i):
@@ -59,6 +65,8 @@ class AutoCktParamsManager(Generic[InputType]):
             if isinstance(val, dict):
                 self.flatten_dict(val, arr)
             # todo from sequence to list and tuple
+            elif isinstance(val, str):
+                continue
             elif isinstance(val, Sequence) and not isinstance(
                 val, str
             ):  # List, tuple, etc
