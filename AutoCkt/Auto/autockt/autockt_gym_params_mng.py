@@ -1,3 +1,4 @@
+from copy import deepcopy
 from .autockt_gym_env_config import AutoCktParams, AutoCktParam
 from typing import TypeVar, Generic, Sequence
 from dataclasses import asdict, is_dataclass
@@ -12,7 +13,8 @@ class AutoCktParamsManager(Generic[InputType]):
         params_ranges: AutoCktParams,
         actions_per_param: list[int],
     ):
-        self.params_ranges = params_ranges
+        self.params_template = deepcopy(params_ranges)
+        self.params_ranges = self.flatten(params_ranges)
         self.actions_per_param = actions_per_param
 
     def reset_to_init(self):
@@ -53,7 +55,7 @@ class AutoCktParamsManager(Generic[InputType]):
 
     def flatten_dict(self, d: dict[str, any], arr: list[Number]):
         """Flatten dictionary `d` into result array `arr`"""
-        for (key, val) in d.items():
+        for key, val in d.items():
             if isinstance(val, dict):
                 self.flatten_dict(val, arr)
             # todo from sequence to list and tuple
@@ -77,3 +79,25 @@ class AutoCktParamsManager(Generic[InputType]):
                 arr.append(val)
             else:
                 raise TypeError
+
+    def unflatten(self, flat_data: list) -> dict:
+        # Use the initial params_template as a reference to reconstruct the data
+        reference = asdict(self.params_template)
+        result = {}
+        flat_idx = 0
+
+        for key, val in reference.items():
+            if isinstance(val, (int, float)):
+                result[key] = flat_data[flat_idx]
+                flat_idx += 1
+            elif isinstance(val, dict):
+                inner_data = {}
+                for inner_key in val.keys():
+                    inner_data[inner_key] = flat_data[flat_idx]
+                    flat_idx += 1
+                result[key] = inner_data
+            # Add more conditions if your data can be more nested
+            else:
+                raise ValueError(f"Unhandled data type: {type(val)} for key {key}")
+
+        return result
