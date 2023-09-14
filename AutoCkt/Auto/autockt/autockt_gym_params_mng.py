@@ -14,7 +14,7 @@ class AutoCktParamsManager(Generic[InputType]):
         actions_per_param: list[int],
     ):
         self.params_template = deepcopy(params_ranges)
-        self.params_ranges = self.flatten_init(params_ranges)
+        self.params_ranges = self.flatten_init_param(params_ranges)
         self.actions_per_param = actions_per_param
 
     def reset_to_init(self):
@@ -24,20 +24,6 @@ class AutoCktParamsManager(Generic[InputType]):
 
     def step(self, cur_action):
         """based on action space move by action's idx"""
-        # Convert to a numpy array and flatten it if it's not already 1D
-        # for idx, (name, _) in enumerate(self.cur_params.items()):
-        #     action_idx = cur_action[name]
-        #     step_update = (
-        #         self.cur_params[name]
-        #         + self.actions_per_param[action_idx] * self.params_template[idx].step
-        #     )
-
-        #     if step_update > self.params_template[idx].range.max:
-        #         step_update = self.params_template[idx].range.max
-        #     elif step_update < self.params_template[idx].range.min:
-        #         step_update = self.params_template[idx].range.min
-
-        #     self.cur_params[name] = step_update
 
         for idx, param_metrics in enumerate(self.params_ranges):
             ##params_ranges: [1.0, 100.0, 1.0, 34.0], each are mix, max, step, init
@@ -56,15 +42,29 @@ class AutoCktParamsManager(Generic[InputType]):
                 step_update = min
 
             self.cur_params[name] = step_update
+        # Convert to a numpy array and flatten it if it's not already 1D
+        # for idx, (name, _) in enumerate(self.cur_params.items()):
+        #     action_idx = cur_action[name]
+        #     step_update = (
+        #         self.cur_params[name]
+        #         + self.actions_per_param[action_idx] * self.params_template[idx].step
+        #     )
+
+        #     if step_update > self.params_template[idx].range.max:
+        #         step_update = self.params_template[idx].range.max
+        #     elif step_update < self.params_template[idx].range.min:
+        #         step_update = self.params_template[idx].range.min
+
+        #     self.cur_params[name] = step_update
 
     def get_cur_params(self):
         return self.cur_params
 
-    def flatten_init(self, l: list) -> list:
-        res = []
+    def flatten_init_param(self, l: list) -> list:
+        params = []
         for ele in l:
-            res.append(self.flatten(ele))
-        return res
+            params.append(self.flatten(ele))
+        return params
 
     def flatten(self, i: InputType) -> list:  # Or maybe list
         if not is_dataclass(i):
