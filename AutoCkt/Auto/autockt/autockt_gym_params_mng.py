@@ -25,17 +25,35 @@ class AutoCktParamsManager(Generic[InputType]):
     def step(self, cur_action):
         """based on action space move by action's idx"""
         # Convert to a numpy array and flatten it if it's not already 1D
-        for idx, (name, _) in enumerate(self.cur_params.items()):
+        # for idx, (name, _) in enumerate(self.cur_params.items()):
+        #     action_idx = cur_action[name]
+        #     step_update = (
+        #         self.cur_params[name]
+        #         + self.actions_per_param[action_idx] * self.params_template[idx].step
+        #     )
+
+        #     if step_update > self.params_template[idx].range.max:
+        #         step_update = self.params_template[idx].range.max
+        #     elif step_update < self.params_template[idx].range.min:
+        #         step_update = self.params_template[idx].range.min
+
+        #     self.cur_params[name] = step_update
+
+        for idx, param_metrics in enumerate(self.params_ranges):
+            ##params_ranges: [1.0, 100.0, 1.0, 34.0], each are mix, max, step, init
+            min = param_metrics[0]
+            max = param_metrics[1]
+            step = param_metrics[2]
+            init = param_metrics[3]
+            name = self.params_template[idx].name
             action_idx = cur_action[name]
             step_update = (
-                self.cur_params[name]
-                + self.actions_per_param[action_idx] * self.params_template[idx].step
+                self.cur_params[name] + self.actions_per_param[action_idx] * step
             )
-
-            if step_update > self.params_template[idx].range.max:
-                step_update = self.params_template[idx].range.max
-            elif step_update < self.params_template[idx].range.min:
-                step_update = self.params_template[idx].range.min
+            if step_update > max:
+                step_update = max
+            elif step_update < min:
+                step_update = min
 
             self.cur_params[name] = step_update
 
@@ -87,25 +105,3 @@ class AutoCktParamsManager(Generic[InputType]):
                 arr.append(val)
             else:
                 raise TypeError
-
-    def unflatten(self, flat_data: list) -> dict:
-        # Use the initial params_template as a reference to reconstruct the data
-        reference = asdict(self.params_template)
-        result = {}
-        flat_idx = 0
-
-        for key, val in reference.items():
-            if isinstance(val, (int, float)):
-                result[key] = flat_data[flat_idx]
-                flat_idx += 1
-            elif isinstance(val, dict):
-                inner_data = {}
-                for inner_key in val.keys():
-                    inner_data[inner_key] = flat_data[flat_idx]
-                    flat_idx += 1
-                result[key] = inner_data
-            # Add more conditions if your data can be more nested
-            else:
-                raise ValueError(f"Unhandled data type: {type(val)} for key {key}")
-
-        return result
