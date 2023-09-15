@@ -11,10 +11,14 @@ import vlsirtools.spice as vsp
 from hdl21.external_module import SpiceType
 from hdl21.prefix import µ, NANO, PICO, FEMTO
 import numpy
-import Latch
+
+# import Latch
+from .Latch import LatchParams, LatchGen
 
 
-def _get_delay(out: numpy.array, clk: numpy.array, time: numpy.array) -> float:
+def _get_delay(
+    out: numpy.array, clk: numpy.array, time: numpy.array, ifdebug=False
+) -> float:
     VDD_voltage = 1.2
     out_crossing = numpy.where(numpy.diff(numpy.sign(out - 0.5 * VDD_voltage)))[0]
     out_crossing_time = []
@@ -35,13 +39,15 @@ def _get_delay(out: numpy.array, clk: numpy.array, time: numpy.array) -> float:
             numpy.where(numpy.diff(numpy.sign(clk_crossing_time - t)))[0][0]
         ]
         crossing_sum += t - clk_time_to_subtract
-        print(str(clk_time_to_subtract) + " -> " + str(t))
+        if ifdebug:
+            print(str(clk_time_to_subtract) + " -> " + str(t))
     delay = crossing_sum / crossing_count
 
-    print("out_crossing:            " + str(out_crossing))
-    print("out_crossing_time:       " + str(out_crossing_time))
-    print("clk_crossing:            " + str(clk_crossing))
-    print("clk_crossing_time:       " + str(clk_crossing_time))
+    if ifdebug:
+        print("out_crossing:            " + str(out_crossing))
+        print("out_crossing_time:       " + str(out_crossing_time))
+        print("clk_crossing:            " + str(clk_crossing))
+        print("clk_crossing_time:       " + str(clk_crossing_time))
 
     return delay
 
@@ -59,12 +65,8 @@ class FFParams:
     # L1 = Latch.LatchParams()
     # L2 = Latch.LatchParams()
 
-    L1 = h.Param(
-        dtype=Latch.LatchParams, desc="params of Latch1", default=Latch.LatchParams()
-    )
-    L2 = h.Param(
-        dtype=Latch.LatchParams, desc="params of Latch2", default=Latch.LatchParams()
-    )
+    L1 = h.Param(dtype=LatchParams, desc="params of Latch1", default=LatchParams())
+    L2 = h.Param(dtype=LatchParams, desc="params of Latch2", default=LatchParams())
 
 
 @h.generator
@@ -82,12 +84,12 @@ def FFgen(p: FFParams) -> h.Module:
         intermediate_signal = h.Signal()
 
         # Sampling latch
-        Sampling_latch = Latch.LatchGen(p.L1)(
+        Sampling_latch = LatchGen(p.L1)(
             VDD=VDD, VSS=VSS, CLK=CKB, CKB=CLK, D=D, Q=intermediate_signal
         )
 
         # Holding latch
-        Holding_latch = Latch.LatchGen(p.L2)(
+        Holding_latch = LatchGen(p.L2)(
             VDD=VDD, VSS=VSS, CLK=CLK, CKB=CKB, D=intermediate_signal, Q=Q
         )
 
@@ -154,7 +156,7 @@ def FFSim(params: FFParams, input_shift: float) -> h.sim.Sim:
 
 
 def FF_inner(
-    params: FFParams, input_shift: float, round: int
+    params: FFParams, input_shift: float, round: int, ifdebug=False
 ) -> tuple[bool, float, float]:
     """# FF Generation & Simulation
     Inner implementation. Also used for testing."""
@@ -175,23 +177,28 @@ def FF_inner(
     # Run the simulation!
     results = sim_input.run(opts)
 
-    from matplotlib import pyplot as plt
+    if ifdebug:
+        from matplotlib import pyplot as plt
 
-    plt.cla()
-    plt.plot(
-        results["tr"].data["time"],
-        results["tr"].data["v(xtop.sig_out)"],
-        label="sig_out",
-    )
-    plt.plot(
-        results["tr"].data["time"], results["tr"].data["v(xtop.clk_p)"], label="clk_p"
-    )
-    plt.plot(
-        results["tr"].data["time"], results["tr"].data["v(xtop.vin_p)"], label="vin_p"
-    )
-    plt.legend()
-    plt.show()
-    plt.savefig("FF_sim_" + str(round) + ".png")
+        plt.cla()
+        plt.plot(
+            results["tr"].data["time"],
+            results["tr"].data["v(xtop.sig_out)"],
+            label="sig_out",
+        )
+        plt.plot(
+            results["tr"].data["time"],
+            results["tr"].data["v(xtop.clk_p)"],
+            label="clk_p",
+        )
+        plt.plot(
+            results["tr"].data["time"],
+            results["tr"].data["v(xtop.vin_p)"],
+            label="vin_p",
+        )
+        plt.legend()
+        plt.show()
+        plt.savefig("FF_sim_" + str(round) + ".png")
 
     if results["tr"].data["v(xtop.sig_out)"][7517] > 0.12:
         return False, 0, 0
@@ -205,6 +212,7 @@ def FF_inner(
         results["tr"].data["v(xtop.sig_out)"],
         results["tr"].data["v(xtop.clk_p)"],
         results["tr"].data["time"],
+        ifdebug,
     )
     power = _get_FF_power(results["tr"].data["i(v.xtop.vvdc)"], 1.2)
 
@@ -213,22 +221,26 @@ def FF_inner(
 
 
 def main():
+    ifdebug = False
+
     params = FFParams()
     ifwork, output_delay, power = FF_inner(params, 0, 0)
-    print("clk->q delay:    " + str(output_delay))
-    print("power:           " + str(power))
-    print("==============================")
+    if ifdebug:
+        print("clk->q delay:    " + str(output_delay))
+        print("power:           " + str(power))
+        print("==============================")
     shift_min = 0 * NANO
     shift_max = 5 * NANO
     cursor = (shift_min + shift_max) / 2
     ifwork, temp_delay, power_null = FF_inner(params, cursor, 1)
     round = 1
 
-    print("round:           " + str(round))
-    print("clk->q delay:    " + str(temp_delay))
-    print("max shift:       " + str(float(shift_max)))
-    print("min shift:       " + str(float(shift_min)))
-    print("==============================")
+    if ifdebug:
+        print("round:           " + str(round))
+        print("clk->q delay:    " + str(temp_delay))
+        print("max shift:       " + str(float(shift_max)))
+        print("min shift:       " + str(float(shift_min)))
+        print("==============================")
 
     while (shift_max - shift_min) > 0.1 * PICO:
         if ifwork == False:
@@ -243,11 +255,12 @@ def main():
         round += 1
         ifwork, temp_delay, power_null = FF_inner(params, cursor, round)
 
-        print("round:           " + str(round))
-        print("clk->q delay:    " + str(temp_delay))
-        print("max shift:       " + str(float(shift_max)))
-        print("min shift:       " + str(float(shift_min)))
-        print("==============================")
+        if ifdebug:
+            print("round:           " + str(round))
+            print("clk->q delay:    " + str(temp_delay))
+            print("max shift:       " + str(float(shift_max)))
+            print("min shift:       " + str(float(shift_min)))
+            print("==============================")
 
     setup_time = 5 * NANO - cursor
 
@@ -257,11 +270,12 @@ def main():
     ifwork, temp_delay, power_null = FF_inner(params, cursor, 100)
     round = 100
 
-    print("round:           " + str(round))
-    print("clk->q delay:    " + str(temp_delay))
-    print("max shift:       " + str(float(shift_max)))
-    print("min shift:       " + str(float(shift_min)))
-    print("==============================")
+    if ifdebug:
+        print("round:           " + str(round))
+        print("clk->q delay:    " + str(temp_delay))
+        print("max shift:       " + str(float(shift_max)))
+        print("min shift:       " + str(float(shift_min)))
+        print("==============================")
 
     while (shift_min - shift_max) > 0.1 * PICO:
         if ifwork == False:
@@ -276,11 +290,12 @@ def main():
         round += 1
         ifwork, temp_delay, power_null = FF_inner(params, cursor, round)
 
-        print("round:           " + str(round))
-        print("clk->q delay:    " + str(temp_delay))
-        print("max shift:       " + str(float(shift_max)))
-        print("min shift:       " + str(float(shift_min)))
-        print("==============================")
+        if ifdebug:
+            print("round:           " + str(round))
+            print("clk->q delay:    " + str(temp_delay))
+            print("max shift:       " + str(float(shift_max)))
+            print("min shift:       " + str(float(shift_min)))
+            print("==============================")
 
     hold_time = 5 * NANO + cursor
 

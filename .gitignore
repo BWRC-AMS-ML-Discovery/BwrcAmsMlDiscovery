@@ -85,6 +85,9 @@ coverage.xml
 .pytest_cache/
 cover/
 
+Example/Server/example_server/*_sim_*.png
+Example/Server/example_server/*_sim.png
+
 # Translations
 *.mo
 *.pot

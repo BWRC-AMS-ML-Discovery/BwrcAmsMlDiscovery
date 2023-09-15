@@ -4,13 +4,19 @@
 """
 
 import sys
+import os
+from pathlib import Path
+
 from copy import deepcopy
 import hdl21 as h
 import hdl21.sim as hs
 import vlsirtools.spice as vsp
 from hdl21.external_module import SpiceType
-from hdl21.prefix import µ, NANO
+from hdl21.prefix import µ, NANO, PICO
 import numpy
+
+CURRENT_PATH = Path(os.path.dirname(os.path.abspath(__file__)))
+SPICE_MODEL_45NM_BULK_PATH = CURRENT_PATH / "45nm_bulk.txt"
 
 
 def _get_best_crossing(yvec: numpy.array, val: float) -> tuple[int, bool]:
@@ -113,66 +119,181 @@ def LatchGen(p: LatchParams) -> h.Module:
     return Latch
 
 
+def _get_Latch_delay(
+    out: numpy.array, clk: numpy.array, time: numpy.array, ifdebug=False
+) -> float:
+    VDD_voltage = 1.2
+    out_crossing = numpy.where(numpy.diff(numpy.sign(out - 0.5 * VDD_voltage)))[0]
+    out_crossing_time = []
+    for t in out_crossing:
+        out_crossing_time.append(time[t])
+    if out_crossing_time[0] < 1e-9:
+        out_crossing_time.pop(0)
+    clk_crossing = numpy.where(numpy.diff(numpy.sign(clk - 0.5 * VDD_voltage)))[0]
+    clk_crossing_time = []
+    for y in clk_crossing:
+        clk_crossing_time.append(time[y])
+    #     print("time[y]:            "+str(time[y]))
+    # print("clk_crossing_time:       "+str(out_crossing_time))
+
+    if ifdebug:
+        print("out_crossing:            " + str(out_crossing))
+        print("out_crossing_time:       " + str(out_crossing_time))
+        print("clk_crossing:            " + str(clk_crossing))
+        print("clk_crossing_time:       " + str(clk_crossing_time))
+
+    crossing_count = 0
+    crossing_sum = 0
+    for t in out_crossing_time:
+        crossing_count += 1
+        crossing_index = numpy.where(numpy.diff(numpy.sign(clk_crossing_time - t)))
+        if numpy.size(crossing_index) == 0:
+            clk_time_to_subtract = clk_crossing_time[len(clk_crossing_time) - 1]
+        else:
+            clk_time_to_subtract = clk_crossing_time[crossing_index[0][0]]
+        crossing_sum += t - clk_time_to_subtract
+        if ifdebug:
+            print(str(clk_time_to_subtract) + " -> " + str(t))
+    delay = crossing_sum / crossing_count
+
+    return delay
+
+
+def _get_Latch_power(Idc: numpy.array, VDD: float) -> float:
+    Ivdd = -numpy.average(Idc)
+    power = VDD * Ivdd
+    return power
+
+
 # FIXME: Need to get
 # (i) settling time;
 # (ii) power consumption
+def LatchSim(params: LatchParams, input_shift: float) -> h.sim.Sim:
+    """# FF Simulation Input"""
+
+    @hs.sim
+    class LatchSimGen:
+        @h.module
+        class Tb:
+
+            VSS = h.Port()  # The testbench interface: sole port VSS
+            vdc = h.Vdc(dc=1.2)(n=VSS)  # A DC voltage source
+
+            input_params = h.PulseVoltageSourceParams(
+                delay=input_shift,
+                v1=1.2,
+                v2=0,
+                period=40 * NANO,
+                width=20 * NANO,
+                fall=0,
+                rise=0,
+            )
+            vin = h.PulseVoltageSource(input_params)(n=VSS)
+
+            clock_params = h.PulseVoltageSourceParams(
+                delay=0 * NANO,
+                v1=0,
+                v2=1.2,
+                period=20 * NANO,
+                width=10 * NANO,
+                fall=0,
+                rise=0,
+            )
+            clk_b_params = h.PulseVoltageSourceParams(
+                delay=0 * NANO,
+                v1=1.2,
+                v2=0,
+                period=20 * NANO,
+                width=10 * NANO,
+                fall=0,
+                rise=0,
+            )
+            CLK = h.PulseVoltageSource(clock_params)(n=VSS)
+            CKB = h.PulseVoltageSource(clk_b_params)(n=VSS)
+
+            sig_out = h.Signal()
+
+            inst = LatchGen(params)(
+                VDD=vdc.p, VSS=VSS, D=vin.p, CLK=CLK.p, CKB=CKB.p, Q=sig_out
+            )
+
+        # Simulation Stimulus
+        op = hs.Op()
+        # ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
+        tr = hs.Tran(tstop=80 * NANO, tstep=1 * h.prefix.p, name="mytran")
+        mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
+
+    return LatchSimGen
 
 
-@hs.sim
-class LatchSim:
-    @h.module
-    class Tb:
-        """# Basic Mos Testbench"""
+def Latch_inner(
+    params: LatchParams, input_shift: float, round: int, ifdebug=False
+) -> tuple[bool, float, float]:
+    """# Latch Generation & Simulation
+    Inner implementation. Also used for testing."""
 
-        VSS = h.Port()  # The testbench interface: sole port VSS
-        vdc = h.Vdc(dc=1.2)(n=VSS)  # A DC voltage source
+    if not vsp.ngspice.available():
+        raise RuntimeError(f"Cannot find ngspice simulator")
 
-        input_params = h.PulseVoltageSourceParams(
-            delay=2 * NANO,
-            v1=1.2,
-            v2=0,
-            period=10 * NANO,
-            width=5 * NANO,
-            fall=0,
-            rise=0,
+    # Create a set of simulation input for it
+    sim_input = LatchSim(params, input_shift)
+
+    # Simulation options
+    opts = vsp.SimOptions(
+        simulator=vsp.SupportedSimulators.NGSPICE,
+        fmt=vsp.ResultFormat.SIM_DATA,  # Get Python-native result types
+        rundir="./scratch",  # Set the working directory for the simulation. Uses a temporary directory by default.
+    )
+
+    # Run the simulation!
+    results = sim_input.run(opts)
+
+    if ifdebug:
+        from matplotlib import pyplot as plt
+
+        plt.cla()
+        plt.plot(
+            results["tr"].data["time"],
+            results["tr"].data["v(xtop.sig_out)"],
+            label="sig_out",
         )
-        vin = h.PulseVoltageSource(input_params)(n=VSS)
-
-        clock_params = h.PulseVoltageSourceParams(
-            delay=1 * NANO,
-            v1=0,
-            v2=1.2,
-            period=20 * NANO,
-            width=10 * NANO,
-            fall=0,
-            rise=0,
+        plt.plot(
+            results["tr"].data["time"],
+            results["tr"].data["v(xtop.clk_p)"],
+            label="clk_p",
         )
-        clk_b_params = h.PulseVoltageSourceParams(
-            delay=1 * NANO,
-            v1=1.2,
-            v2=0,
-            period=20 * NANO,
-            width=10 * NANO,
-            fall=0,
-            rise=0,
+        plt.plot(
+            results["tr"].data["time"],
+            results["tr"].data["v(xtop.vin_p)"],
+            label="vin_p",
         )
-        CLK = h.PulseVoltageSource(clock_params)(n=VSS)
-        CKB = h.PulseVoltageSource(clk_b_params)(n=VSS)
+        plt.legend()
+        plt.show()
+        plt.savefig("Latch_sim_" + str(round) + ".png")
 
-        sig_out = h.Signal()
+        if results["tr"].data["v(xtop.sig_out)"][15000] > 0.12:
+            return False, 0, 0
+        if results["tr"].data["v(xtop.sig_out)"][35000] < 1.08:
+            return False, 0, 0
+        if results["tr"].data["v(xtop.sig_out)"][55000] > 0.12:
+            return False, 0, 0
 
-        inst = LatchGen()(VDD=vdc.p, VSS=VSS, D=vin.p, CLK=CLK.p, CKB=CKB.p, Q=sig_out)
+    # Extract our metrics from those results
+    output_delay = _get_Latch_delay(
+        results["tr"].data["v(xtop.sig_out)"],
+        results["tr"].data["v(xtop.vin_p)"],
+        results["tr"].data["time"],
+        ifdebug,
+    )
+    power = _get_Latch_power(results["tr"].data["i(v.xtop.vvdc)"], 1.2)
 
-    # Simulation Stimulus
-    op = hs.Op()
-    # ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
-    tr = hs.Tran(tstop=31 * NANO, tstep=1 * h.prefix.p, name="mytran")
-    mod = hs.Include("../45nm_bulk.txt")
+    # And return them as an `OpAmpOutput`
+    return True, output_delay, power
 
 
 def main():
     # h.netlist(LatchGen(), sys.stdout)
-    h.netlist(LatchGen(LatchParams()), sys.stdout)
+    # h.netlist(LatchGen(LatchParams()), sys.stdout)
 
     opts = vsp.SimOptions(
         simulator=vsp.SupportedSimulators.NGSPICE,
@@ -184,9 +305,12 @@ def main():
         return
 
     # Run the simulation!
-    results = LatchSim.run(opts)
+    params = LatchParams()
+    results = LatchSim(params, 5 * NANO).run(opts)
 
-    print(results)
+    ifdebug = False
+
+    """ print(results)
     print("====================")
     print(results["tr"])
     print("====================")
@@ -220,34 +344,97 @@ def main():
         (["time", "v(xtop.sig_out)", "v(xtop.clk_p)", "v(xtop.vin_p)"], table2)
     )
     print(table3)
-    numpy.savetxt("Latch.csv", table2, delimiter=",")
+    numpy.savetxt("Latch.csv", table2, delimiter=",") """
 
-    from matplotlib import pyplot as plt
+    if ifdebug:
+        from matplotlib import pyplot as plt
 
-    plt.plot(
-        results["tr"].data["time"],
-        results["tr"].data["v(xtop.sig_out)"],
-        label="sig_out",
-    )
-    plt.plot(
-        results["tr"].data["time"], results["tr"].data["v(xtop.clk_p)"], label="clk_p"
-    )
-    plt.plot(
-        results["tr"].data["time"], results["tr"].data["v(xtop.vin_p)"], label="vin_p"
-    )
-    plt.legend()
-    plt.show()
-    plt.savefig("Latch_sim.png")
+        plt.plot(
+            results["tr"].data["time"],
+            results["tr"].data["v(xtop.sig_out)"],
+            label="sig_out",
+        )
+        plt.plot(
+            results["tr"].data["time"],
+            results["tr"].data["v(xtop.clk_p)"],
+            label="clk_p",
+        )
+        plt.plot(
+            results["tr"].data["time"],
+            results["tr"].data["v(xtop.vin_p)"],
+            label="vin_p",
+        )
+        plt.legend()
+        plt.show()
+        plt.savefig("Latch_sim.png")
 
-    print("====================")
+    if ifdebug:
+        print("====================")
     out_crossing = numpy.where(
         numpy.diff(numpy.sign(results["tr"].data["v(xtop.sig_out)"] - 0.6))
     )[0]
-    print("out_crossing:    " + str(out_crossing))
+    if ifdebug:
+        print("out_crossing:    " + str(out_crossing))
     vin_crossing = numpy.where(
         numpy.diff(numpy.sign(results["tr"].data["v(xtop.vin_p)"] - 0.6))
     )[0]
-    print("vin_crossing:    " + str(vin_crossing))
+    if ifdebug:
+        print("vin_crossing:    " + str(vin_crossing))
+        print(
+            "delay:   "
+            + str(
+                _get_Latch_delay(
+                    results["tr"].data["v(xtop.sig_out)"],
+                    results["tr"].data["v(xtop.vin_p)"],
+                    results["tr"].data["time"],
+                    ifdebug,
+                )
+            )
+        )
+
+    params = LatchParams()
+    ifwork, output_delay, power = Latch_inner(params, 5 * NANO, 0, ifdebug)
+    if ifdebug:
+        print("clk->q delay:    " + str(output_delay))
+        print("power:           " + str(power))
+        print("==============================")
+    shift_min = 5 * NANO
+    shift_max = 11 * NANO
+    cursor = (shift_min + shift_max) / 2
+    ifwork, temp_delay, power_null = Latch_inner(params, cursor, 1, ifdebug)
+    round = 1
+    if ifdebug:
+        print("round:           " + str(round))
+        print("clk->q delay:    " + str(temp_delay))
+        print("max shift:       " + str(float(shift_max)))
+        print("min shift:       " + str(float(shift_min)))
+        print("==============================")
+
+    while (shift_max - shift_min) > 0.1 * PICO:
+        if ifwork == False:
+            shift_max = cursor
+        elif temp_delay > 1.05 * output_delay:
+            shift_max = cursor
+        elif temp_delay == 1.05 * output_delay:
+            break
+        else:
+            shift_min = cursor
+        cursor = (shift_min + shift_max) / 2
+        round += 1
+        ifwork, temp_delay, power_null = Latch_inner(params, cursor, round, ifdebug)
+        if ifdebug:
+            print("round:           " + str(round))
+            print("clk->q delay:    " + str(temp_delay))
+            print("max shift:       " + str(float(shift_max)))
+            print("min shift:       " + str(float(shift_min)))
+            print("==============================")
+
+    setup_time = 10 * NANO - cursor
+
+    print("Final Results:")
+    print("clk->q delay:    " + str(output_delay * 1e9) + " ns")
+    print("power:           " + str(power))
+    print("setup time:       " + str(float(setup_time * 1e9)) + " ns")
 
     # print("Gain:            "+str(find_dc_gain(2*results["ac"].data["v(xtop.sig_out)"])))
     # print("UGBW:            "+str(find_ugbw(results["ac"].freq,2*results["ac"].data["v(xtop.sig_out)"])))

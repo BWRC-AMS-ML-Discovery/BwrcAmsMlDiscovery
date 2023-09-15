@@ -1,5 +1,5 @@
 from discovery_shared.rpc import Rpc
-from example_server import latch_sim
+from example_server import latch_sim, LatchInput, LatchOutput
 
 
 def test_types():
@@ -15,7 +15,9 @@ def test_sim():
     TODO Add test cases
     """
 
-    inp = None
+    inp = LatchInput(
+        w1=10, w2=20, w3=10, w4=20, w5=10, w6=20, w7=20, w8=20, w9=10, w10=10, VDD=1.2
+    )
     out = latch_sim(inp)
     print(out)
 

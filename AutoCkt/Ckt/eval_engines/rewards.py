@@ -60,6 +60,28 @@ def latch_reward(
     TODO Implement
     """
 
+    def calc_relative(curr: Number, ideal: Number):
+        # ideal = float(ideal)  # Not sure if this is necessary
+        relative = curr / ideal
+        return relative
+
+    # adapted TwoAmp reward using new variables
+    def reward(curr_output, target_output):
+        # populate relative for each key input of target
+        pos_val = []
+        reward = 1.0
+        for key in target_output:
+            reward = reward * calc_relative(
+                getattr(curr_output, key),
+                target_output[key],
+            )
+
+        # TODO this 10 seems pretty arbitrary
+        return reward
+
+    # run the reward function
+    return reward(curr_output, target_output)
+
 
 def flip_flop_reward(
     curr_output: FlipFlopOutput,  # This is from simulation
@@ -68,6 +90,28 @@ def flip_flop_reward(
     """
     TODO Implement
     """
+
+    def calc_relative(curr: Number, ideal: Number):
+        # ideal = float(ideal)  # Not sure if this is necessary
+        relative = curr / ideal
+        return relative
+
+    # adapted TwoAmp reward using new variables
+    def reward(curr_output, target_output):
+        # populate relative for each key input of target
+        pos_val = []
+        reward = 1.0
+        for key in target_output:
+            reward = reward * calc_relative(
+                getattr(curr_output, key),
+                target_output[key],
+            )
+
+        # TODO this 10 seems pretty arbitrary
+        return reward
+
+    # run the reward function
+    return reward(curr_output, target_output)
 
 
 def folded_cascode_reward(
@@ -78,6 +122,28 @@ def folded_cascode_reward(
     TODO Implement
     """
 
+    def calc_relative(curr: Number, ideal: Number):
+        # ideal = float(ideal)  # Not sure if this is necessary
+        relative = curr / ideal
+        return relative
+
+    # adapted TwoAmp reward using new variables
+    def reward(curr_output, target_output):
+        # populate relative for each key input of target
+        pos_val = []
+        reward = 1.0
+        for key in target_output:
+            reward = reward * calc_relative(
+                getattr(curr_output, key),
+                target_output[key],
+            )
+
+        # TODO this 10 seems pretty arbitrary
+        return reward
+
+    # run the reward function
+    return reward(curr_output, target_output)
+
 
 def ldo_reward(
     curr_output: LDOOutput,  # This is from simulation
@@ -87,6 +153,28 @@ def ldo_reward(
     TODO Implement
     """
 
+    def calc_relative(curr: Number, ideal: Number):
+        # ideal = float(ideal)  # Not sure if this is necessary
+        relative = curr / ideal
+        return relative
+
+    # adapted TwoAmp reward using new variables
+    def reward(curr_output, target_output):
+        # populate relative for each key input of target
+        pos_val = []
+        reward = 1.0
+        for key in target_output:
+            reward = reward * calc_relative(
+                getattr(curr_output, key),
+                target_output[key],
+            )
+
+        # TODO this 10 seems pretty arbitrary
+        return reward
+
+    # run the reward function
+    return reward(curr_output, target_output)
+
 
 def two_stage_op_amp_ngm_reward(
     curr_output: TwoStageOpAmpNgmOutput,  # This is from simulation
@@ -95,3 +183,25 @@ def two_stage_op_amp_ngm_reward(
     """
     TODO Implement
     """
+
+    def calc_relative(curr: Number, ideal: Number):
+        # ideal = float(ideal)  # Not sure if this is necessary
+        relative = curr / ideal
+        return relative
+
+    # adapted TwoAmp reward using new variables
+    def reward(curr_output, target_output):
+        # populate relative for each key input of target
+        pos_val = []
+        reward = 1.0
+        for key in target_output:
+            reward = reward * calc_relative(
+                getattr(curr_output, key),
+                target_output[key],
+            )
+
+        # TODO this 10 seems pretty arbitrary
+        return reward
+
+    # run the reward function
+    return reward(curr_output, target_output)

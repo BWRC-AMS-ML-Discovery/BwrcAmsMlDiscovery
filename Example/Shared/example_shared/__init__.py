@@ -13,6 +13,8 @@ from typing import Optional
 from discovery_shared.dataclasses import dataclass
 from discovery_shared.rpc import Rpc
 
+import hdl21 as h
+
 
 @dataclass
 class Example:
@@ -111,9 +113,6 @@ auto_ckt_sim_hdl21 = Rpc(
 
 @dataclass
 class LatchInput:
-    """
-    TODO What do we wanna vary?
-    """
 
     w1: int
     w2: int
@@ -125,13 +124,15 @@ class LatchInput:
     w8: int
     w9: int
     w10: int
+    VDD: h.Scalar
 
 
 @dataclass
 class LatchOutput:
-    """
-    TODO What do we get out?
-    """
+
+    power: float
+    output_delay: float
+    setup_time: float
 
 
 latch_sim = Rpc(
@@ -144,9 +145,6 @@ latch_sim = Rpc(
 
 @dataclass
 class FlipFlopInput:
-    """
-    TODO Is this correct?
-    """
 
     l1: LatchInput
     l2: LatchInput
@@ -154,9 +152,11 @@ class FlipFlopInput:
 
 @dataclass
 class FlipFlopOutput:
-    """
-    TODO What do we get out?
-    """
+
+    power: float
+    output_delay: float
+    setup_time: float
+    hold_time: float
 
 
 flip_flop_sim = Rpc(
@@ -169,27 +169,53 @@ flip_flop_sim = Rpc(
 
 @dataclass
 class FoldedCascodeInput:
-    """
-    TODO What do we wanna vary?
-    """
 
-    w15_16: int
+    w1_2: int
     w5_6: int
-    w2_8: int
+    w7_8: int
     w9_10: int
     w11_12: int
     w13_14: int
+    w15_16: int
     w17: int
-    w1_2: int
-    w7_8: int
     w18: int
+
+    cl: h.Scalar
+    cc: h.Scalar
+    rc: h.Scalar
+
+    wb0: int
+    wb1: int
+    wb2: int
+    wb3: int
+    wb4: int
+    wb5: int
+    wb6: int
+    wb7: int
+    wb8: int
+    wb9: int
+    wb10: int
+    wb11: int
+    wb12: int
+    wb13: int
+    wb14: int
+    wb15: int
+    wb16: int
+    wb17: int
+    wb18: int
+    wb19: int
+
+    ibias: h.Scalar
+    Vcm: h.Scalar
 
 
 @dataclass
 class FoldedCascodeOutput:
-    """
-    TODO What do we get out?
-    """
+
+    gain: float
+    ugbw: float
+    phm: float
+    ibias: float
 
 
 folded_cascode_sim = Rpc(
@@ -202,17 +228,25 @@ folded_cascode_sim = Rpc(
 
 @dataclass
 class LDOInput:
-    """
-    TODO What do we wanna vary?
-    """
 
-    w1a: int
-    w1b: int
-    w2a: int
-    w2b: int
+    w1: int
+    w2: int
     w3: int
-    w4a: int
-    w4b: int
+    w4: int
+    w5: int
+    w6: int
+    w7r: int
+    w8: int
+    wc: int
+    w10: int
+    wpass: int
+    VDD: h.Scalar
+    Cc: h.Scalar
+    Cf1: h.Scalar
+    Cf2: h.Scalar
+    Rrf1: h.Scalar
+    Rrf2: h.Scalar
+    ibias: h.Scalar
 
 
 @dataclass
@@ -232,9 +266,6 @@ ldo_sim = Rpc(
 
 @dataclass
 class TwoStageOpAmpNgmInput:
-    """
-    TODO What do we wanna vary?
-    """
 
     wtail1: int
     wtail2: int
@@ -246,13 +277,21 @@ class TwoStageOpAmpNgmInput:
     wn_gm: int
     wtail: int
     wtailr: int
+    Cc: float
+    Rf: float
+    VDD: float
+    Vcm: float
+    Vref: float
+    ibias: float
 
 
 @dataclass
 class TwoStageOpAmpNgmOutput:
-    """
-    TODO What do we get out?
-    """
+
+    gain: float
+    ugbw: float
+    phm: float
+    ibias: float
 
 
 two_stage_op_amp_ngm_sim = Rpc(
