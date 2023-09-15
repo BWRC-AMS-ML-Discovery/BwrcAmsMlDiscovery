@@ -14,6 +14,7 @@
 `bwrc_discovery_server` handles authentication, server_start.
 
 ### Example: Example contains three public packages that are `example_client`, `example_server`, and `example_shared`.
+### FIXME: update this 
 
 Example is a use case of bwrc_discovery.
 

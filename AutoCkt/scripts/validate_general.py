@@ -22,7 +22,7 @@ from autockt.autockt_gym_env_config import (
     AutoCktSpecs,
     AutoCktSpec,
 )
-from example_client import (
+from autockt import (
     AutoCktInput,
     AutoCktOutput,
     auto_ckt_sim,

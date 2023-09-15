@@ -1,5 +1,5 @@
 from discovery_shared.rpc import Rpc
-from example_server import ldo_sim
+from eval_engines import ldo_sim
 
 
 def test_types():

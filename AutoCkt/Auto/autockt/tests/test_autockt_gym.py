@@ -10,7 +10,7 @@ from autockt.autockt_gym_env_config import (
 )
 from dotenv import dotenv_values
 from eval_engines.rewards import settaluri_reward
-from example_client import (
+from autockt import (
     AutoCktInput,
     AutoCktOutput,
     auto_ckt_sim,

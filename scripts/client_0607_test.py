@@ -6,6 +6,13 @@ from example_client import (
 )
 
 
+def test_auto_ckt():
+    """testing auto ckt rpcs"""
+    to_test = AutoCktInput(3, 3, 3, 3, 3, 3, 1e-12)
+    test = auto_ckt_sim(to_test)
+    return test
+
+
 def main():
     """
     Not picked up by pytest
