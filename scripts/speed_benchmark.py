@@ -4,7 +4,7 @@ from autockt.client import (
     start as start_client,
     Config,
 )
-from autockt_shared import auto_ckt_sim_hdl21, AutoCktInput, auto_ckt_sim
+from autockt_shared import auto_ckt_sim_hdl21, OpAmpInput, auto_ckt_sim
 
 ENABLE_HTTPS = True
 
@@ -25,7 +25,7 @@ def main():
 
     start_client(cfg)
 
-    to_test = AutoCktInput(3, 3, 3, 3, 3, 3, 1e-12)
+    to_test = OpAmpInput(3, 3, 3, 3, 3, 3, 1e-12)
 
     start_time = time.time()
     auto_ckt_sim(to_test)

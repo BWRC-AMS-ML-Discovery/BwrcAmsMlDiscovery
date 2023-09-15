@@ -16,16 +16,16 @@ from dotenv import dotenv_values
 
 # Workspace Imports
 from autockt_shared import (
+    OpAmpInput,
+    OpAmpOutput,
     FlipFlopInput,
     FlipFlopOutput,
     FoldedCascodeInput,
-    FoldedCascodeOutput,
     LDOInput,
     LDOOutput,
     LatchInput,
     LatchOutput,
     TwoStageOpAmpNgmInput,
-    TwoStageOpAmpNgmOutput,
     latch_sim,
     flip_flop_sim,
     folded_cascode_sim,
@@ -33,8 +33,6 @@ from autockt_shared import (
     two_stage_op_amp_ngm_sim,
     auto_ckt_sim,
     auto_ckt_sim_hdl21,
-    AutoCktInput,
-    AutoCktOutput,
 )
 from .auto_ckt_sim_lib import (
     create_design,
@@ -53,7 +51,7 @@ from .TwoStageOpAmp import (
 
 # FIXME should be async? FastAPI says both are ok.
 @auto_ckt_sim.impl
-def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
+def auto_ckt_sim(inp: OpAmpInput) -> OpAmpOutput:
     """
     AutoCkt Simulation
     """
@@ -72,7 +70,7 @@ def auto_ckt_sim(inp: AutoCktInput) -> AutoCktOutput:
 
 
 @auto_ckt_sim_hdl21.impl
-def auto_ckt_sim_hdl21(inp: AutoCktInput) -> AutoCktOutput:
+def auto_ckt_sim_hdl21(inp: OpAmpInput) -> OpAmpOutput:
     """
     AutoCkt Simulation
     """
@@ -118,8 +116,8 @@ def auto_ckt_sim_hdl21(inp: AutoCktInput) -> AutoCktOutput:
     idd = ac_result.data["i(v.xtop.vvdc)"]
     ibias = find_I_vdd(idd)
 
-    # And return them as an `AutoCktOutput`
-    return AutoCktOutput(
+    # And return them as an `OpAmpOutput`
+    return OpAmpOutput(
         ugbw=ugbw,
         gain=gain,
         phm=phm,
@@ -307,7 +305,7 @@ from .FoldedCascode import (
 
 
 @folded_cascode_sim.impl
-def folded_cascode_sim(inp: FoldedCascodeInput) -> FoldedCascodeOutput:
+def folded_cascode_sim(inp: FoldedCascodeInput) -> OpAmpOutput:
     """
     FoldedCascode Simulation
     """
@@ -371,8 +369,8 @@ def folded_cascode_sim(inp: FoldedCascodeInput) -> FoldedCascodeOutput:
     idd = ac_result.data["i(v.xtop.vvdc)"]
     ibias = find_I_vdd(idd)
 
-    # And return them as an `FoldedCascodeOutput`
-    return FoldedCascodeOutput(
+    # And return them as an `OpAmpOutput`
+    return OpAmpOutput(
         ugbw=ugbw,
         gain=gain,
         phm=phm,
@@ -399,7 +397,7 @@ from .TwoStageOpAmp_ngm import (
 
 
 @two_stage_op_amp_ngm_sim.impl
-def two_stage_op_amp_ngm_sim(inp: TwoStageOpAmpNgmInput) -> TwoStageOpAmpNgmOutput:
+def two_stage_op_amp_ngm_sim(inp: TwoStageOpAmpNgmInput) -> OpAmpOutput:
     """
     TwoStageOpAmpNgm Simulation
     """
@@ -446,8 +444,8 @@ def two_stage_op_amp_ngm_sim(inp: TwoStageOpAmpNgmInput) -> TwoStageOpAmpNgmOutp
     idd = ac_result.data["i(v.xtop.vvdc)"]
     ibias = find_I_vdd(idd)
 
-    # And return them as an `TwoStageOpAmpNgmOutput`
-    return TwoStageOpAmpNgmOutput(
+    # And return them as an `OpAmpOutput`
+    return OpAmpOutput(
         ugbw=ugbw,
         gain=gain,
         phm=phm,

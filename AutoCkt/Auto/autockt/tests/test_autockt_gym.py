@@ -11,8 +11,8 @@ from autockt_shared.cktopt import (
 from dotenv import dotenv_values
 from autockt_shared.rewards import settaluri_reward
 from autockt import (
-    AutoCktInput,
-    AutoCktOutput,
+    OpAmpInput,
+    OpAmpOutput,
     auto_ckt_sim,
     start_client,
     Config,
@@ -50,8 +50,8 @@ def _test_https() -> AutoCktGym:
                 AutoCktSpec("ibias", (0.0001, 0.01), normalize=0.001),
             ]
         ),
-        input_type=AutoCktInput,
-        output_type=AutoCktOutput,
+        input_type=OpAmpInput,
+        output_type=OpAmpOutput,
         simulation=auto_ckt_sim,
         reward=settaluri_reward,
     )

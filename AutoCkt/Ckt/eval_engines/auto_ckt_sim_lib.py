@@ -13,8 +13,8 @@ import scipy.optimize as sciopt
 
 # Workspace Imports
 from autockt_shared import (
-    AutoCktInput,
-    AutoCktOutput,
+    OpAmpInput,
+    OpAmpOutput,
 )
 
 
@@ -33,7 +33,7 @@ def _mkdir():
     return (tmpdir, rundir)
 
 
-def create_design(state: AutoCktInput):
+def create_design(state: OpAmpInput):
     tmpdir, design_folder = _mkdir()
     fpath = os.path.join(design_folder, ".cir")
 
@@ -99,7 +99,7 @@ def translate_result(tmpdir, output_path):
     ugbw = find_ugbw(freq, vout)
     phm = find_phm(freq, vout)
 
-    spec = AutoCktOutput(
+    spec = OpAmpOutput(
         ugbw=ugbw,
         gain=gain,
         phm=phm,

@@ -35,8 +35,8 @@ from autockt_shared.cktopt import (
     AutoCktSpec,
 )
 from autockt_shared import (
-    AutoCktInput,
-    AutoCktOutput,
+    OpAmpInput,
+    OpAmpOutput,
     auto_ckt_sim,
 )
 from autockt_shared.rewards import (
@@ -79,8 +79,8 @@ circuit_optimization = AutoCktCircuitOptimization(
             AutoCktSpec("ibias", (0.0001, 0.01), normalize=0.001),
         ]
     ),
-    input_type=AutoCktInput,
-    output_type=AutoCktOutput,
+    input_type=OpAmpInput,
+    output_type=OpAmpOutput,
     simulation=auto_ckt_sim,
     reward=settaluri_reward,
 )

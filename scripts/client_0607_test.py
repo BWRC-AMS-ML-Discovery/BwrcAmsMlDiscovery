@@ -1,4 +1,5 @@
 from dotenv import dotenv_values
+from autockt_shared import OpAmpInput, auto_ckt_sim
 from autockt.client import (
     start as start_client,
     Config,
@@ -7,7 +8,7 @@ from autockt.client import (
 
 def test_auto_ckt():
     """testing auto ckt rpcs"""
-    to_test = AutoCktInput(3, 3, 3, 3, 3, 3, 1e-12)
+    to_test = OpAmpInput(3, 3, 3, 3, 3, 3, 1e-12)
     test = auto_ckt_sim(to_test)
     return test
 
