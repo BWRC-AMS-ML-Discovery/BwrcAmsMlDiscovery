@@ -6,7 +6,7 @@ from dataclasses import asdict
 from pydantic.dataclasses import dataclass
 
 # Local imports
-from shared.typing import Number
+from autockt_shared.typing import Number
 from discovery_shared.rpc import Rpc
 
 

@@ -1,5 +1,5 @@
 from discovery_shared.rpc import Rpc
-from example_server import folded_cascode_sim, FoldedCascodeInput
+from eval_engines import folded_cascode_sim, FoldedCascodeInput
 
 
 def test_types():

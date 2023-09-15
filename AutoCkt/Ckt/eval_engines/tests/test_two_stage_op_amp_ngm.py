@@ -1,8 +1,7 @@
 from discovery_shared.rpc import Rpc
-from example_server import (
+from eval_engines import (
     two_stage_op_amp_ngm_sim,
     TwoStageOpAmpNgmInput,
-    TwoStageOpAmpNgmOutput,
 )
 
 

@@ -1,30 +1,29 @@
 """ 
-# Fully Differential OTA Example 
-
-Highlights the capacity to use `Diff` signals and `Pair`s of instances 
-for differential circuits. 
-
+# Two Stage Op Amp
 """
 
-import sys
+import os
+from pathlib import Path
 from copy import deepcopy
+from dataclasses import asdict
+
+import numpy
+
 import hdl21 as h
 import hdl21.sim as hs
 import vlsirtools.spice as vsp
 from hdl21.external_module import SpiceType
 from hdl21.prefix import µ, NANO
-import numpy
+
+
+CURRENT_PATH = Path(os.path.dirname(os.path.abspath(__file__)))
+SPICE_MODEL_45NM_BULK_PATH = CURRENT_PATH / "45nm_bulk.txt"
 
 
 """ 
 Create a small "PDK" consisting of an externally-defined Nmos and Pmos transistor. 
 Real versions will have some more parameters; these just have multiplier "m". 
 """
-
-
-@h.paramclass
-class MosParams:
-    m = h.Param(dtype=int, desc="Transistor Multiplier")
 
 
 @h.paramclass
@@ -137,32 +136,42 @@ class Compensation:
     c = CapCell(p=r.n, n=b, VDD=VDD, VSS=VSS)
 
 
-@hs.sim
-class MosDcopSim:
-    """# Mos Dc Operating Point Simulation Input"""
+def OpAmpSim(params: OpAmpParams) -> h.sim.Sim:
+    """# Op Amp Simulation Input"""
 
-    @h.module
-    class Tb:
-        """# Basic Mos Testbench"""
+    @hs.sim
+    class MosDcopSim:
+        """# Mos Dc Operating Point Simulation Input"""
 
-        VSS = h.Port()  # The testbench interface: sole port VSS
-        vdc = h.Vdc(dc=1.2)(n=VSS)  # A DC voltage source
-        dcin = h.Diff()
-        sig_out = h.Signal()
-        i_bias = h.Signal()
-        sig_p = h.Vdc(dc=0.6, ac=0.5)(p=dcin.p, n=VSS)
-        sig_n = h.Vdc(dc=0.6, ac=-0.5)(p=dcin.n, n=VSS)
-        Isource = h.Isrc(dc=3e-5)(p=vdc.p, n=i_bias)
+        @h.module
+        class Tb:
+            """# Basic Mos Testbench"""
 
-        inst = OpAmp()(VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out)
+            VSS = h.Port()  # The testbench interface: sole port VSS
+            vdc = h.Vdc(dc=params.VDD)(n=VSS)  # A DC voltage source
+            dcin = h.Diff()
+            sig_out = h.Signal()
+            i_bias = h.Signal()
+            sig_p = h.Vdc(dc=params.VDD / 2, ac=0.5)(p=dcin.p, n=VSS)
+            sig_n = h.Vdc(dc=params.VDD / 2, ac=-0.5)(p=dcin.n, n=VSS)
+            Isource = h.Isrc(dc=params.ibias)(p=vdc.p, n=i_bias)
 
-    # Simulation Stimulus
-    op = hs.Op()
-    ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
-    mod = hs.Include("../ngspice/spice_models/45nm_bulk.txt")
+            inst = OpAmp(params)(
+                VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out
+            )
+
+        # Simulation Stimulus
+        op = hs.Op()
+        ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
+        mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
+
+    return MosDcopSim
 
 
 def main():
+    """
+    @deprecated: I think MosDcopSim has been changed to OpAmpSim
+    """
     # h.netlist(OpAmp(), sys.stdout)
 
     opts = vsp.SimOptions(
@@ -175,73 +184,32 @@ def main():
         return
 
     # Run the simulation!
-    results = MosDcopSim.run(opts)
-
-    """     # Get the transistor drain current
-    # print(results)
-    print(results["op"])
-    print(results["ac"].data["v(xtop.sig_out)"])
-    print(results["ac"].data["i(v.xtop.vvdc)"])
-    # # print(results["ac"].data["v(xtop.dcin_p)"])
-    # # print(results["ac"].data["v(xtop.dcin_n)"])
-    print(type(results))
-    print(type(results["ac"]))
-    print(type(results["ac"].data["v(xtop.sig_out)"]))
-    print(results["ac"].data.keys())
-    print(type(results["ac"].data)) """
+    results = OpAmpSim.run(opts)
 
     print(
         "Gain:            "
-        + str(find_dc_gain(2 * results["ac"].data["v(xtop.sig_out)"]))
+        + str(
+            find_dc_gain(2 * results["ac"].data["v(xtop.sig_out)"]),
+        )
     )
     print(
         "UGBW:            "
-        + str(find_ugbw(results["ac"].freq, 2 * results["ac"].data["v(xtop.sig_out)"]))
+        + str(
+            find_ugbw(results["ac"].freq, 2 * results["ac"].data["v(xtop.sig_out)"]),
+        )
     )
     print(
         "Phase margin:    "
-        + str(find_phm(results["ac"].freq, 2 * results["ac"].data["v(xtop.sig_out)"]))
+        + str(
+            find_phm(results["ac"].freq, 2 * results["ac"].data["v(xtop.sig_out)"]),
+        )
     )
-    print("Ivdd:            " + str(find_I_vdd(results["ac"].data["i(v.xtop.vvdc)"])))
-
-    # result_list=list(results["ac"].data["v(xtop.sig_out)"])
-    # result_list_i=list(results["ac"].data["i(v.xtop.vvdc)"])
-    # import math, cmath
-    # # from tabulate import tabulate
-    # for i in range(len(result_list)):
-    #     freq = 10 * math.pow(10,i/10)
-    #     gain = result_list[i]
-    #     abs_gain = abs(result_list[i])*2
-    #     gain_phase = math.degrees(cmath.phase(gain))
-    #     power_con = abs(result_list_i[i])
-    #     print (format(freq,".7E")+"   "+format(gain,".7E")+"   "+format(abs_gain,".7E")+"   "+str(gain_phase)+"   "+format(power_con,".7E"))
-
-    # for i in range(len(result_list)-1):
-    #     if (abs(result_list[i])*2>1) & (abs(result_list[i+1])*2<1):
-    #         if abs(abs(result_list[i])*2-1) > abs(abs(result_list[i+1])*2-1):
-    #             ugbw = 10 * math.pow(10,(i+1)/10)
-    #             phase_margin = math.degrees(cmath.phase(result_list[i+1]))
-    #         else:
-    #             ugbw = 10 * math.pow(10,i/10)
-    #             phase_margin = math.degrees(cmath.phase(result_list[i]))
-
-    # # print(result_list)
-    # # print(len(result_list))
-    # # print(list(results["ac"].data["v(xtop.sig_out)"]))
-    # # print(len(results["ac"].data["v(xtop.sig_out)"]))
-    # print("Gain: "+format(abs(result_list[0])*2,".7e"))
-    # print("UGBW: "+format(ugbw,".7e"))
-    # print("Phase Margin: "+str(180+phase_margin))
-    # print("Ivdd: "+format(abs(result_list_i[0]),".7e"))
-
-
-"""     import numpy
-    numpy.set_printoptions(precision=7, suppress=False)
-    print(numpy.abs(results["ac"].data["v(xtop.sig_out)"]))
-    numpy.set_printoptions(precision=7, suppress=True)
-    print(numpy.angle(results["ac"].data["v(xtop.sig_out)"], deg=True))
-    print((results["ac"].freq))
- """
+    print(
+        "Ivdd:            "
+        + str(
+            find_I_vdd(results["ac"].data["i(v.xtop.vvdc)"]),
+        )
+    )
 
 
 def find_I_vdd(vout: numpy.array) -> float:
@@ -285,7 +253,3 @@ def _get_best_crossing(yvec: numpy.array, val: float) -> tuple[int, bool]:
         return zero_crossings[0], True
     else:
         return (zero_crossings[0] + 1), True
-
-
-if __name__ == "__main__":
-    main()

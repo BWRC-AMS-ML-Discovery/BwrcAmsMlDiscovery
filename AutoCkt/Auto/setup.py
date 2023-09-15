@@ -38,8 +38,6 @@ setup(
         "pyyaml==5.1.2",
         "pydantic==1.9.1",
         "autockt_shared",  # Local "workspace" dependency
-        "example_shared",  # Local "workspace" dependency
-        "example_client",  # Local "workspace" dependency
     ],
     extras_require={
         "dev": [

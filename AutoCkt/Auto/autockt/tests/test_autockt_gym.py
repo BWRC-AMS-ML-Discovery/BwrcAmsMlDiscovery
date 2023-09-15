@@ -1,6 +1,6 @@
 from autockt.autockt_gym import AutoCktGym
 import IPython
-from autockt.autockt_gym_env_config import (
+from autockt_shared.cktopt import (
     AutoCktCircuitOptimization,
     AutoCktGymEnvConfig,
     AutoCktParam,
@@ -9,12 +9,12 @@ from autockt.autockt_gym_env_config import (
     AutoCktSpecs,
 )
 from dotenv import dotenv_values
-from eval_engines.rewards import settaluri_reward
-from example_client import (
-    AutoCktInput,
-    AutoCktOutput,
+from autockt_shared.rewards import settaluri_reward
+from autockt import (
+    OpAmpInput,
+    OpAmpOutput,
     auto_ckt_sim,
-    example_client_start,
+    start_client,
     Config,
 )
 
@@ -28,7 +28,7 @@ def _test_https() -> AutoCktGym:
         raise ValueError("THE_SERVER_URL not set in .env file")
     cfg = Config(server_url=THE_SERVER_URL, enable_https=True)
 
-    example_client_start(cfg)
+    start_client(cfg)
 
     circuit_optimization = AutoCktCircuitOptimization(
         params=AutoCktParams(
@@ -50,8 +50,8 @@ def _test_https() -> AutoCktGym:
                 AutoCktSpec("ibias", (0.0001, 0.01), normalize=0.001),
             ]
         ),
-        input_type=AutoCktInput,
-        output_type=AutoCktOutput,
+        input_type=OpAmpInput,
+        output_type=OpAmpOutput,
         simulation=auto_ckt_sim,
         reward=settaluri_reward,
     )
