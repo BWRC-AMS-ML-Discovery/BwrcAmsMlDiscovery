@@ -12,7 +12,7 @@ if __name__ != "__main__":
 from autockt.trainer import (
     autockt_train,
 )
-from autockt.autockt_gym_env_config import (
+from autockt_shared.cktopt import (
     AutoCktCircuitOptimization,
     AutoCktGymEnvConfig,
     AutoCktParams,
@@ -20,18 +20,18 @@ from autockt.autockt_gym_env_config import (
     AutoCktSpecs,
     AutoCktSpec,
 )
-from example_client import (
+from autockt_shared import (
     AutoCktInput,
     AutoCktOutput,
     auto_ckt_sim,
 )
-from eval_engines.rewards import (
+from autockt_shared.rewards import (
     settaluri_reward,
 )
 
 from dotenv import dotenv_values
-from example_client import (
-    example_client_start,
+from autockt.client import (
+    start as start_client,
     Config,
 )
 
@@ -45,7 +45,7 @@ def main():
     if not THE_SERVER_URL:
         raise ValueError("THE_SERVER_URL not set in .env file")
     cfg = Config(server_url=THE_SERVER_URL, enable_https=True)
-    example_client_start(cfg)
+    start_client(cfg)
 
     experiment_name = "train_45nm_ngspice"
     num_workers = 1

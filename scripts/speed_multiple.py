@@ -20,12 +20,12 @@ from autockt.autockt_gym_env_config import (
     AutoCktSpecs,
     AutoCktSpec,
 )
-from example_client import (
+from autockt_shared import (
     AutoCktInput,
     AutoCktOutput,
     auto_ckt_sim,
 )
-from eval_engines.rewards import (
+from autockt_shared.rewards import (
     settaluri_reward,
 )
 

@@ -1,12 +1,12 @@
-from example_client import AutoCktOutput
-from example_shared import (
+from autockt_shared import (
+    AutoCktOutput,
     FlipFlopOutput,
     FoldedCascodeOutput,
     LDOOutput,
     LatchOutput,
     TwoStageOpAmpNgmOutput,
+    Number,
 )
-from shared.typing import Number
 
 
 # TODO: remove target_output, can be assumed from rl model

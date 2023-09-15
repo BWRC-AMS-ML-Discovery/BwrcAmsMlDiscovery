@@ -12,7 +12,7 @@ import scipy.interpolate as interp
 import scipy.optimize as sciopt
 
 # Workspace Imports
-from example_shared import (
+from autockt_shared import (
     AutoCktInput,
     AutoCktOutput,
 )

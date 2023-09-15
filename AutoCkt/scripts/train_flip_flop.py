@@ -1,16 +1,16 @@
-from example_shared import (
+from autockt_shared import (
     FlipFlopInput,
     FlipFlopOutput,
     flip_flop_sim,
 )
-from AutoCkt.Auto.autockt.autockt_gym_env_config import (
+from autockt_shared.cktopt import (
     AutoCktCircuitOptimization,
     AutoCktParam,
     AutoCktParams,
     AutoCktSpec,
     AutoCktSpecs,
 )
-from AutoCkt.Ckt.eval_engines.rewards import flip_flop_reward
+from autockt_shared.rewards import flip_flop_reward
 
 
 circuit_optimization = AutoCktCircuitOptimization(

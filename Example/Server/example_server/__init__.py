@@ -1,3 +1,7 @@
+"""
+# Example `Discovery` Server Implementation 
+"""
+
 import discovery_server as ds
 from discovery_server import Config
 from example_shared import example, Example

@@ -26,7 +26,7 @@ from ray.tune.registry import register_env
 from autockt.envs.ngspice_vanilla_opamp import TwoStageAmp
 from autockt.autockt_gym import AutoCktGym
 
-from autockt.autockt_gym_env_config import (
+from autockt_shared.cktopt import (
     AutoCktCircuitOptimization,
     AutoCktGymEnvConfig,
     AutoCktParams,
@@ -34,12 +34,12 @@ from autockt.autockt_gym_env_config import (
     AutoCktSpecs,
     AutoCktSpec,
 )
-from example_client import (
+from autockt_shared import (
     AutoCktInput,
     AutoCktOutput,
     auto_ckt_sim,
 )
-from eval_engines.rewards import (
+from autockt_shared.rewards import (
     settaluri_reward,
 )
 

@@ -1,10 +1,10 @@
+import time
 from dotenv import dotenv_values
-from example_client import (
-    example_client_start,
+from autockt.client import (
+    start as start_client,
     Config,
 )
-import time
-from example_client import auto_ckt_sim_hdl21, AutoCktInput, auto_ckt_sim
+from autockt_shared import auto_ckt_sim_hdl21, AutoCktInput, auto_ckt_sim
 
 ENABLE_HTTPS = True
 
@@ -23,7 +23,7 @@ def main():
         raise ValueError("THE_SERVER_URL not set in .env file")
     cfg = Config(server_url="34.83.44.225", enable_https=ENABLE_HTTPS)
 
-    example_client_start(cfg)
+    start_client(cfg)
 
     to_test = AutoCktInput(3, 3, 3, 3, 3, 3, 1e-12)
 

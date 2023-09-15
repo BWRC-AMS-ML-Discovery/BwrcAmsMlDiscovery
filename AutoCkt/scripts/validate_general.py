@@ -14,7 +14,7 @@ from validate import run
 from autockt.trainer import (
     autockt_train,
 )
-from autockt.autockt_gym_env_config import (
+from autockt_shared.cktopt import (
     AutoCktCircuitOptimization,
     AutoCktGymEnvConfig,
     AutoCktParams,
@@ -27,7 +27,7 @@ from autockt import (
     AutoCktOutput,
     auto_ckt_sim,
 )
-from eval_engines.rewards import (
+from autockt_shared.rewards import (
     settaluri_reward,
 )
 

@@ -5,11 +5,10 @@ Shared code
 
 # Std-Lib Imports
 from typing import Optional, Union
-from collections import OrderedDict
-from typing import List
+from dataclasses import dataclass
 
 # Workspace Imports
-from dataclasses import dataclass, fields
+from discovery_shared import Rpc
 
 
 @dataclass
@@ -132,7 +131,7 @@ class LatchInput:
     w8: int
     w9: int
     w10: int
-    VDD: h.Scalar
+    VDD: int
 
 
 @dataclass
@@ -188,9 +187,9 @@ class FoldedCascodeInput:
     w17: int
     w18: int
 
-    cl: h.Scalar
-    cc: h.Scalar
-    rc: h.Scalar
+    cl: int
+    cc: int
+    rc: int
 
     wb0: int
     wb1: int
@@ -213,8 +212,8 @@ class FoldedCascodeInput:
     wb18: int
     wb19: int
 
-    ibias: h.Scalar
-    Vcm: h.Scalar
+    ibias: int
+    Vcm: int
 
 
 @dataclass
@@ -248,13 +247,13 @@ class LDOInput:
     wc: int
     w10: int
     wpass: int
-    VDD: h.Scalar
-    Cc: h.Scalar
-    Cf1: h.Scalar
-    Cf2: h.Scalar
-    Rrf1: h.Scalar
-    Rrf2: h.Scalar
-    ibias: h.Scalar
+    VDD: int
+    Cc: int
+    Cf1: int
+    Cf2: int
+    Rrf1: int
+    Rrf2: int
+    ibias: int
 
 
 @dataclass

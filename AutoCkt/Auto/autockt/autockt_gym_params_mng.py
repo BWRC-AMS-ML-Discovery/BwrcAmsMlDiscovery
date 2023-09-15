@@ -1,8 +1,8 @@
 from copy import deepcopy
-from .autockt_gym_env_config import AutoCktParams, AutoCktParam
 from typing import TypeVar, Generic, Sequence
 from dataclasses import asdict, is_dataclass
-from shared.typing import Number
+
+from autockt_shared.cktopt import AutoCktParams, Number
 
 InputType = TypeVar("InputType")
 

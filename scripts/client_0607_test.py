@@ -1,7 +1,6 @@
 from dotenv import dotenv_values
-from example_client import (
-    test_auto_ckt,
-    example_client_start,
+from autockt.client import (
+    start as start_client,
     Config,
 )
 
@@ -26,7 +25,7 @@ def main():
         raise ValueError("THE_SERVER_URL not set in .env file")
     cfg = Config(server_url=THE_SERVER_URL, enable_https=False)
 
-    example_client_start(cfg)
+    start_client(cfg)
 
     test()
 

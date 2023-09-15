@@ -8,7 +8,7 @@ import hdl21 as h
 import hdl21.sim as hs
 import vlsirtools.spice as vsp
 
-from example_shared import OpAmpOutput
+from autockt_shared import OpAmpOutput
 
 from .params import TbParams
 from .pdk import SPICE_MODEL_45NM_BULK_PATH

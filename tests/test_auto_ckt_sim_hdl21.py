@@ -1,4 +1,4 @@
-from example_client import (
+from autockt_shared import (
     auto_ckt_sim_hdl21,
     AutoCktInput,
     AutoCktOutput,
