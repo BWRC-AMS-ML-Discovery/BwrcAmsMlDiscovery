@@ -13,7 +13,7 @@ from hdl21.external_module import SpiceType
 from hdl21.prefix import µ, NANO
 import numpy
 
-from .pdk import SPICE_MODEL_45NM_BULK_PATH, nmos, pmos
+from pdk import SPICE_MODEL_45NM_BULK_PATH, nmos, pmos
 
 
 @h.paramclass
@@ -49,10 +49,14 @@ def ngmOpAmp(p: ngmOpAmpParams) -> h.Module:
         ibias = h.Input()
 
         inp = h.Diff(desc="Differential Input", port=True, role=h.Diff.Roles.SINK)
-        cm = h.Input()
+        # cm = h.Input()
         ref = h.Input()
         v5 = h.Output()
         v6 = h.Output()
+
+        cm = h.Signal()
+        vcm = h.Vdc(dc=p.Vcm)(n=VSS)
+        cm = vcm.p
 
         # Internal Signals
         v1, v2, v3, v4, v7, v8, v9 = h.Signals(7)
@@ -130,7 +134,7 @@ def ngmOpAmpSim(params: ngmOpAmpParams) -> h.sim.Sim:
             sig_p = h.Vdc(dc=params.VDD / 2, ac=0.5)(p=dcin.p, n=VSS)
             sig_n = h.Vdc(dc=params.VDD / 2, ac=-0.5)(p=dcin.n, n=VSS)
             Isource = h.Isrc(dc=params.ibias)(p=vdc.p, n=i_bias)
-            vcm = h.Vdc(dc=params.Vcm)(n=VSS)
+            # vcm = h.Vdc(dc=params.Vcm)(n=VSS)
             vref = h.Vdc(dc=params.Vref)(n=VSS)
             dangling = h.Signal()
 
@@ -141,14 +145,13 @@ def ngmOpAmpSim(params: ngmOpAmpParams) -> h.sim.Sim:
                 inp=dcin,
                 v5=sig_out,
                 v6=dangling,
-                cm=vcm.p,
                 ref=vref.p,
             )
 
         # Simulation Stimulus
         op = hs.Op()
         ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
-        mod = hs.Include(SPICE_MODEL_NGM_PATH)
+        mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
 
     return MosDcopSim
 
