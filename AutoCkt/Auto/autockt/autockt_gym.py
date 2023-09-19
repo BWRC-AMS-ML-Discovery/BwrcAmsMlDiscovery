@@ -7,7 +7,7 @@ from gym import spaces
 from pydantic.tools import parse_obj_as
 
 # Local imports
-from .autockt_gym_env_config import (
+from autockt_shared.cktopt import (
     AutoCktParams,
     AutoCktSpecs,
     AutoCktGymEnvConfig,
@@ -16,7 +16,6 @@ from .autockt_gym_env_config import (
 
 from .autockt_gym_params_mng import AutoCktParamsManager
 from .autockt_gym_ideal_specs_mng import SpecManager
-from shared.typing import Number
 
 
 class AutoCktGym(gym.Env):

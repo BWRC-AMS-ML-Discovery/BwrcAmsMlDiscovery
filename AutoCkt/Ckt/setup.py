@@ -25,20 +25,21 @@ setup(
     author="The Regents of the University of California",
     author_email="FIXME",
     packages=find_packages(),
-    python_requires=">=3.7, <4",  ## FIXME: require 3.7, maybe more, after dependencies upgrades
+    python_requires=">=3.7, <4",
     install_requires=[  ##
-        ## FIXME: can we ease up on the version requirements?
-        "numpy==1.21.5",
+        "hdl21>=4",
+        "numpy",
+        "scipy",
         "autockt_shared",  # Local "workspace" dependency
     ],
-    # extras_require={
-    #     "dev": [
-    #         "pytest==7.1",
-    #         "coverage",
-    #         "pytest-cov",
-    #         "pre-commit==2.20",
-    #         "black==22.6",
-    #         "twine",
-    #     ]
-    # },
+    extras_require={
+        "dev": [
+            "pytest==7.1",
+            "coverage",
+            "pytest-cov",
+            "pre-commit==2.20",
+            "black==22.6",
+            "twine",
+        ]
+    },
 )

@@ -1,9 +1,9 @@
-from example_shared import AutoCktInput, AutoCktOutput
-from example_client import auto_ckt_sim
+from autockt_shared import OpAmpInput, OpAmpOutput
+from autockt import auto_ckt_sim
 
 
 def ordered_dict_to_input(param_val):
-    return AutoCktInput(
+    return OpAmpInput(
         mp1=param_val["mp1"],
         mn1=param_val["mn1"],
         mp3=param_val["mp3"],
@@ -14,7 +14,7 @@ def ordered_dict_to_input(param_val):
     )
 
 
-def output_to_dict(out: AutoCktOutput) -> dict:
+def output_to_dict(out: OpAmpOutput) -> dict:
     return {
         "ugbw": out.ugbw,
         "gain": out.gain,
@@ -24,7 +24,7 @@ def output_to_dict(out: AutoCktOutput) -> dict:
 
 
 def create_design_and_simulate(param_val) -> dict:
-    inp: AutoCktInput = ordered_dict_to_input(param_val)
-    out: AutoCktOutput = auto_ckt_sim(inp)
+    inp: OpAmpInput = ordered_dict_to_input(param_val)
+    out: OpAmpOutput = auto_ckt_sim(inp)
     result: dict = output_to_dict(out)
     return result

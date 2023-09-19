@@ -11,7 +11,7 @@ from collections import OrderedDict
 from pydantic.dataclasses import dataclass
 
 # local imports
-from .autockt_gym_env_config import (
+from autockt_shared.cktopt import (
     AutoCktSpec,
     AutoCktSpecs,
     AutoCktParam,

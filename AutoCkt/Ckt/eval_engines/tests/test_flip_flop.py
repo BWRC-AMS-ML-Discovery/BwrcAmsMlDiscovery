@@ -1,5 +1,5 @@
 from discovery_shared.rpc import Rpc
-from example_server import flip_flop_sim
+from eval_engines import flip_flop_sim, FlipFlopInput
 
 
 def test_types():
@@ -15,7 +15,7 @@ def test_sim():
     TODO Add test cases
     """
 
-    inp = None
+    inp = FlipFlopInput()
     out = flip_flop_sim(inp)
     print(out)
 

@@ -9,10 +9,8 @@ if __name__ != "__main__":
 
 
 # Local Imports
-from autockt.trainer import (
-    autockt_train,
-)
-from autockt.autockt_gym_env_config import (
+from autockt.trainer import autockt_train
+from autockt_shared.cktopt import (
     AutoCktCircuitOptimization,
     AutoCktGymEnvConfig,
     AutoCktParams,
@@ -20,12 +18,12 @@ from autockt.autockt_gym_env_config import (
     AutoCktSpecs,
     AutoCktSpec,
 )
-from example_client import (
-    AutoCktInput,
-    AutoCktOutput,
+from autockt_shared import (
+    OpAmpInput,
+    OpAmpOutput,
     auto_ckt_sim,
 )
-from eval_engines.rewards import (
+from autockt_shared.rewards import (
     settaluri_reward,
 )
 
@@ -54,8 +52,8 @@ def main():
                 AutoCktSpec("ibias", (0.0001, 0.01), normalize=0.001),
             ]
         ),
-        input_type=AutoCktInput,
-        output_type=AutoCktOutput,
+        input_type=OpAmpInput,
+        output_type=OpAmpOutput,
         simulation=auto_ckt_sim,
         reward=settaluri_reward,
     )
