@@ -6,7 +6,7 @@
 from dataclasses import asdict
 
 # PyPi Imports
-import hdl21 as h
+import hdl21 as h  ##FIXME this is also not working but hdl is not compatible
 import vlsirtools.spice as vsp
 from hdl21.prefix import µ, NANO, PICO
 
