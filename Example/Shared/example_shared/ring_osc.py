@@ -5,6 +5,7 @@ Using the inverter delay element defined in `inverter.sch.svg`.
 """
 
 import hdl21 as h
+import hdl21.sim as hs
 from hdl21.primitives import MosParams
 import hdl21schematicimporter as _
 
@@ -37,3 +38,12 @@ def RingOsc(params: RingOscParams) -> h.Module:
         ic = inverter(params.mos)(inp=c, out=a, VDD=VDD, VSS=VSS)
 
     return RingOsc
+
+
+@hs.sim
+class RingOscSim:
+    """
+    TODO
+    """
+
+    pass
