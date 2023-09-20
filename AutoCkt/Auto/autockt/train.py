@@ -1,13 +1,13 @@
 # Local Imports
 from autockt.client import Config, start as start_client
 from autockt.trainer import autockt_train
-from autockt_shared import AutoCktCircuitOptimization, AutoCktGymEnvConfig
+from autockt_shared import CircuitOptimization, AutoCktGymEnvConfig
 
 from dotenv import dotenv_values
 
 
 def train(
-    circuit_optimization: AutoCktCircuitOptimization,
+    circuit_optimization: CircuitOptimization,
     experiment_name: str = "train_45nm_ngspice",
     num_workers: int = 1,
 ):

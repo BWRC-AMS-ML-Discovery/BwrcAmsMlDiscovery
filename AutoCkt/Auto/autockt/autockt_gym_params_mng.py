@@ -2,15 +2,15 @@ from copy import deepcopy
 from typing import TypeVar, Generic, Sequence
 from dataclasses import asdict, is_dataclass
 
-from autockt_shared.cktopt import AutoCktParams, Number
+from autockt_shared.cktopt import ParamSpecs, Number
 
 InputType = TypeVar("InputType")
 
 
-class AutoCktParamsManager(Generic[InputType]):
+class ParamSpecsManager(Generic[InputType]):
     def __init__(
         self,
-        params_ranges: AutoCktParams,
+        params_ranges: ParamSpecs,
         actions_per_param: list[int],
     ):
         self.params_template = deepcopy(params_ranges)

@@ -6,11 +6,11 @@ from discovery_shared import Rpc
 
 # Local Imports
 from .cktopt import (
-    AutoCktCircuitOptimization,
-    AutoCktSpec,
-    AutoCktSpecs,
-    AutoCktParam,
-    AutoCktParams,
+    CircuitOptimization,
+    MetricSpec,
+    MetricSpecs,
+    ParamSpec,
+    ParamSpecs,
     Number,
 )
 from .latch import LatchInput
@@ -69,26 +69,26 @@ def flip_flop_reward(
     return reward(curr_output, target_output)
 
 
-circuit_optimization = AutoCktCircuitOptimization(
-    params=AutoCktParams(
+circuit_optimization = CircuitOptimization(
+    params=ParamSpecs(
         # TODO Change these
         [
-            AutoCktParam("mp1", (1, 100), step=1, init=34),
-            AutoCktParam("mn1", (1, 100), step=1, init=34),
-            AutoCktParam("mp3", (1, 100), step=1, init=34),
-            AutoCktParam("mn3", (1, 100), step=1, init=34),
-            AutoCktParam("mn4", (1, 100), step=1, init=34),
-            AutoCktParam("mn5", (1, 100), step=1, init=15),
-            AutoCktParam("cc", (0.1e-12, 10.0e-12), step=0.1e-12, init=2.1e-12),
+            ParamSpec("mp1", (1, 100), step=1, init=34),
+            ParamSpec("mn1", (1, 100), step=1, init=34),
+            ParamSpec("mp3", (1, 100), step=1, init=34),
+            ParamSpec("mn3", (1, 100), step=1, init=34),
+            ParamSpec("mn4", (1, 100), step=1, init=34),
+            ParamSpec("mn5", (1, 100), step=1, init=15),
+            ParamSpec("cc", (0.1e-12, 10.0e-12), step=0.1e-12, init=2.1e-12),
         ]
     ),
-    specs=AutoCktSpecs(
+    specs=MetricSpecs(
         # TODO Change these
         [
-            AutoCktSpec("delay", (0, 10e-9), normalize=1e-9),
-            AutoCktSpec("setup_time", (0, 10e-9), normalize=1e-9),
-            AutoCktSpec("hold_time", (0, 10e-9), normalize=1e-9),
-            AutoCktSpec("ibias", (0, 1), normalize=1e-3),
+            MetricSpec("delay", (0, 10e-9), normalize=1e-9),
+            MetricSpec("setup_time", (0, 10e-9), normalize=1e-9),
+            MetricSpec("hold_time", (0, 10e-9), normalize=1e-9),
+            MetricSpec("ibias", (0, 1), normalize=1e-3),
         ]
     ),
     input_type=FlipFlopInput,

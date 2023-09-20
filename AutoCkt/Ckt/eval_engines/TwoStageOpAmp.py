@@ -2,52 +2,12 @@
 # Two Stage Op Amp
 """
 
-import os
-from pathlib import Path
-from copy import deepcopy
-from dataclasses import asdict
-
-import numpy
-
 import hdl21 as h
-import hdl21.sim as hs
-import vlsirtools.spice as vsp
-from hdl21.external_module import SpiceType
-from hdl21.prefix import µ, NANO
+from autockt_shared import OpAmpInput, OpAmpOutput, auto_ckt_sim_hdl21
 
-
-CURRENT_PATH = Path(os.path.dirname(os.path.abspath(__file__)))
-SPICE_MODEL_45NM_BULK_PATH = CURRENT_PATH / "45nm_bulk.txt"
-
-
-""" 
-Create a small "PDK" consisting of an externally-defined Nmos and Pmos transistor. 
-Real versions will have some more parameters; these just have multiplier "m". 
-"""
-
-
-@h.paramclass
-class PdkMosParams:
-    w = h.Param(dtype=h.Scalar, desc="Width in resolution units", default=0.5 * µ)
-    l = h.Param(dtype=h.Scalar, desc="Length in resolution units", default=90 * NANO)
-    nf = h.Param(dtype=h.Scalar, desc="Number of parallel fingers", default=1)
-    m = h.Param(dtype=h.Scalar, desc="Transistor Multiplier", default=1)
-
-
-nmos = h.ExternalModule(
-    name="nmos",
-    desc="Nmos Transistor (Multiplier Param Only!)",
-    port_list=deepcopy(h.Mos.port_list),
-    paramtype=PdkMosParams,
-    spicetype=SpiceType.MOS,
-)
-pmos = h.ExternalModule(
-    name="pmos",
-    desc="Pmos Transistor (Multiplier Param Only!)",
-    port_list=deepcopy(h.Mos.port_list),
-    paramtype=PdkMosParams,
-    spicetype=SpiceType.MOS,
-)
+from .tb import simulate
+from .params import TbParams
+from .pdk import nmos, pmos
 
 
 @h.paramclass
@@ -136,120 +96,24 @@ class Compensation:
     c = CapCell(p=r.n, n=b, VDD=VDD, VSS=VSS)
 
 
-def OpAmpSim(params: OpAmpParams) -> h.sim.Sim:
-    """# Op Amp Simulation Input"""
+@auto_ckt_sim_hdl21.impl
+def auto_ckt_sim_hdl21(inp: OpAmpInput) -> OpAmpOutput:
+    """# Two-Stage OpAmp RPC Implementation"""
 
-    @hs.sim
-    class MosDcopSim:
-        """# Mos Dc Operating Point Simulation Input"""
-
-        @h.module
-        class Tb:
-            """# Basic Mos Testbench"""
-
-            VSS = h.Port()  # The testbench interface: sole port VSS
-            vdc = h.Vdc(dc=params.VDD)(n=VSS)  # A DC voltage source
-            dcin = h.Diff()
-            sig_out = h.Signal()
-            i_bias = h.Signal()
-            sig_p = h.Vdc(dc=params.VDD / 2, ac=0.5)(p=dcin.p, n=VSS)
-            sig_n = h.Vdc(dc=params.VDD / 2, ac=-0.5)(p=dcin.n, n=VSS)
-            Isource = h.Isrc(dc=params.ibias)(p=vdc.p, n=i_bias)
-
-            inst = OpAmp(params)(
-                VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out
-            )
-
-        # Simulation Stimulus
-        op = hs.Op()
-        ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
-        mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
-
-    return MosDcopSim
-
-
-def main():
-    """
-    @deprecated: I think MosDcopSim has been changed to OpAmpSim
-    """
-    # h.netlist(OpAmp(), sys.stdout)
-
-    opts = vsp.SimOptions(
-        simulator=vsp.SupportedSimulators.NGSPICE,
-        fmt=vsp.ResultFormat.SIM_DATA,  # Get Python-native result types
-        rundir="./scratch",  # Set the working directory for the simulation. Uses a temporary directory by default.
-    )
-    if not vsp.ngspice.available():
-        print("ngspice is not available. Skipping simulation.")
-        return
-
-    # Run the simulation!
-    results = OpAmpSim.run(opts)
-
-    print(
-        "Gain:            "
-        + str(
-            find_dc_gain(2 * results["ac"].data["v(xtop.sig_out)"]),
-        )
-    )
-    print(
-        "UGBW:            "
-        + str(
-            find_ugbw(results["ac"].freq, 2 * results["ac"].data["v(xtop.sig_out)"]),
-        )
-    )
-    print(
-        "Phase margin:    "
-        + str(
-            find_phm(results["ac"].freq, 2 * results["ac"].data["v(xtop.sig_out)"]),
-        )
-    )
-    print(
-        "Ivdd:            "
-        + str(
-            find_I_vdd(results["ac"].data["i(v.xtop.vvdc)"]),
-        )
+    # Convert our input into `OpAmpParams`
+    params = OpAmpParams(
+        wp1=inp.mp1,
+        wn1=inp.mn1,
+        wp3=inp.mp3,
+        wn3=inp.mn3,
+        wn4=inp.mn4,
+        wn5=inp.mn5,
+        Cc=inp.cc,
+        # FIXME Extra, don't need?
+        wp2=inp.mp1,
+        wn2=inp.mn1,
     )
 
-
-def find_I_vdd(vout: numpy.array) -> float:
-    return numpy.abs(vout)[0]
-
-
-def find_dc_gain(vout: numpy.array) -> float:
-    return numpy.abs(vout)[0]
-
-
-def find_ugbw(freq: numpy.array, vout: numpy.array) -> float:
-    gain = numpy.abs(vout)
-    ugbw_index, valid = _get_best_crossing(gain, val=1)
-    if valid:
-        return freq[ugbw_index]
-    else:
-        return freq[0]
-
-
-def find_phm(freq: numpy.array, vout: numpy.array) -> float:
-    gain = numpy.abs(vout)
-    phase = numpy.angle(vout, deg=False)
-    phase = numpy.unwrap(phase)  # unwrap the discontinuity
-    phase = numpy.rad2deg(phase)  # convert to degrees
-
-    ugbw_index, valid = _get_best_crossing(gain, val=1)
-    if valid:
-        if phase[ugbw_index] > 0:
-            return -180 + phase[ugbw_index]
-        else:
-            return 180 + phase[ugbw_index]
-    else:
-        return -180
-
-
-def _get_best_crossing(yvec: numpy.array, val: float) -> tuple[int, bool]:
-    zero_crossings = numpy.where(numpy.diff(numpy.sign(yvec - val)))[0]
-    if len(zero_crossings) == 0:
-        return 0, False
-    if abs((yvec - val)[zero_crossings[0]]) < abs((yvec - val)[zero_crossings[0] + 1]):
-        return zero_crossings[0], True
-    else:
-        return (zero_crossings[0] + 1), True
+    # Create a testbench, simulate it, and return the metrics!
+    tbparams = TbParams(dut=OpAmp(params))
+    return simulate(tbparams)
