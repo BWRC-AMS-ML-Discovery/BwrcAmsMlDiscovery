@@ -3,7 +3,7 @@ from ray import tune
 
 # Local imports
 from autockt.autockt_gym import AutoCktGym
-from autockt.autockt_gym_env_config import AutoCktGymEnvConfig
+from autockt_shared.cktopt import AutoCktGymEnvConfig
 
 
 def autockt_train(

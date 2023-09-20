@@ -13,6 +13,8 @@
 
 `bwrc_discovery_server` handles authentication, server_start.
 
+# FIXME: update this section @wayne-wang
+
 ### Example: Example contains three public packages that are `example_client`, `example_server`, and `example_shared`.
 
 Example is a use case of bwrc_discovery.
@@ -21,19 +23,19 @@ Example is a use case of bwrc_discovery.
 ```sh
 auto_ckt_sim_hdl21 = Rpc(
     name="auto_ckt_sim_hdl21",
-    input_type=AutoCktInput,
-    return_type=AutoCktOutput,
+    input_type=OpAmpInput,
+    return_type=OpAmpOutput,
     docstring="Simulation on the Server",
 )
 ```
-where AutoCktInput and AutoCktOutput are also contained in here.
+where OpAmpInput and OpAmpOutput are also contained in here.
 
 `example_client` creates a call for client to send to `example_server`, in terms of autockt, it is called `test_autockt_sim`. 
 
 `example_server` handles the input sent from the client side, using a server function defined here. In terms of autockt, it would be:
 ```sh
 @auto_ckt_sim_hdl21.impl
-def auto_ckt_sim_hdl21(inp: AutoCktInput) -> AutoCktOutput:
+def auto_ckt_sim_hdl21(inp: OpAmpInput) -> OpAmpOutput:
     """
     AutoCkt Simulation
     """

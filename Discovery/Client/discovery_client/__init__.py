@@ -24,7 +24,7 @@ import dotenv
 import httpx
 
 # Workspace Imports
-from discovery_shared.git import GitInfo
+# from discovery_shared.git import GitInfo
 from pydantic.dataclasses import dataclass
 
 
@@ -67,10 +67,10 @@ def alive() -> str:
     return resp.text
 
 
-def version() -> GitInfo:
-    """Server version"""
-    resp = httpx.get(f"http://{config.server_url}/version")
-    return GitInfo(**resp.json())
+# def version() -> GitInfo:
+#     """Server version"""
+#     resp = httpx.get(f"http://{config.server_url}/version")
+#     return GitInfo(**resp.json())
 
 
 """

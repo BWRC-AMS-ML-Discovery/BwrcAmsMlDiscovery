@@ -1,9 +1,16 @@
 from dotenv import dotenv_values
-from example_client import (
-    test_auto_ckt,
-    example_client_start,
+from autockt_shared import OpAmpInput, auto_ckt_sim
+from autockt.client import (
+    start as start_client,
     Config,
 )
+
+
+def test_auto_ckt():
+    """testing auto ckt rpcs"""
+    to_test = OpAmpInput(3, 3, 3, 3, 3, 3, 1e-12)
+    test = auto_ckt_sim(to_test)
+    return test
 
 
 def main():
@@ -19,7 +26,7 @@ def main():
         raise ValueError("THE_SERVER_URL not set in .env file")
     cfg = Config(server_url=THE_SERVER_URL, enable_https=False)
 
-    example_client_start(cfg)
+    start_client(cfg)
 
     test()
 

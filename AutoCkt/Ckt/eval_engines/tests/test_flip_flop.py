@@ -1,5 +1,5 @@
 from discovery_shared.rpc import Rpc
-from example_server import flip_flop_sim, FlipFlopInput, FlipFlopOutput, LatchInput
+from eval_engines import flip_flop_sim, FlipFlopInput
 
 
 def test_types():
