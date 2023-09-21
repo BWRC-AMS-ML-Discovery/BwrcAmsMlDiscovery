@@ -11,7 +11,7 @@ from discovery_client import Config
 
 
 def start(cfg: Config):
-    """retrieve values from .env file then configure nad start the client"""
+    """retrieve values from .env file then configure and start the client"""
 
     dc.configure(cfg)
 
