@@ -71,36 +71,11 @@ def OpAmp(p: OpAmpParams) -> h.Module:
     return DiffOta
 
 
-@h.module
-class CapCell:
-    """# Compensation Capacitor Cell"""
-
-    p, n, VDD, VSS = 4 * h.Port()
-    # FIXME: internal content! Using tech-specific `ExternalModule`s
-
-
-@h.module
-class ResCell:
-    """# Compensation Resistor Cell"""
-
-    p, n, sub = 3 * h.Port()
-    # FIXME: internal content! Using tech-specific `ExternalModule`s
-
-
-@h.module
-class Compensation:
-    """# Single Ended RC Compensation Network"""
-
-    a, b, VDD, VSS = 4 * h.Port()
-    r = ResCell(p=a, sub=VDD)
-    c = CapCell(p=r.n, n=b, VDD=VDD, VSS=VSS)
-
-
-@auto_ckt_sim_hdl21.impl
-def auto_ckt_sim_hdl21(inp: OpAmpInput) -> OpAmpOutput:
+def opamp_inner(inp: OpAmpInput) -> OpAmpOutput:
     """# Two-Stage OpAmp RPC Implementation"""
 
     # Convert our input into `OpAmpParams`
+    # FIXME: @king-han gonna clean all this conversion stuff up
     params = OpAmpParams(
         wp1=inp.mp1,
         wn1=inp.mn1,
@@ -115,5 +90,12 @@ def auto_ckt_sim_hdl21(inp: OpAmpInput) -> OpAmpOutput:
     )
 
     # Create a testbench, simulate it, and return the metrics!
-    tbparams = TbParams(dut=OpAmp(params))
+    opamp = OpAmp(params)
+    tbparams = TbParams(dut=opamp, VDD=params.VDD, ibias=params.ibias)
     return simulate(tbparams)
+
+
+@auto_ckt_sim_hdl21.impl
+def auto_ckt_sim_hdl21(inp: OpAmpInput) -> OpAmpOutput:
+    """# Our RPC Handler"""
+    return opamp_inner(inp)

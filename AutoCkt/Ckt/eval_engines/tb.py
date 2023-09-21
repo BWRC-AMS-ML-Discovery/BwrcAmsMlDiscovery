@@ -121,12 +121,14 @@ def _get_best_crossing(yvec: numpy.array, val: float) -> tuple[int, bool]:
 def extract_outputs(results: h.sim.SimResult) -> OpAmpOutput:
     """# Extract our metrics from `results`"""
 
+    print(results)
+
     ac_result = results["ac"]
-    sig_out = ac_result.data["xtop.sig_out"]
+    sig_out = ac_result.data["v(xtop.sig_out)"]
     gain = find_dc_gain(2 * sig_out)
     ugbw = find_ugbw(ac_result.freq, 2 * sig_out)
     phm = find_phm(ac_result.freq, 2 * sig_out)
-    idd = ac_result.data["xtop.vdc:p"]
+    idd = ac_result.data["i(v.xtop.vvdc)"]
     ibias = find_I_vdd(idd)
 
     # And return them as an `OpAmpOutput`
