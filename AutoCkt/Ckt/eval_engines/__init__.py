@@ -39,7 +39,9 @@ from .auto_ckt_sim_lib import (
     simulate,
     translate_result,
 )
-from .TwoStageOpAmp import (
+
+# FIXME: move all these dependencies into `tb` as well
+from .tb import (
     find_dc_gain,
     find_I_vdd,
     find_phm,
