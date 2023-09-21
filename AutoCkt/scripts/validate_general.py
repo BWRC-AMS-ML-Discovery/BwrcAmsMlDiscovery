@@ -10,11 +10,11 @@ if __name__ != "__main__":
 
 # Local Imports
 from validate import run  # FIXME: what/ where is this?
-from autockt_shared.cktopt import AutoCktCircuitOptimization, AutoCktGymEnvConfig
+from autockt_shared.cktopt import CircuitOptimization, AutoCktGymEnvConfig
 
 
 def main(
-    circuit_optimization: AutoCktCircuitOptimization,
+    circuit_optimization: CircuitOptimization,
     num_workers: int = 1,
 ):
     """# Entry point for a validation script, running `circuit_optimization`."""

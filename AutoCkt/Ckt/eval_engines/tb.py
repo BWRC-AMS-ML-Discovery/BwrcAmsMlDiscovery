@@ -54,10 +54,13 @@ def OpAmpSim(params: TbParams) -> h.sim.Sim:
 
 
 def simulate(params: TbParams) -> OpAmpOutput:
-    """# FIXME DOCSTRING PLZ"""
+    """# Simulate an op-amp testbench, parse and return its metrics."""
 
     # Get our simulation input
     sim_input = OpAmpSim(params=params)
+
+    if not vsp.ngspice.available():
+        raise RuntimeError(f"No ngspice available")
 
     opts = vsp.SimOptions(
         simulator=vsp.SupportedSimulators.NGSPICE,
