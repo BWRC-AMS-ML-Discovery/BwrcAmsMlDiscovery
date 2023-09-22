@@ -13,7 +13,7 @@ from hdl21.prefix import µ, NANO, PICO, FEMTO
 import numpy
 
 # import Latch
-from .Latch import LatchParams, LatchGen
+from Latch import LatchParams, LatchGen
 
 
 def _get_delay(
