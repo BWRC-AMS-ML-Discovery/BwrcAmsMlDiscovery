@@ -11,11 +11,11 @@ from collections import OrderedDict
 from pydantic.dataclasses import dataclass
 
 # local imports
-from .autockt_gym_env_config import (
-    AutoCktSpec,
-    AutoCktSpecs,
-    AutoCktParam,
-    AutoCktParams,
+from autockt_shared.cktopt import (
+    MetricSpec,
+    MetricSpecs,
+    ParamSpec,
+    ParamSpecs,
     Number,
 )
 
@@ -27,7 +27,7 @@ class SpecManager:
     """
 
     # the inital specs used to create the spec manager
-    init_spec: AutoCktSpecs
+    init_spec: MetricSpecs
 
     # list if ids the spec has
     spec_id: list[str]

@@ -1,39 +1,42 @@
 # BWRC AMS ML Discovery
 
-## BWRC AMS ML Discovery is now separated into three major parts:
-### Discovery: Discovery contains two public packages that are `bwrc_discovery_client` and `bwrc_discovery_shared`. 
+Implementation of the `CktGym` project's ML-client & circuit-server architecture. 
 
-`bwrc_discovery_shared` is a collection of data classes used to support server side functions. 
+Includes: 
 
-`bwrc_discovery_client` contains client call methods that are accepted by the server. 
+- The [Discovery](./Discovery/) client and server libraries 
+- A simple [Example](./Example/) use case
+- The re-implementation of the [AutoCkt](./AutoCkt/) framework using [Discovery](./Discovery/) 
 
-`bwrc_discovery_shared` provides a data class called `rpcs` that defines rpc functions to be used by the server.
+## [Discovery](./Discovery/) Libraries
 
- In `bwrc_discovery_client`, function called `_setup_server_rpcs` correctly registers these rpc classes to the server and instantiate/register them. 
+Use these to create a new server instance pair. 
 
-`bwrc_discovery_server` handles authentication, server_start.
+## [Example](./Example) Use Case
 
-### Example: Example contains three public packages that are `example_client`, `example_server`, and `example_shared`.
+Example is a use case of `discovery_client` and `discovery_server`, exposing a single simple endpoint.
 
-Example is a use case of bwrc_discovery.
+## [AutoCkt](./AutoCkt/) 
+
+@wayne-wang start fixing from here
 
 `example_shared` contains data classes for rpcs and defined rpc classes that are used for registering in the `discovery_shared`, which in terms of example AutoCkt, would be:
 ```sh
 auto_ckt_sim_hdl21 = Rpc(
     name="auto_ckt_sim_hdl21",
-    input_type=AutoCktInput,
-    return_type=AutoCktOutput,
+    input_type=OpAmpInput,
+    return_type=OpAmpOutput,
     docstring="Simulation on the Server",
 )
 ```
-where AutoCktInput and AutoCktOutput are also contained in here.
+where OpAmpInput and OpAmpOutput are also contained in here.
 
 `example_client` creates a call for client to send to `example_server`, in terms of autockt, it is called `test_autockt_sim`. 
 
 `example_server` handles the input sent from the client side, using a server function defined here. In terms of autockt, it would be:
 ```sh
 @auto_ckt_sim_hdl21.impl
-def auto_ckt_sim_hdl21(inp: AutoCktInput) -> AutoCktOutput:
+def auto_ckt_sim_hdl21(inp: OpAmpInput) -> OpAmpOutput:
     """
     AutoCkt Simulation
     """

@@ -7,16 +7,15 @@ from gym import spaces
 from pydantic.tools import parse_obj_as
 
 # Local imports
-from .autockt_gym_env_config import (
-    AutoCktParams,
-    AutoCktSpecs,
+from autockt_shared.cktopt import (
+    ParamSpecs,
+    MetricSpecs,
     AutoCktGymEnvConfig,
-    AutoCktCircuitOptimization,
+    CircuitOptimization,
 )
 
-from .autockt_gym_params_mng import AutoCktParamsManager
+from .autockt_gym_params_mng import ParamSpecsManager
 from .autockt_gym_ideal_specs_mng import SpecManager
-from shared.typing import Number
 
 
 class AutoCktGym(gym.Env):
@@ -38,7 +37,7 @@ class AutoCktGym(gym.Env):
                 actions_per_param=actions_per_param,
             ):
                 match circuit_optimization:
-                    case AutoCktCircuitOptimization(
+                    case CircuitOptimization(
                         params=params,
                         specs=specs,
                         input_type=input_type,
@@ -54,7 +53,7 @@ class AutoCktGym(gym.Env):
         self.reward = reward
 
         # create managers
-        self.params_manager = AutoCktParamsManager(params, actions_per_param)
+        self.params_manager = ParamSpecsManager(params, actions_per_param)
         self.spec_manager = SpecManager(specs)
 
         # Necessary for the gym.Env API
@@ -118,7 +117,7 @@ class AutoCktGym(gym.Env):
 
     def _build_action_space(
         self,
-        params: AutoCktParams,
+        params: ParamSpecs,
         actions_per_param: list[int],
     ):
         # TODO We can generalize actions
@@ -137,8 +136,8 @@ class AutoCktGym(gym.Env):
 
     def _build_observation_space(
         self,
-        params: AutoCktParams,
-        specs: AutoCktSpecs,
+        params: ParamSpecs,
+        specs: MetricSpecs,
     ):
         # TODO We can observe more things
         num_fields = sum(
