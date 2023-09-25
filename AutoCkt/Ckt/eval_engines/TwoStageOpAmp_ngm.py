@@ -13,7 +13,13 @@ from hdl21.external_module import SpiceType
 from hdl21.prefix import µ, NANO
 import numpy
 
-from .pdk import SPICE_MODEL_45NM_BULK_PATH, nmos, pmos
+from autockt_shared import TwoStageOpAmpNgmInput, OpAmpOutput, auto_ckt_sim_hdl21
+
+from .tb import simulate
+from .params import TbParams
+from .pdk import nmos, pmos
+
+# from .pdk import SPICE_MODEL_45NM_BULK_PATH, nmos, pmos
 
 
 @h.paramclass
@@ -86,29 +92,34 @@ def ngmOpAmp(p: ngmOpAmpParams) -> h.Module:
     return DiffOta
 
 
-@h.module
-class CapCell:
-    """# Compensation Capacitor Cell"""
+def opamp_inner(inp: TwoStageOpAmpNgmInput) -> OpAmpOutput:
+    """# Two-Stage OpAmp RPC Implementation"""
 
-    p, n, VDD, VSS = 4 * h.Port()
-    # FIXME: internal content! Using tech-specific `ExternalModule`s
+    # Convert our input into `OpAmpParams`
+    # FIXME: @king-han gonna clean all this conversion stuff up
+    params = ngmOpAmpParams(
+        wp1=inp.mp1,
+        wn1=inp.mn1,
+        wp3=inp.mp3,
+        wn3=inp.mn3,
+        wn4=inp.mn4,
+        wn5=inp.mn5,
+        Cc=inp.cc,
+        # FIXME Extra, don't need?
+        wp2=inp.mp1,
+        wn2=inp.mn1,
+    )
+
+    # Create a testbench, simulate it, and return the metrics!
+    opamp = ngmOpAmp(params)
+    tbparams = TbParams(dut=opamp, VDD=params.VDD, ibias=params.ibias)
+    return simulate(tbparams)
 
 
-@h.module
-class ResCell:
-    """# Compensation Resistor Cell"""
-
-    p, n, sub = 3 * h.Port()
-    # FIXME: internal content! Using tech-specific `ExternalModule`s
-
-
-@h.module
-class Compensation:
-    """# Single Ended RC Compensation Network"""
-
-    a, b, VDD, VSS = 4 * h.Port()
-    r = ResCell(p=a, sub=VDD)
-    c = CapCell(p=r.n, n=b, VDD=VDD, VSS=VSS)
+@auto_ckt_sim_hdl21.impl
+def auto_ckt_sim_hdl21(inp: TwoStageOpAmpNgmInput) -> OpAmpOutput:
+    """# Our RPC Handler"""
+    return opamp_inner(inp)
 
 
 def ngmOpAmpSim(params: ngmOpAmpParams) -> h.sim.Sim:
