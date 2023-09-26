@@ -3,7 +3,6 @@
 Shared server-client code
 """
 
-from example_shared.hdl21_paramclass import hdl21_paramclass, like_hdl21_paramclass
 import hdl21 as h
 
 from pydantic import Field, validator
@@ -12,6 +11,7 @@ from pydantic import Field, validator
 # Workspace Imports
 from discovery_shared.dataclasses import dataclass
 from discovery_shared.rpc import Rpc
+from example_shared.hdl21_paramclass import hdl21_paramclass, like_hdl21_paramclass
 
 
 @dataclass
