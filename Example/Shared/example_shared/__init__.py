@@ -114,3 +114,6 @@ def ring_osc(params: RingOscInput) -> RingOscOutput:
     return RingOscOutput(
         frequency=1 / result.ia.tpd,
     )
+
+
+# * We can also implement "@like_autockt_paramspec" and "@like_autockt_targetspec"
