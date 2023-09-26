@@ -1,19 +1,7 @@
-from discovery_shared.rpc import Rpc
-from eval_engines import folded_cascode_sim, FoldedCascodeInput
+def main():
+    from autockt_shared import FoldedCascodeInput
+    from eval_engines.FoldedCascode import FoldedCascode_inner
 
-
-def test_types():
-    print(folded_cascode_sim)
-    assert type(folded_cascode_sim) == Rpc
-
-    print(folded_cascode_sim.func)
-    assert type(folded_cascode_sim.func) == type(lambda x: x)
-
-
-def test_sim():
-    """
-    TODO Add test cases
-    """
     inp = FoldedCascodeInput(
         w1_2=10,
         w5_6=10,
@@ -51,14 +39,13 @@ def test_sim():
         Vcm=1,
     )
 
-    out = folded_cascode_sim(inp)
-    print(out)
+    r = FoldedCascode_inner(inp)
+    print(r)
 
 
 def test():
-    test_types()
-    test_sim()
+    main()
 
 
 if __name__ == "__main__":
-    test()
+    main()

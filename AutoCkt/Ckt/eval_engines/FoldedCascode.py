@@ -3,18 +3,17 @@
 """
 
 import hdl21 as h
-import hdl21.sim as hs
-import vlsirtools.spice as vsp
-import numpy
+from autockt_shared import FoldedCascodeInput, OpAmpOutput, auto_ckt_sim_hdl21
 
-# Local Imports
-from .pdk import SPICE_MODEL_45NM_BULK_PATH, nmos, pmos
+from .tb import simulate
+from .params import TbParams
+from .pdk import nmos, pmos
 
-# fmt: off
 
 @h.paramclass
 class FoldedCascodeParams:
     """Parameter class"""
+
     w1_2 = h.Param(dtype=int, desc="Width of M1/2", default=10)
     w5_6 = h.Param(dtype=int, desc="Width of M5/6", default=10)
     w7_8 = h.Param(dtype=int, desc="Width of M7/8", default=10)
@@ -24,7 +23,7 @@ class FoldedCascodeParams:
     w15_16 = h.Param(dtype=int, desc="Width of M15/16", default=10)
     w17 = h.Param(dtype=int, desc="Width of M17", default=10)
     w18 = h.Param(dtype=int, desc="width of M18", default=10)
-    
+
     cl = h.Param(dtype=h.Scalar, desc="cl capacitance", default=1e-14)
     cc = h.Param(dtype=h.Scalar, desc="cc capacitance", default=1e-14)
     rc = h.Param(dtype=h.Scalar, desc="rc resistor", default=100)
@@ -54,6 +53,7 @@ class FoldedCascodeParams:
     ibias = h.Param(dtype=h.Scalar, desc="ibias current", default=30e-6)
     Vcm = h.Param(dtype=h.Scalar, desc="Vcm", default=1)
 
+
 @h.generator
 def FoldedCascodeGen(p: FoldedCascodeParams) -> h.Module:
     """# Two stage OpAmp"""
@@ -67,14 +67,21 @@ def FoldedCascodeGen(p: FoldedCascodeParams) -> h.Module:
         inp = h.Diff(desc="Differential Input", port=True, role=h.Diff.Roles.SINK)
 
         # ref = h.Input()
-        v9 = h.Output()
-        v10 = h.Output()
+        # v9 = h.Output()
+        # v10 = h.Output()
         # v_nmbias = h.Input()
         # v_nbbias = h.Input()
         # v_bbias = h.Input()
-        v_cm = h.Input()
+        # v_cm = h.Input()
         # v_cs = h.Input()
+        # v_cs = h.Signal()
+
+        out = h.Output()
+        v10 = h.Signal()
+        v_cm = h.Signal()
         v_cs = h.Signal()
+
+        vcm_vsource = h.Vdc(dc=p.Vcm)(p=v_cm, n=VSS)
 
         v_nmbias, v_nbbias, v_bbias, v_pcas = h.Signals(4)
 
@@ -98,13 +105,13 @@ def FoldedCascodeGen(p: FoldedCascodeParams) -> h.Module:
         M12 = nmos(m=p.w11_12)(d=v4, g=v_nbbias, s=VSS, b=VSS)
 
         # Output Stage
-        M13 = pmos(m=p.w13_14)(d=v9, g=v_cs, s=VDD, b=VDD)
+        M13 = pmos(m=p.w13_14)(d=out, g=v_cs, s=VDD, b=VDD)
         M14 = pmos(m=p.w13_14)(d=v10, g=v_cs, s=VDD, b=VDD)
-        M15 = nmos(m=p.w15_16)(d=v9, g=v5, s=VSS, b=VSS)
+        M15 = nmos(m=p.w15_16)(d=out, g=v5, s=VSS, b=VSS)
         M16 = nmos(m=p.w15_16)(d=v10, g=v6, s=VSS, b=VSS)
 
         # Compensation Network
-        Cc_1 = h.Cap(c=p.cc)(p=v9, n=v7)  # Miller Capacitance
+        Cc_1 = h.Cap(c=p.cc)(p=out, n=v7)  # Miller Capacitance
         Cc_2 = h.Cap(c=p.cc)(p=v10, n=v8)
         Rc_1 = h.Res(r=p.rc)(p=v7, n=v5)
         Rc_2 = h.Res(r=p.rc)(p=v8, n=v6)
@@ -142,142 +149,50 @@ def FoldedCascodeGen(p: FoldedCascodeParams) -> h.Module:
     return FoldedCascode
 
 
-@h.module
-class CapCell:
-    """# Compensation Capacitor Cell"""
+def FoldedCascode_inner(inp: FoldedCascodeInput) -> OpAmpOutput:
+    """# Two-Stage OpAmp RPC Implementation"""
 
-    p, n, VDD, VSS = 4 * h.Port()
-    # FIXME: internal content! Using tech-specific `ExternalModule`s
-
-
-@h.module
-class ResCell:
-    """# Compensation Resistor Cell"""
-
-    p, n, sub = 3 * h.Port()
-    # FIXME: internal content! Using tech-specific `ExternalModule`s
-
-
-@h.module
-class Compensation:
-    """# Single Ended RC Compensation Network"""
-
-    a, b, VDD, VSS = 4 * h.Port()
-    r = ResCell(p=a, sub=VDD)
-    c = CapCell(p=r.n, n=b, VDD=VDD, VSS=VSS)
-
-
-def FoldedCascodeSim(params: FoldedCascodeParams) -> h.sim.Sim:
-    """# Op Amp Simulation Input"""
-
-    @hs.sim
-    class MosDcopSim:
-        """# Mos Dc Operating Point Simulation Input"""
-
-        @h.module
-        class Tb:
-            """# Basic Mos Testbench"""
-            VSS = h.Port()  # The testbench interface: sole port VSS
-            vdc = h.Vdc(dc=params.VDD)(n=VSS)  # A DC voltage source
-            dcin = h.Diff()
-            sig_out = h.Signal()
-            i_bias = h.Signal()
-            dangling = h.Signal()
-            sig_p = h.Vdc(dc=params.VDD / 2, ac=0.5)(p=dcin.p, n=VSS)
-            sig_n = h.Vdc(dc=params.VDD / 2, ac=-0.5)(p=dcin.n, n=VSS)
-            Isource = h.Isrc(dc=params.ibias)(p=vdc.p, n=i_bias)
-            vcm = h.Vdc(dc=params.Vcm)(n=VSS)
-
-            inst = FoldedCascodeGen(params)(
-                VDD=vdc.p,
-                VSS=VSS,
-                ibias=i_bias,
-                inp=dcin,
-                v9=sig_out,
-                v10=dangling,
-                v_cm=vcm.p,
-            )
-
-        # Simulation Stimulus
-        op = hs.Op()
-        ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
-        mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
-
-    return MosDcopSim
-
-def main():
-    # h.netlist(OpAmp(), sys.stdout)
-
-    opts = vsp.SimOptions(
-        simulator=vsp.SupportedSimulators.NGSPICE,
-        fmt=vsp.ResultFormat.SIM_DATA,  # Get Python-native result types
-        rundir="./scratch",  # Set the working directory for the simulation. Uses a temporary directory by default.
+    # Convert our input into `OpAmpParams`
+    # FIXME: @king-han gonna clean all this conversion stuff up
+    params = FoldedCascodeParams(
+        w1_2=inp.w1_2,
+        w5_6=inp.w5_6,
+        w7_8=inp.w7_8,
+        w9_10=inp.w9_10,
+        w11_12=inp.w11_12,
+        w13_14=inp.w13_14,
+        w15_16=inp.w15_16,
+        w17=inp.w17,
+        w18=inp.w18,
+        # VDD=inp.VDD,
+        cl=inp.cl,
+        cc=inp.cc,
+        rc=inp.rc,
+        wb0=inp.wb0,
+        wb1=inp.wb1,
+        wb2=inp.wb2,
+        wb3=inp.wb3,
+        wb4=inp.wb4,
+        wb5=inp.wb5,
+        wb6=inp.wb6,
+        wb7=inp.wb7,
+        wb8=inp.wb8,
+        wb9=inp.wb9,
+        wb10=inp.wb10,
+        wb11=inp.wb11,
+        wb12=inp.wb12,
+        wb13=inp.wb13,
+        wb14=inp.wb14,
+        wb15=inp.wb15,
+        wb16=inp.wb16,
+        wb17=inp.wb17,
+        wb18=inp.wb18,
+        wb19=inp.wb19,
+        ibias=inp.ibias,
+        Vcm=inp.Vcm,
     )
-    if not vsp.ngspice.available():
-        print("ngspice is not available. Skipping simulation.")
-        return
 
-    # Run the simulation!
-    params = FoldedCascodeParams()
-    results = FoldedCascodeSim(params).run(opts)
-
-    print(
-        "Gain:            "
-        + str(find_dc_gain(2 * results["ac"].data["v(xtop.sig_out)"]))
-    )
-    print(
-        "UGBW:            "
-        + str(find_ugbw(results["ac"].freq, 2 * results["ac"].data["v(xtop.sig_out)"]))
-    )
-    print(
-        "Phase margin:    "
-        + str(find_phm(results["ac"].freq, 2 * results["ac"].data["v(xtop.sig_out)"]))
-    )
-    print("Ivdd:            " + str(find_I_vdd(results["ac"].data["i(v.xtop.vvdc)"])))
-
-
-def find_I_vdd(vout: numpy.array) -> float:
-    return numpy.abs(vout)[0]
-
-
-def find_dc_gain(vout: numpy.array) -> float:
-    return numpy.abs(vout)[0]
-
-
-def find_ugbw(freq: numpy.array, vout: numpy.array) -> float:
-    gain = numpy.abs(vout)
-    ugbw_index, valid = _get_best_crossing(gain, val=1)
-    if valid:
-        return freq[ugbw_index]
-    else:
-        return freq[0]
-
-
-def find_phm(freq: numpy.array, vout: numpy.array) -> float:
-    gain = numpy.abs(vout)
-    phase = numpy.angle(vout, deg=False)
-    phase = numpy.unwrap(phase)  # unwrap the discontinuity
-    phase = numpy.rad2deg(phase)  # convert to degrees
-
-    ugbw_index, valid = _get_best_crossing(gain, val=1)
-    if valid:
-        if phase[ugbw_index] > 0:
-            return -180 + phase[ugbw_index]
-        else:
-            return 180 + phase[ugbw_index]
-    else:
-        return -180
-
-
-def _get_best_crossing(yvec: numpy.array, val: float) -> tuple[int, bool]:
-    zero_crossings = numpy.where(numpy.diff(numpy.sign(yvec - val)))[0]
-    if len(zero_crossings) == 0:
-        return 0, False
-    if abs((yvec - val)[zero_crossings[0]]) < abs((yvec - val)[zero_crossings[0] + 1]):
-        return zero_crossings[0], True
-    else:
-        return (zero_crossings[0] + 1), True
-
-
-if __name__ == "__main__":
-    main()
+    # Create a testbench, simulate it, and return the metrics!
+    opamp = FoldedCascodeGen(params)
+    tbparams = TbParams(dut=opamp, VDD=params.VDD, ibias=params.ibias)
+    return simulate(tbparams)
