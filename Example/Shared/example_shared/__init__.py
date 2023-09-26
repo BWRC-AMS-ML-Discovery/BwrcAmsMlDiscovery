@@ -3,6 +3,7 @@
 Shared server-client code
 """
 
+from example_shared.hdl21_paramclass import hdl21_paramclass, like_hdl21_paramclass
 import hdl21 as h
 
 from pydantic import Field, validator
@@ -29,6 +30,7 @@ example = Rpc(
 )
 
 
+@like_hdl21_paramclass
 @dataclass
 class RingOscInput:
     num_inverters: int = Field(
@@ -65,24 +67,3 @@ ring_osc = Rpc(
     return_type=RingOscOutput,
     docstring="Ring Oscillator RPC",
 )
-
-
-def dataclass_to_hdl21_paramclass(dataclass: type) -> h.Type:
-    """Convert a dataclass to an hdl21 Paramclass"""
-
-    attributes = {
-        field_name: h.Param(
-            dtype=field.type,
-            desc=field.default.description,
-            default=field.default.default,
-        )
-        for field_name, field in dataclass.__dataclass_fields__.items()
-    }
-
-    return h.paramclass(
-        type(
-            dataclass.__name__,
-            (),
-            attributes,
-        )
-    )
