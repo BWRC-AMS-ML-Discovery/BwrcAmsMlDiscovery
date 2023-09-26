@@ -84,12 +84,10 @@ def RingOsc(params: hdl21_paramclass[RingOscInput]) -> h.Module:
     @h.module
     class RingOsc:
         VDD, VSS = h.Inputs(2)
-        a, b, c = h.Outputs(3)
+        a = h.Outputs(params.num_inverters)
 
-        # Instantiate our 3 schematic inverters
-        ia = inverter(mos)(inp=a, out=b, VDD=VDD, VSS=VSS)
-        ib = inverter(mos)(inp=b, out=c, VDD=VDD, VSS=VSS)
-        ic = inverter(mos)(inp=c, out=a, VDD=VDD, VSS=VSS)
+        for i in range(params.num_inverters):
+            ia = inverter(mos)(inp=a[i], out=a[i + 1], VDD=VDD, VSS=VSS)
 
     return RingOsc
 
