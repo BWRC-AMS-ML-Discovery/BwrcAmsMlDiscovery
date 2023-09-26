@@ -5,6 +5,7 @@ Shared server-client code
 
 import hdl21 as h
 import hdl21.sim as hs
+from hdl21.primitives import MosParams
 
 from pydantic import Field, validator
 
@@ -78,15 +79,17 @@ ring_osc = Rpc(
 def RingOsc(params: hdl21_paramclass[RingOscInput]) -> h.Module:
     """A three-stage ring oscillator"""
 
+    mos = MosParams()
+
     @h.module
     class RingOsc:
         VDD, VSS = h.Inputs(2)
         a, b, c = h.Outputs(3)
 
         # Instantiate our 3 schematic inverters
-        ia = inverter(params.mos)(inp=a, out=b, VDD=VDD, VSS=VSS)
-        ib = inverter(params.mos)(inp=b, out=c, VDD=VDD, VSS=VSS)
-        ic = inverter(params.mos)(inp=c, out=a, VDD=VDD, VSS=VSS)
+        ia = inverter(mos)(inp=a, out=b, VDD=VDD, VSS=VSS)
+        ib = inverter(mos)(inp=b, out=c, VDD=VDD, VSS=VSS)
+        ic = inverter(mos)(inp=c, out=a, VDD=VDD, VSS=VSS)
 
     return RingOsc
 
@@ -101,3 +104,15 @@ def RingOscSim(params: hdl21_paramclass[RingOscInput]) -> hs.Sim:
         instance = RingOsc(params)
 
     return RingOscSim
+
+
+@ring_osc.impl
+def ring_osc(params: RingOscInput) -> RingOscOutput:
+    """# Ring Oscillator"""
+
+    sim = RingOscSim(params)
+    result = sim.run(1e-9)
+
+    return RingOscOutput(
+        frequency=1 / result.ia.tpd,
+    )
