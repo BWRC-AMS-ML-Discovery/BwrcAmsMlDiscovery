@@ -4,6 +4,7 @@ Shared server-client code
 """
 
 import hdl21 as h
+import hdl21.sim as hs
 
 from pydantic import Field, validator
 
@@ -67,3 +68,15 @@ ring_osc = Rpc(
     return_type=RingOscOutput,
     docstring="Ring Oscillator RPC",
 )
+
+
+def RingOscSim(params: hdl21_paramclass[RingOscInput]) -> hs.Sim:
+    @hs.sim
+    class RingOscSim:
+        """
+        TODO
+        """
+
+        pass
+
+    return RingOscSim

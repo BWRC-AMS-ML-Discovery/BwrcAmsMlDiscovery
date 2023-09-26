@@ -38,12 +38,3 @@ def RingOsc(params: RingOscParams) -> h.Module:
         ic = inverter(params.mos)(inp=c, out=a, VDD=VDD, VSS=VSS)
 
     return RingOsc
-
-
-@hs.sim
-class RingOscSim:
-    """
-    TODO
-    """
-
-    pass
