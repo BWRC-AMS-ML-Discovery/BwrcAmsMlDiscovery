@@ -3,6 +3,8 @@
 Shared server-client code
 """
 
+import hdl21 as h
+
 from pydantic import Field, validator
 
 
@@ -63,3 +65,26 @@ ring_osc = Rpc(
     return_type=RingOscOutput,
     docstring="Ring Oscillator RPC",
 )
+
+
+def dataclass_to_hdl21_paramclass(dataclass: type) -> h.Type:
+    """Convert a dataclass to an hdl21 Paramclass"""
+
+    class Params:
+        pass
+
+    # Add all the fields from the dataclass
+    for field in dataclass.__dataclass_fields__.values():
+        param = h.Param(
+            dtype=field.type,
+            desc=field.metadata.get("description", ""),
+            default=field.default,
+            # ge=field.metadata.get("ge", None),
+            # le=field.metadata.get("le", None),
+            # step=field.metadata.get("step", None),
+            # normalize=field.metadata.get("normalize", None),
+        )
+
+        setattr(Params, field.name, param)
+
+    return h.paramclass(Params)
