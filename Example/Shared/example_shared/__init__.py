@@ -70,21 +70,19 @@ ring_osc = Rpc(
 def dataclass_to_hdl21_paramclass(dataclass: type) -> h.Type:
     """Convert a dataclass to an hdl21 Paramclass"""
 
-    class Params:
-        pass
-
-    # Add all the fields from the dataclass
-    for field in dataclass.__dataclass_fields__.values():
-        param = h.Param(
+    attributes = {
+        field_name: h.Param(
             dtype=field.type,
-            desc=field.metadata.get("description", ""),
-            default=field.default,
-            # ge=field.metadata.get("ge", None),
-            # le=field.metadata.get("le", None),
-            # step=field.metadata.get("step", None),
-            # normalize=field.metadata.get("normalize", None),
+            desc=field.default.description,
+            default=field.default.default,
         )
+        for field_name, field in dataclass.__dataclass_fields__.items()
+    }
 
-        setattr(Params, field.name, param)
-
-    return h.paramclass(Params)
+    return h.paramclass(
+        type(
+            dataclass.__name__,
+            (),
+            attributes,
+        )
+    )
