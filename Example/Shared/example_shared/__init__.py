@@ -15,6 +15,10 @@ from discovery_shared.rpc import Rpc
 from example_shared.hdl21_paramclass import hdl21_paramclass, like_hdl21_paramclass
 
 
+# Import the inverter schematic
+from .inverter import inverter
+
+
 @dataclass
 class Example:
     """# Example of a dataclass that can be used as a POST body"""
@@ -70,6 +74,23 @@ ring_osc = Rpc(
 )
 
 
+@h.generator
+def RingOsc(params: hdl21_paramclass[RingOscInput]) -> h.Module:
+    """A three-stage ring oscillator"""
+
+    @h.module
+    class RingOsc:
+        VDD, VSS = h.Inputs(2)
+        a, b, c = h.Outputs(3)
+
+        # Instantiate our 3 schematic inverters
+        ia = inverter(params.mos)(inp=a, out=b, VDD=VDD, VSS=VSS)
+        ib = inverter(params.mos)(inp=b, out=c, VDD=VDD, VSS=VSS)
+        ic = inverter(params.mos)(inp=c, out=a, VDD=VDD, VSS=VSS)
+
+    return RingOsc
+
+
 def RingOscSim(params: hdl21_paramclass[RingOscInput]) -> hs.Sim:
     @hs.sim
     class RingOscSim:
@@ -77,6 +98,6 @@ def RingOscSim(params: hdl21_paramclass[RingOscInput]) -> hs.Sim:
         TODO
         """
 
-        pass
+        instance = RingOsc(params)
 
     return RingOscSim
