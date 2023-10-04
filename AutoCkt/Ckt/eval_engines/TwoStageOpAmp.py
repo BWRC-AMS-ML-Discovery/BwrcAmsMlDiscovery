@@ -10,26 +10,8 @@ from .params import TbParams
 from .pdk import nmos, pmos
 
 
-@h.paramclass
-class OpAmpParams:
-    """Parameter class"""
-
-    wp1 = h.Param(dtype=int, desc="Width of PMOS mp1", default=10)
-    wp2 = h.Param(dtype=int, desc="Width of PMOS mp2", default=10)
-    wp3 = h.Param(dtype=int, desc="Width of PMOS mp3", default=4)
-    wn1 = h.Param(dtype=int, desc="Width of NMOS mn1", default=38)
-    wn2 = h.Param(dtype=int, desc="Width of NMOS mn2", default=38)
-    wn3 = h.Param(dtype=int, desc="Width of NMOS mn3", default=9)
-    wn4 = h.Param(dtype=int, desc="Width of NMOS mn4", default=20)
-    wn5 = h.Param(dtype=int, desc="Width of NMOS mn5", default=60)
-    VDD = h.Param(dtype=h.Scalar, desc="VDD voltage", default=1.2)
-    CL = h.Param(dtype=h.Scalar, desc="CL capacitance", default=1e-11)
-    Cc = h.Param(dtype=h.Scalar, desc="Cc capacitance", default=3e-12)
-    ibias = h.Param(dtype=h.Scalar, desc="ibias current", default=3e-5)
-
-
 @h.generator
-def OpAmp(p: OpAmpParams) -> h.Module:
+def OpAmp(p: hdl21_paramclass[OpAmpInput]) -> h.Module:
     """# Two stage OpAmp"""
 
     @h.module
@@ -76,18 +58,8 @@ def opamp_inner(inp: OpAmpInput) -> OpAmpOutput:
 
     # Convert our input into `OpAmpParams`
     # FIXME: @king-han gonna clean all this conversion stuff up
-    params = OpAmpParams(
-        wp1=inp.mp1,
-        wn1=inp.mn1,
-        wp3=inp.mp3,
-        wn3=inp.mn3,
-        wn4=inp.mn4,
-        wn5=inp.mn5,
-        Cc=inp.cc,
-        # FIXME Extra, don't need?
-        wp2=inp.mp1,
-        wn2=inp.mn1,
-    )
+    # FIXME the names of the params are not the same, need to change above
+    params = as_hdl21_paramclass(inp)
 
     # Create a testbench, simulate it, and return the metrics!
     opamp = OpAmp(params)

@@ -17,6 +17,51 @@ from .cktopt import (
 )
 
 
+from dataclasses import asdict
+
+
+def as_hdl21_paramclass(data):
+    """
+    Convert a dataclass to a Hdl21 parameter class
+    """
+    return hdl21_paramclass[type(data)](
+        **asdict(data),
+    )
+
+
+def as_param_specs(dataclass_type):
+    """
+    Convert a dataclass to a ParamSpecs
+    """
+    return ParamSpecs(
+        [
+            ParamSpec(
+                name=field.name,
+                range=(field.default.ge, field.default.le),
+                step=field.default.extra["step"],
+                init=field.default.default,
+            )
+            for field in dataclass_type.__dataclass_fields__.values()
+        ]
+    )
+
+
+def as_target_specs(dataclass_type):
+    """
+    Convert a dataclass to a MetricSpecs
+    """
+    return MetricSpecs(
+        [
+            MetricSpec(
+                name=field.name,
+                range=(field.default.ge, field.default.le),
+                normalize=field.default.extra["normalize"],
+            )
+            for field in dataclass_type.__dataclass_fields__.values()
+        ]
+    )
+
+
 @dataclass
 class OpAmpInput:
     """
@@ -121,25 +166,8 @@ auto_ckt_sim_hdl21 = Rpc(
 
 
 circuit_optimization = CircuitOptimization(
-    params=ParamSpecs(
-        [
-            ParamSpec("mp1", (1, 100), step=1, init=34),
-            ParamSpec("mn1", (1, 100), step=1, init=34),
-            ParamSpec("mp3", (1, 100), step=1, init=34),
-            ParamSpec("mn3", (1, 100), step=1, init=34),
-            ParamSpec("mn4", (1, 100), step=1, init=34),
-            ParamSpec("mn5", (1, 100), step=1, init=15),
-            ParamSpec("cc", (0.1e-12, 10.0e-12), step=0.1e-12, init=2.1e-12),
-        ]
-    ),
-    specs=MetricSpecs(
-        [
-            MetricSpec("gain", (200, 400), normalize=350),
-            MetricSpec("ugbw", (1.0e6, 2.5e7), normalize=9.5e5),
-            MetricSpec("phm", (60, 60.0000001), normalize=60),
-            MetricSpec("ibias", (0.0001, 0.01), normalize=0.001),
-        ]
-    ),
+    params=as_param_specs(OpAmpInput),
+    specs=as_target_specs(OpAmpOutput),
     input_type=OpAmpInput,
     output_type=OpAmpOutput,
     simulation=auto_ckt_sim,
