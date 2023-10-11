@@ -1,5 +1,5 @@
 from .opamp_output import OpAmpOutput
-from .typing import Number
+from .cktopt import Number
 
 
 # TODO: remove target_output, can be assumed from rl model
