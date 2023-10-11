@@ -35,7 +35,7 @@ def OpAmp(p: Hdl21Paramclass(OpAmpInput)) -> h.Module:
 
     @h.module
     class DiffOta:
-        cl = h.prefix.Prefixed(1e-11)
+        cl = h.prefix.Prefixed(number=1e-11)
 
         # IO Interface
         VDD, VSS = 2 * h.Input()
