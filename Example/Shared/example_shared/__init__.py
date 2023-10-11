@@ -4,6 +4,13 @@ Shared server-client code
 """
 
 
+# Std-Lib Imports
+from enum import Enum
+from typing import Optional, Tuple
+
+# PyPi Imports
+import hdl21 as h
+
 # Workspace Imports
 from discovery_shared.dataclasses import dataclass
 from discovery_shared.rpc import Rpc
