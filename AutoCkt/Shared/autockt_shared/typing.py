@@ -8,15 +8,6 @@ from autockt_shared.cktopt import (
 )
 
 
-def as_hdl21_paramclass(data):
-    """
-    Convert a dataclass to a Hdl21 parameter class
-    """
-    return hdl21_paramclass[type(data)](
-        **asdict(data),
-    )
-
-
 def as_param_specs(dataclass_type):
     """
     Convert a dataclass to a ParamSpecs

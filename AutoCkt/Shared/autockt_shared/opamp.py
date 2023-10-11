@@ -1,5 +1,5 @@
 # Std-Lib Imports
-from dataclasses import dataclass
+from pydantic.dataclasses import dataclass
 
 # Workspace Imports
 from discovery_shared import Rpc
@@ -126,6 +126,6 @@ circuit_optimization = CircuitOptimization(
     specs=as_target_specs(OpAmpOutputTargets),
     input_type=OpAmpInput,
     output_type=OpAmpOutput,
-    simulation=auto_ckt_sim,
+    simulation=auto_ckt_sim_hdl21,
     reward=settaluri_reward,
 )

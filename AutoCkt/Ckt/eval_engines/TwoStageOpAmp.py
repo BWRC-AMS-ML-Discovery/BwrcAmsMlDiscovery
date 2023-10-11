@@ -8,6 +8,7 @@ from autockt_shared import OpAmpInput, OpAmpOutput, auto_ckt_sim_hdl21
 from .tb import simulate
 from .params import TbParams
 from .pdk import nmos, pmos
+from .typing import as_hdl21_paramclass, Hdl21Paramclass
 
 
 @h.paramclass
@@ -29,7 +30,7 @@ class OpAmpParams:
 
 
 @h.generator
-def OpAmp(p: OpAmpParams) -> h.Module:
+def OpAmp(p: Hdl21Paramclass(OpAmpInput)) -> h.Module:
     """# Two stage OpAmp"""
 
     @h.module
@@ -75,19 +76,7 @@ def opamp_inner(inp: OpAmpInput) -> OpAmpOutput:
     """# Two-Stage OpAmp RPC Implementation"""
 
     # Convert our input into `OpAmpParams`
-    # FIXME: @king-han gonna clean all this conversion stuff up
-    params = OpAmpParams(
-        wp1=inp.mp1,
-        wn1=inp.mn1,
-        wp3=inp.mp3,
-        wn3=inp.mn3,
-        wn4=inp.mn4,
-        wn5=inp.mn5,
-        Cc=inp.cc,
-        # FIXME Extra, don't need?
-        wp2=inp.mp1,
-        wn2=inp.mn1,
-    )
+    params = as_hdl21_paramclass(inp)
 
     # Create a testbench, simulate it, and return the metrics!
     opamp = OpAmp(params)
