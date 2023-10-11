@@ -15,6 +15,7 @@ from .cktopt import (
     ParamSpec,
     ParamSpecs,
 )
+from .typing import as_param_specs, as_target_specs
 
 
 @dataclass
@@ -121,8 +122,8 @@ auto_ckt_sim_hdl21 = Rpc(
 
 
 circuit_optimization = CircuitOptimization(
-    params=FIXME,
-    specs=FIXME,
+    params=as_param_specs(OpAmpInput),
+    specs=as_target_specs(OpAmpOutput),
     input_type=OpAmpInput,
     output_type=OpAmpOutput,
     simulation=auto_ckt_sim,

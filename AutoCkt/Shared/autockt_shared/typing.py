@@ -1,7 +1,11 @@
 from dataclasses import asdict
-from typing import ParamSpec
 
-from autockt_shared.cktopt import ParamSpecs
+from autockt_shared.cktopt import (
+    MetricSpec,
+    MetricSpecs,
+    ParamSpec,
+    ParamSpecs,
+)
 
 
 def as_hdl21_paramclass(data):
