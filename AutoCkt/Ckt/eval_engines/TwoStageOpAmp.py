@@ -35,6 +35,8 @@ def OpAmp(p: Hdl21Paramclass(OpAmpInput)) -> h.Module:
 
     @h.module
     class DiffOta:
+        cl = h.prefix.Prefixed(1e-11)
+
         # IO Interface
         VDD, VSS = 2 * h.Input()
         ibias = h.Input()
@@ -46,28 +48,28 @@ def OpAmp(p: Hdl21Paramclass(OpAmpInput)) -> h.Module:
         net3, net4, net5 = h.Signals(3)
 
         # Input Stage
-        mp1 = pmos(m=p.wp1)(
+        mp1 = pmos(m=p.mp1)(
             d=net4, g=net4, s=VDD, b=VDD
         )  # Current mirror within the input stage
-        mp2 = pmos(m=p.wp2)(
+        mp2 = pmos(m=p.mp1)(
             d=net5, g=net4, s=VDD, b=VDD
         )  # Current mirror within the input stage
-        mn1 = nmos(m=p.wn1)(d=net4, g=inp.n, s=net3, b=net3)  # Input MOS pair
-        mn2 = nmos(m=p.wn2)(d=net5, g=inp.p, s=net3, b=net3)  # Input MOS pair
-        mn3 = nmos(m=p.wn3)(d=net3, g=ibias, s=VSS, b=VSS)  # Mirrored current source
+        mn1 = nmos(m=p.mn1)(d=net4, g=inp.n, s=net3, b=net3)  # Input MOS pair
+        mn2 = nmos(m=p.mn1)(d=net5, g=inp.p, s=net3, b=net3)  # Input MOS pair
+        mn3 = nmos(m=p.mn3)(d=net3, g=ibias, s=VSS, b=VSS)  # Mirrored current source
 
         # Output Stage
-        mp3 = pmos(m=p.wp3)(d=out, g=net5, s=VDD, b=VDD)  # Output inverter
-        mn5 = nmos(m=p.wn5)(d=out, g=ibias, s=VSS, b=VSS)  # Output inverter
-        CL = h.Cap(c=p.CL)(p=out, n=VSS)  # Load capacitance
+        mp3 = pmos(m=p.mp3)(d=out, g=net5, s=VDD, b=VDD)  # Output inverter
+        mn5 = nmos(m=p.mn5)(d=out, g=ibias, s=VSS, b=VSS)  # Output inverter
+        CL = h.Cap(c=cl)(p=out, n=VSS)  # Load capacitance
 
         # Biasing
-        mn4 = nmos(m=p.wn4)(
+        mn4 = nmos(m=p.mn4)(
             d=ibias, g=ibias, s=VSS, b=VSS
         )  # Current mirror co-operating with mn3
 
         # Compensation Network
-        Cc = h.Cap(c=p.Cc)(p=net5, n=out)  # Miller Capacitance
+        Cc = h.Cap(c=p.cc)(p=net5, n=out)  # Miller Capacitance
 
     return DiffOta
 
