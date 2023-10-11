@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 # Workspace Imports
 from discovery_shared import Rpc
-from pydantic import Field
+from pydantic.dataclasses import Field
 
 # Local Imports
 from .opamp_output import OpAmpOutput
@@ -76,7 +76,7 @@ class OpAmpInput:
 
 
 @dataclass
-class OpAmpOutput:
+class OpAmpOutputTargets(OpAmpOutput):
     """# Op-Amp Output
     Server output type reused by several op-amp flavors"""
 
@@ -123,7 +123,7 @@ auto_ckt_sim_hdl21 = Rpc(
 
 circuit_optimization = CircuitOptimization(
     params=as_param_specs(OpAmpInput),
-    specs=as_target_specs(OpAmpOutput),
+    specs=as_target_specs(OpAmpOutputTargets),
     input_type=OpAmpInput,
     output_type=OpAmpOutput,
     simulation=auto_ckt_sim,
