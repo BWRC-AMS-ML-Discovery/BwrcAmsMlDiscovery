@@ -80,6 +80,9 @@ def opamp_inner(inp: OpAmpInput) -> OpAmpOutput:
     # Convert our input into `OpAmpParams`
     params = as_hdl21_paramclass(inp)
 
+    VDD = h.prefix.Prefixed(number=1.2)
+    ibias = h.prefix.Prefixed(number=3e-5)
+
     # Create a testbench, simulate it, and return the metrics!
     opamp = OpAmp(params)
     tbparams = TbParams(dut=opamp, VDD=params.VDD, ibias=params.ibias)
