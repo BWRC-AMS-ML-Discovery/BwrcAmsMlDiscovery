@@ -85,5 +85,9 @@ def opamp_inner(inp: OpAmpInput) -> OpAmpOutput:
 
     # Create a testbench, simulate it, and return the metrics!
     opamp = OpAmp(params)
-    tbparams = TbParams(dut=opamp, VDD=params.VDD, ibias=params.ibias)
+    tbparams = TbParams(
+        dut=opamp,
+        VDD=VDD,
+        ibias=ibias,
+    )
     return simulate(tbparams)
