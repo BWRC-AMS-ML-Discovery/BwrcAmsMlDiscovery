@@ -6,8 +6,11 @@ from dataclasses import asdict
 from pydantic.dataclasses import dataclass
 
 # Local imports
-from autockt_shared.typing import Number
 from discovery_shared.rpc import Rpc
+
+
+# FIXME When training, everything converts to float, why?
+Number = float | int
 
 
 @dataclass
