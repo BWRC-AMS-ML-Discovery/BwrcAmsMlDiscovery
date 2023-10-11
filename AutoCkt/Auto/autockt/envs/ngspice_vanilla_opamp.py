@@ -17,8 +17,6 @@ from .create_design_and_simulate_lib import create_design_and_simulate
 from shared import *
 from eval_engines import PARAMS_RANGE, NORM_CONSTANT, TARGET_RANGE
 
-# FIXME Avoid storing files?
-SPECS_DIR = "/tmp/ckt_da_new/specs/"
 PARAMS_RANGE = PARAMS_RANGE
 NORM_CONSTANT = NORM_CONSTANT
 TARGET_RANGE = TARGET_RANGE
