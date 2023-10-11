@@ -76,6 +76,15 @@ def auto_ckt_sim(inp: OpAmpInput) -> OpAmpOutput:
     return specs
 
 
+from .TwoStageOpAmp import opamp_inner
+
+
+@auto_ckt_sim_hdl21.impl
+def auto_ckt_sim_hdl21(inp: OpAmpInput) -> OpAmpOutput:
+    """# Our RPC Handler"""
+    return opamp_inner(inp)
+
+
 from .Latch import LatchParams, Latch_inner
 
 

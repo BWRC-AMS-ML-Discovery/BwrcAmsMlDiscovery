@@ -93,9 +93,3 @@ def opamp_inner(inp: OpAmpInput) -> OpAmpOutput:
     opamp = OpAmp(params)
     tbparams = TbParams(dut=opamp, VDD=params.VDD, ibias=params.ibias)
     return simulate(tbparams)
-
-
-@auto_ckt_sim_hdl21.impl
-def auto_ckt_sim_hdl21(inp: OpAmpInput) -> OpAmpOutput:
-    """# Our RPC Handler"""
-    return opamp_inner(inp)
