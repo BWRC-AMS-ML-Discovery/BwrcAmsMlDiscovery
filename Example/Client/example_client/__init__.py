@@ -11,6 +11,7 @@ from example_shared import (
     SecretSpiceSimulationInput,
     SecretSpiceSimulationOutput,
     simulate_that_opamp,
+    simulate_on_the_server,
     OpAmpParams,
     VlsirProtoBufKind,
     VlsirProtoBufBinary,
