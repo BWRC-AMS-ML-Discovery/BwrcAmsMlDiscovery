@@ -49,6 +49,13 @@ from .tb import (
 )
 
 
+def start_server(cfg: Config):
+    """Retrieve values from .env and then configure and start the server"""
+
+    ds.configure(cfg)
+    ds.start_server()
+
+
 # FIXME should be async? FastAPI says both are ok.
 @auto_ckt_sim.impl
 def auto_ckt_sim(inp: OpAmpInput) -> OpAmpOutput:
