@@ -18,11 +18,11 @@ from autockt_shared import (
 )
 
 
-# TODO maybe don't need to save files at all
-IO_BASE_DIR = "/tmp/ckt_da_new/"
+CURRENT_PATH = Path(__file__).resolve().parent
+NETLIST_PATH = CURRENT_PATH / "ngspice" / "netlist" / "two_stage_opamp.cir"
 
 
-_raw_file = open(IO_BASE_DIR + "in/" + "two_stage_opamp.cir", "r")
+_raw_file = open(NETLIST_PATH, "r")
 _tmp_lines = _raw_file.readlines()
 _raw_file.close()
 
