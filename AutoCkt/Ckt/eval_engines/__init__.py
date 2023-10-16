@@ -1,5 +1,5 @@
 """
-# Example Server
+# AutoCkt Server
 """
 
 # Stdlib Imports
@@ -39,14 +39,21 @@ from .auto_ckt_sim_lib import (
     simulate,
     translate_result,
 )
-from .TwoStageOpAmp import (
-    OpAmpParams as TwoStageOpAmpParams,
-    OpAmpSim,
+
+# FIXME: move all these dependencies into `tb` as well
+from .tb import (
     find_dc_gain,
     find_I_vdd,
     find_phm,
     find_ugbw,
 )
+
+
+def start_server(cfg: Config):
+    """Retrieve values from .env and then configure and start the server"""
+
+    ds.configure(cfg)
+    ds.start_server()
 
 
 # FIXME should be async? FastAPI says both are ok.
@@ -69,60 +76,13 @@ def auto_ckt_sim(inp: OpAmpInput) -> OpAmpOutput:
     return specs
 
 
+from .TwoStageOpAmp import opamp_inner
+
+
 @auto_ckt_sim_hdl21.impl
 def auto_ckt_sim_hdl21(inp: OpAmpInput) -> OpAmpOutput:
-    """
-    AutoCkt Simulation
-    """
-    if not vsp.ngspice.available():
-        raise RuntimeError
-
-    # Convert our input into `OpAmpParams`
-    # FIXME Is this correct?
-    params = TwoStageOpAmpParams(
-        wp1=inp.mp1,
-        wn1=inp.mn1,
-        wp3=inp.mp3,
-        wn3=inp.mn3,
-        wn4=inp.mn4,
-        wn5=inp.mn5,
-        Cc=inp.cc,
-        # FIXME Extra, don't need?
-        wp2=inp.mp1,
-        wn2=inp.mn1,
-    )
-
-    # Create a set of simulation input for it
-    sim_input = OpAmpSim(params)
-    print(sim_input)
-    print(params)
-
-    # Simulation options
-    opts = vsp.SimOptions(
-        simulator=vsp.SupportedSimulators.NGSPICE,
-        fmt=vsp.ResultFormat.SIM_DATA,  # Get Python-native result types
-        rundir="./scratch",  # Set the working directory for the simulation. Uses a temporary directory by default.
-    )
-
-    # Run the simulation!
-    results = sim_input.run(opts)
-
-    # Extract our metrics from those results
-    ac_result = results["ac"]
-    sig_out = ac_result.data["v(xtop.sig_out)"]
-    gain = find_dc_gain(2 * sig_out)
-    ugbw = find_ugbw(ac_result.freq, 2 * sig_out)
-    phm = find_phm(ac_result.freq, 2 * sig_out)
-    idd = ac_result.data["i(v.xtop.vvdc)"]
-    ibias = find_I_vdd(idd)
-
-    # And return them as an `OpAmpOutput`
-    return OpAmpOutput(
-        ugbw=ugbw,
-        gain=gain,
-        phm=phm,
-        ibias=ibias,
-    )
+    """# Our RPC Handler"""
+    return opamp_inner(inp)
 
 
 from .Latch import LatchParams, Latch_inner

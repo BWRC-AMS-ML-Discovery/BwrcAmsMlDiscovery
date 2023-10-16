@@ -27,12 +27,12 @@ from autockt.envs.ngspice_vanilla_opamp import TwoStageAmp
 from autockt.autockt_gym import AutoCktGym
 
 from autockt_shared.cktopt import (
-    AutoCktCircuitOptimization,
+    CircuitOptimization,
     AutoCktGymEnvConfig,
-    AutoCktParams,
-    AutoCktParam,
-    AutoCktSpecs,
-    AutoCktSpec,
+    ParamSpecs,
+    ParamSpec,
+    MetricSpecs,
+    MetricSpec,
 )
 from autockt_shared import (
     OpAmpInput,
@@ -59,24 +59,24 @@ Example Usage via executable:
 register_env("opamp-v0", lambda config: TwoStageAmp(config))
 register_env("autockt", lambda config: AutoCktGym(config))
 
-circuit_optimization = AutoCktCircuitOptimization(
-    params=AutoCktParams(
+circuit_optimization = CircuitOptimization(
+    params=ParamSpecs(
         [
-            AutoCktParam("mp1", (1, 100), step=1, init=34),
-            AutoCktParam("mn1", (1, 100), step=1, init=34),
-            AutoCktParam("mp3", (1, 100), step=1, init=34),
-            AutoCktParam("mn3", (1, 100), step=1, init=34),
-            AutoCktParam("mn4", (1, 100), step=1, init=34),
-            AutoCktParam("mn5", (1, 100), step=1, init=15),
-            AutoCktParam("cc", (0.1e-12, 10.0e-12), step=0.1e-12, init=2.1e-12),
+            ParamSpec("mp1", (1, 100), step=1, init=34),
+            ParamSpec("mn1", (1, 100), step=1, init=34),
+            ParamSpec("mp3", (1, 100), step=1, init=34),
+            ParamSpec("mn3", (1, 100), step=1, init=34),
+            ParamSpec("mn4", (1, 100), step=1, init=34),
+            ParamSpec("mn5", (1, 100), step=1, init=15),
+            ParamSpec("cc", (0.1e-12, 10.0e-12), step=0.1e-12, init=2.1e-12),
         ]
     ),
-    specs=AutoCktSpecs(  # FIXME Numbers right?
+    specs=MetricSpecs(  # FIXME Numbers right?
         [
-            AutoCktSpec("gain", (200, 400), normalize=350),
-            AutoCktSpec("ugbw", (1.0e6, 2.5e7), normalize=9.5e5),
-            AutoCktSpec("phm", (60, 60.0000001), normalize=60),
-            AutoCktSpec("ibias", (0.0001, 0.01), normalize=0.001),
+            MetricSpec("gain", (200, 400), normalize=350),
+            MetricSpec("ugbw", (1.0e6, 2.5e7), normalize=9.5e5),
+            MetricSpec("phm", (60, 60.0000001), normalize=60),
+            MetricSpec("ibias", (0.0001, 0.01), normalize=0.001),
         ]
     ),
     input_type=OpAmpInput,

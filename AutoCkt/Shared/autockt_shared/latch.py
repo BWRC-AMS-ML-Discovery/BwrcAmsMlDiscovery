@@ -6,11 +6,11 @@ from discovery_shared import Rpc
 
 # Local Imports
 from .cktopt import (
-    AutoCktCircuitOptimization,
-    AutoCktSpec,
-    AutoCktSpecs,
-    AutoCktParam,
-    AutoCktParams,
+    CircuitOptimization,
+    MetricSpec,
+    MetricSpecs,
+    ParamSpec,
+    ParamSpecs,
     Number,
 )
 
@@ -76,28 +76,28 @@ def latch_reward(
     return reward(curr_output, target_output)
 
 
-circuit_optimization = AutoCktCircuitOptimization(
-    params=AutoCktParams(
+circuit_optimization = CircuitOptimization(
+    params=ParamSpecs(
         [
-            AutoCktParam("w1", (1, 100), step=1, init=10),
-            AutoCktParam("w2", (1, 100), step=1, init=20),
-            AutoCktParam("w3", (1, 100), step=1, init=10),
-            AutoCktParam("w4", (1, 100), step=1, init=20),
-            AutoCktParam("w5", (1, 100), step=1, init=10),
-            AutoCktParam("w6", (1, 100), step=1, init=20),
-            AutoCktParam("w7", (1, 100), step=1, init=20),
-            AutoCktParam("w8", (1, 100), step=1, init=20),
-            AutoCktParam("w9", (1, 100), step=1, init=10),
-            AutoCktParam("w10", (1, 100), step=1, init=10),
+            ParamSpec("w1", (1, 100), step=1, init=10),
+            ParamSpec("w2", (1, 100), step=1, init=20),
+            ParamSpec("w3", (1, 100), step=1, init=10),
+            ParamSpec("w4", (1, 100), step=1, init=20),
+            ParamSpec("w5", (1, 100), step=1, init=10),
+            ParamSpec("w6", (1, 100), step=1, init=20),
+            ParamSpec("w7", (1, 100), step=1, init=20),
+            ParamSpec("w8", (1, 100), step=1, init=20),
+            ParamSpec("w9", (1, 100), step=1, init=10),
+            ParamSpec("w10", (1, 100), step=1, init=10),
         ]
     ),
-    specs=AutoCktSpecs(
+    specs=MetricSpecs(
         # TODO Change these
         [
-            AutoCktSpec("delay", (0, 10e-9), normalize=1e-9),
-            AutoCktSpec("setup_time", (0, 10e-9), normalize=1e-9),
-            AutoCktSpec("hold_time", (0, 10e-9), normalize=1e-9),
-            AutoCktSpec("ibias", (0, 1), normalize=1e-3),
+            MetricSpec("delay", (0, 10e-9), normalize=1e-9),
+            MetricSpec("setup_time", (0, 10e-9), normalize=1e-9),
+            MetricSpec("hold_time", (0, 10e-9), normalize=1e-9),
+            MetricSpec("ibias", (0, 1), normalize=1e-3),
         ]
     ),
     input_type=LatchInput,

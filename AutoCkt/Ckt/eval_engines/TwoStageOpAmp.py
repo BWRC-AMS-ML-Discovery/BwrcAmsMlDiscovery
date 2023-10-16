@@ -2,52 +2,13 @@
 # Two Stage Op Amp
 """
 
-import os
-from pathlib import Path
-from copy import deepcopy
-from dataclasses import asdict
-
-import numpy
-
 import hdl21 as h
-import hdl21.sim as hs
-import vlsirtools.spice as vsp
-from hdl21.external_module import SpiceType
-from hdl21.prefix import µ, NANO
+from autockt_shared import OpAmpInput, OpAmpOutput, auto_ckt_sim_hdl21
 
-
-CURRENT_PATH = Path(os.path.dirname(os.path.abspath(__file__)))
-SPICE_MODEL_45NM_BULK_PATH = CURRENT_PATH / "45nm_bulk.txt"
-
-
-""" 
-Create a small "PDK" consisting of an externally-defined Nmos and Pmos transistor. 
-Real versions will have some more parameters; these just have multiplier "m". 
-"""
-
-
-@h.paramclass
-class PdkMosParams:
-    w = h.Param(dtype=h.Scalar, desc="Width in resolution units", default=0.5 * µ)
-    l = h.Param(dtype=h.Scalar, desc="Length in resolution units", default=90 * NANO)
-    nf = h.Param(dtype=h.Scalar, desc="Number of parallel fingers", default=1)
-    m = h.Param(dtype=h.Scalar, desc="Transistor Multiplier", default=1)
-
-
-nmos = h.ExternalModule(
-    name="nmos",
-    desc="Nmos Transistor (Multiplier Param Only!)",
-    port_list=deepcopy(h.Mos.port_list),
-    paramtype=PdkMosParams,
-    spicetype=SpiceType.MOS,
-)
-pmos = h.ExternalModule(
-    name="pmos",
-    desc="Pmos Transistor (Multiplier Param Only!)",
-    port_list=deepcopy(h.Mos.port_list),
-    paramtype=PdkMosParams,
-    spicetype=SpiceType.MOS,
-)
+from .tb import simulate
+from .params import TbParams
+from .pdk import nmos, pmos
+from .typing import as_hdl21_paramclass, Hdl21Paramclass
 
 
 @h.paramclass
@@ -69,11 +30,13 @@ class OpAmpParams:
 
 
 @h.generator
-def OpAmp(p: OpAmpParams) -> h.Module:
+def OpAmp(p: Hdl21Paramclass(OpAmpInput)) -> h.Module:
     """# Two stage OpAmp"""
 
     @h.module
     class DiffOta:
+        cl = h.prefix.Prefixed(number=1e-11)
+
         # IO Interface
         VDD, VSS = 2 * h.Input()
         ibias = h.Input()
@@ -85,171 +48,46 @@ def OpAmp(p: OpAmpParams) -> h.Module:
         net3, net4, net5 = h.Signals(3)
 
         # Input Stage
-        mp1 = pmos(m=p.wp1)(
+        mp1 = pmos(m=p.mp1)(
             d=net4, g=net4, s=VDD, b=VDD
         )  # Current mirror within the input stage
-        mp2 = pmos(m=p.wp2)(
+        mp2 = pmos(m=p.mp1)(
             d=net5, g=net4, s=VDD, b=VDD
         )  # Current mirror within the input stage
-        mn1 = nmos(m=p.wn1)(d=net4, g=inp.n, s=net3, b=net3)  # Input MOS pair
-        mn2 = nmos(m=p.wn2)(d=net5, g=inp.p, s=net3, b=net3)  # Input MOS pair
-        mn3 = nmos(m=p.wn3)(d=net3, g=ibias, s=VSS, b=VSS)  # Mirrored current source
+        mn1 = nmos(m=p.mn1)(d=net4, g=inp.n, s=net3, b=net3)  # Input MOS pair
+        mn2 = nmos(m=p.mn1)(d=net5, g=inp.p, s=net3, b=net3)  # Input MOS pair
+        mn3 = nmos(m=p.mn3)(d=net3, g=ibias, s=VSS, b=VSS)  # Mirrored current source
 
         # Output Stage
-        mp3 = pmos(m=p.wp3)(d=out, g=net5, s=VDD, b=VDD)  # Output inverter
-        mn5 = nmos(m=p.wn5)(d=out, g=ibias, s=VSS, b=VSS)  # Output inverter
-        CL = h.Cap(c=p.CL)(p=out, n=VSS)  # Load capacitance
+        mp3 = pmos(m=p.mp3)(d=out, g=net5, s=VDD, b=VDD)  # Output inverter
+        mn5 = nmos(m=p.mn5)(d=out, g=ibias, s=VSS, b=VSS)  # Output inverter
+        CL = h.Cap(c=cl)(p=out, n=VSS)  # Load capacitance
 
         # Biasing
-        mn4 = nmos(m=p.wn4)(
+        mn4 = nmos(m=p.mn4)(
             d=ibias, g=ibias, s=VSS, b=VSS
         )  # Current mirror co-operating with mn3
 
         # Compensation Network
-        Cc = h.Cap(c=p.Cc)(p=net5, n=out)  # Miller Capacitance
+        Cc = h.Cap(c=p.cc)(p=net5, n=out)  # Miller Capacitance
 
     return DiffOta
 
 
-@h.module
-class CapCell:
-    """# Compensation Capacitor Cell"""
+def opamp_inner(inp: OpAmpInput) -> OpAmpOutput:
+    """# Two-Stage OpAmp RPC Implementation"""
 
-    p, n, VDD, VSS = 4 * h.Port()
-    # FIXME: internal content! Using tech-specific `ExternalModule`s
+    # Convert our input into `OpAmpParams`
+    params = as_hdl21_paramclass(inp)
 
+    VDD = h.prefix.Prefixed(number=1.2)
+    ibias = h.prefix.Prefixed(number=3e-5)
 
-@h.module
-class ResCell:
-    """# Compensation Resistor Cell"""
-
-    p, n, sub = 3 * h.Port()
-    # FIXME: internal content! Using tech-specific `ExternalModule`s
-
-
-@h.module
-class Compensation:
-    """# Single Ended RC Compensation Network"""
-
-    a, b, VDD, VSS = 4 * h.Port()
-    r = ResCell(p=a, sub=VDD)
-    c = CapCell(p=r.n, n=b, VDD=VDD, VSS=VSS)
-
-
-def OpAmpSim(params: OpAmpParams) -> h.sim.Sim:
-    """# Op Amp Simulation Input"""
-
-    @hs.sim
-    class MosDcopSim:
-        """# Mos Dc Operating Point Simulation Input"""
-
-        @h.module
-        class Tb:
-            """# Basic Mos Testbench"""
-
-            VSS = h.Port()  # The testbench interface: sole port VSS
-            vdc = h.Vdc(dc=params.VDD)(n=VSS)  # A DC voltage source
-            dcin = h.Diff()
-            sig_out = h.Signal()
-            i_bias = h.Signal()
-            sig_p = h.Vdc(dc=params.VDD / 2, ac=0.5)(p=dcin.p, n=VSS)
-            sig_n = h.Vdc(dc=params.VDD / 2, ac=-0.5)(p=dcin.n, n=VSS)
-            Isource = h.Isrc(dc=params.ibias)(p=vdc.p, n=i_bias)
-
-            inst = OpAmp(params)(
-                VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out
-            )
-
-        # Simulation Stimulus
-        op = hs.Op()
-        ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
-        mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
-
-    return MosDcopSim
-
-
-def main():
-    """
-    @deprecated: I think MosDcopSim has been changed to OpAmpSim
-    """
-    # h.netlist(OpAmp(), sys.stdout)
-
-    opts = vsp.SimOptions(
-        simulator=vsp.SupportedSimulators.NGSPICE,
-        fmt=vsp.ResultFormat.SIM_DATA,  # Get Python-native result types
-        rundir="./scratch",  # Set the working directory for the simulation. Uses a temporary directory by default.
+    # Create a testbench, simulate it, and return the metrics!
+    opamp = OpAmp(params)
+    tbparams = TbParams(
+        dut=opamp,
+        VDD=VDD,
+        ibias=ibias,
     )
-    if not vsp.ngspice.available():
-        print("ngspice is not available. Skipping simulation.")
-        return
-
-    # Run the simulation!
-    results = OpAmpSim.run(opts)
-
-    print(
-        "Gain:            "
-        + str(
-            find_dc_gain(2 * results["ac"].data["v(xtop.sig_out)"]),
-        )
-    )
-    print(
-        "UGBW:            "
-        + str(
-            find_ugbw(results["ac"].freq, 2 * results["ac"].data["v(xtop.sig_out)"]),
-        )
-    )
-    print(
-        "Phase margin:    "
-        + str(
-            find_phm(results["ac"].freq, 2 * results["ac"].data["v(xtop.sig_out)"]),
-        )
-    )
-    print(
-        "Ivdd:            "
-        + str(
-            find_I_vdd(results["ac"].data["i(v.xtop.vvdc)"]),
-        )
-    )
-
-
-def find_I_vdd(vout: numpy.array) -> float:
-    return numpy.abs(vout)[0]
-
-
-def find_dc_gain(vout: numpy.array) -> float:
-    return numpy.abs(vout)[0]
-
-
-def find_ugbw(freq: numpy.array, vout: numpy.array) -> float:
-    gain = numpy.abs(vout)
-    ugbw_index, valid = _get_best_crossing(gain, val=1)
-    if valid:
-        return freq[ugbw_index]
-    else:
-        return freq[0]
-
-
-def find_phm(freq: numpy.array, vout: numpy.array) -> float:
-    gain = numpy.abs(vout)
-    phase = numpy.angle(vout, deg=False)
-    phase = numpy.unwrap(phase)  # unwrap the discontinuity
-    phase = numpy.rad2deg(phase)  # convert to degrees
-
-    ugbw_index, valid = _get_best_crossing(gain, val=1)
-    if valid:
-        if phase[ugbw_index] > 0:
-            return -180 + phase[ugbw_index]
-        else:
-            return 180 + phase[ugbw_index]
-    else:
-        return -180
-
-
-def _get_best_crossing(yvec: numpy.array, val: float) -> tuple[int, bool]:
-    zero_crossings = numpy.where(numpy.diff(numpy.sign(yvec - val)))[0]
-    if len(zero_crossings) == 0:
-        return 0, False
-    if abs((yvec - val)[zero_crossings[0]]) < abs((yvec - val)[zero_crossings[0] + 1]):
-        return zero_crossings[0], True
-    else:
-        return (zero_crossings[0] + 1), True
+    return simulate(tbparams)
