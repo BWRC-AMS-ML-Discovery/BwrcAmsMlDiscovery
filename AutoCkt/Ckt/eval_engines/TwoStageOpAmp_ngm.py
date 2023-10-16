@@ -148,7 +148,7 @@ def ngmOpAmpSim(params: ngmOpAmpParams) -> h.sim.Sim:
         # Simulation Stimulus
         op = hs.Op()
         ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
-        mod = hs.Include(SPICE_MODEL_NGM_PATH)
+        mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
 
     return MosDcopSim
 

@@ -6,8 +6,9 @@ from collections import OrderedDict
 import yaml
 
 
-# FIXME Avoid storing files?
-SPECS_DIR = "/tmp/ckt_da_new/specs/"
+# We con't use YAML anymore. We use dataclasses.
+# See the original AutoCkt repo for the YAML file
+SPECS_DIR = ...
 
 
 # way of ordering the way a yaml file is read

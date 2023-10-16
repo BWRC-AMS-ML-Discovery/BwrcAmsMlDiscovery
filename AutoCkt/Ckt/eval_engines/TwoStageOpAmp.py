@@ -8,6 +8,7 @@ from autockt_shared import OpAmpInput, OpAmpOutput, auto_ckt_sim_hdl21
 from .tb import simulate
 from .params import TbParams
 from .pdk import nmos, pmos
+from .typing import as_hdl21_paramclass, Hdl21Paramclass
 
 
 @h.paramclass
@@ -29,11 +30,13 @@ class OpAmpParams:
 
 
 @h.generator
-def OpAmp(p: OpAmpParams) -> h.Module:
+def OpAmp(p: Hdl21Paramclass(OpAmpInput)) -> h.Module:
     """# Two stage OpAmp"""
 
     @h.module
     class DiffOta:
+        cl = h.prefix.Prefixed(number=1e-11)
+
         # IO Interface
         VDD, VSS = 2 * h.Input()
         ibias = h.Input()
@@ -45,28 +48,28 @@ def OpAmp(p: OpAmpParams) -> h.Module:
         net3, net4, net5 = h.Signals(3)
 
         # Input Stage
-        mp1 = pmos(m=p.wp1)(
+        mp1 = pmos(m=p.mp1)(
             d=net4, g=net4, s=VDD, b=VDD
         )  # Current mirror within the input stage
-        mp2 = pmos(m=p.wp2)(
+        mp2 = pmos(m=p.mp1)(
             d=net5, g=net4, s=VDD, b=VDD
         )  # Current mirror within the input stage
-        mn1 = nmos(m=p.wn1)(d=net4, g=inp.n, s=net3, b=net3)  # Input MOS pair
-        mn2 = nmos(m=p.wn2)(d=net5, g=inp.p, s=net3, b=net3)  # Input MOS pair
-        mn3 = nmos(m=p.wn3)(d=net3, g=ibias, s=VSS, b=VSS)  # Mirrored current source
+        mn1 = nmos(m=p.mn1)(d=net4, g=inp.n, s=net3, b=net3)  # Input MOS pair
+        mn2 = nmos(m=p.mn1)(d=net5, g=inp.p, s=net3, b=net3)  # Input MOS pair
+        mn3 = nmos(m=p.mn3)(d=net3, g=ibias, s=VSS, b=VSS)  # Mirrored current source
 
         # Output Stage
-        mp3 = pmos(m=p.wp3)(d=out, g=net5, s=VDD, b=VDD)  # Output inverter
-        mn5 = nmos(m=p.wn5)(d=out, g=ibias, s=VSS, b=VSS)  # Output inverter
-        CL = h.Cap(c=p.CL)(p=out, n=VSS)  # Load capacitance
+        mp3 = pmos(m=p.mp3)(d=out, g=net5, s=VDD, b=VDD)  # Output inverter
+        mn5 = nmos(m=p.mn5)(d=out, g=ibias, s=VSS, b=VSS)  # Output inverter
+        CL = h.Cap(c=cl)(p=out, n=VSS)  # Load capacitance
 
         # Biasing
-        mn4 = nmos(m=p.wn4)(
+        mn4 = nmos(m=p.mn4)(
             d=ibias, g=ibias, s=VSS, b=VSS
         )  # Current mirror co-operating with mn3
 
         # Compensation Network
-        Cc = h.Cap(c=p.Cc)(p=net5, n=out)  # Miller Capacitance
+        Cc = h.Cap(c=p.cc)(p=net5, n=out)  # Miller Capacitance
 
     return DiffOta
 
@@ -75,21 +78,16 @@ def opamp_inner(inp: OpAmpInput) -> OpAmpOutput:
     """# Two-Stage OpAmp RPC Implementation"""
 
     # Convert our input into `OpAmpParams`
-    # FIXME: @king-han gonna clean all this conversion stuff up
-    params = OpAmpParams(
-        wp1=inp.mp1,
-        wn1=inp.mn1,
-        wp3=inp.mp3,
-        wn3=inp.mn3,
-        wn4=inp.mn4,
-        wn5=inp.mn5,
-        Cc=inp.cc,
-        # FIXME Extra, don't need?
-        wp2=inp.mp1,
-        wn2=inp.mn1,
-    )
+    params = as_hdl21_paramclass(inp)
+
+    VDD = h.prefix.Prefixed(number=1.2)
+    ibias = h.prefix.Prefixed(number=3e-5)
 
     # Create a testbench, simulate it, and return the metrics!
     opamp = OpAmp(params)
-    tbparams = TbParams(dut=opamp, VDD=params.VDD, ibias=params.ibias)
+    tbparams = TbParams(
+        dut=opamp,
+        VDD=VDD,
+        ibias=ibias,
+    )
     return simulate(tbparams)

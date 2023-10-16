@@ -18,11 +18,12 @@ from autockt_shared import (
 )
 
 
-# TODO maybe don't need to save files at all
-IO_BASE_DIR = "/tmp/ckt_da_new/"
+CURRENT_PATH = Path(__file__).resolve().parent
+NETLIST_PATH = CURRENT_PATH / "ngspice" / "netlist" / "two_stage_opamp.cir"
+SPICE_MODEL_PATH = CURRENT_PATH / "ngspice" / "spice_models" / "45nm_bulk.txt"
 
 
-_raw_file = open(IO_BASE_DIR + "in/" + "two_stage_opamp.cir", "r")
+_raw_file = open(NETLIST_PATH, "r")
 _tmp_lines = _raw_file.readlines()
 _raw_file.close()
 
@@ -47,8 +48,11 @@ def create_design(state: OpAmpInput):
                 # parent_path = os.path.abspath(os.path.join(current_fpath, os.pardir))
                 # parent_path = os.path.abspath(os.path.join(parent_path, os.pardir))
                 # path_to_model = os.path.join(parent_path, 'spice_models/45nm_bulk.txt')
-                # lines[line_num] = lines[line_num].replace(found.group(1), path_to_model)
-                pass  # do not change the model path
+                lines[line_num] = lines[line_num].replace(
+                    found.group(1),
+                    str(SPICE_MODEL_PATH),
+                )
+                # pass  # do not change the model path
         if ".param" in line:
             for key, value in asdict(state).items():
                 regex = re.compile("%s=(\S+)" % (key))
