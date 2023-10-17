@@ -2,6 +2,7 @@ set -eo
 
 # Install all of our packages with development extras
 pip install \
+    -e "./Discovery/Dev" \
     -e "./Discovery/Shared[dev]" \
     -e "./Discovery/Server[dev]" \
     -e "./Discovery/Client[dev]" \

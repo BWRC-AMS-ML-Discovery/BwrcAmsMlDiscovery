@@ -2,15 +2,16 @@ set -eo
 
 # Install all of our packages with development extras
 pip install \
-    -e "./Discovery/Shared[dev]" \
-    -e "./Discovery/Client[dev]" \
-    -e "./Discovery/Server[dev]" \
-    -e "./AutoCkt/Shared[dev]" \
-    -e "./AutoCkt/Server[dev]" \
-    -e "./AutoCkt/Client[dev]" 
+    -e "./Discovery/Dev" \
+    -e "./Discovery/Shared" \
+    -e "./Discovery/Client" \
+    -e "./Discovery/Server" \
+    -e "./AutoCkt/Shared" \
+    -e "./AutoCkt/Server" \
+    -e "./AutoCkt/Client" 
 
 # The point: leaving out this one: 
-##-e "./AutoCkt/Ml[dev]"
+##-e "./AutoCkt/Ml"
 
 # Swap to the ray/ OpenAI/ ML-stuff preferred version of protobuf
 # Hdl21 includes a dependency on a newer version, 

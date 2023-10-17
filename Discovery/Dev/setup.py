@@ -16,20 +16,23 @@ long_description = "" if not readme.exists() else readme.read_text(encoding="utf
 
 
 setup(
-    name="autockt_client",
-    version="0.0.1",
-    description="BWRC AMS ML Discovery AutoCkt - Client",
+    name="cktgym_discovery_dev",
+    version="0.0.4",
+    description="BWRC AMS ML Discovery - Dev Packages",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="FIXME",
+    url="https://github.com/BWRC-AMS-ML-Discovery",
     author="The Regents of the University of California",
-    author_email="FIXME",
+    author_email="haohanw@eecs.berkeley.edu",
     packages=find_packages(),
-    python_requires=">=3.7, <4",  ## FIXME: require 3.7, maybe more, after dependencies upgrades
-    install_requires=[  ##
-        # Local "workspace" dependencies
-        "autockt_shared",
-        "discovery_client",
+    python_requires=">=3.7, <3.11",
+    install_requires=[
+        "ipython==6.5.0",
+        "pytest==7.1",
+        "coverage",
+        "pytest-cov",
+        "pre-commit==2.20",
+        "black==22.6",
+        "twine",
     ],
-    extras_require={"dev": ["cktgym_discovery_dev"]},
 )

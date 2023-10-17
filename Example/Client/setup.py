@@ -31,14 +31,5 @@ setup(
         "cktgym_discovery_client",
         "example_shared==0.0.1",
     ],
-    extras_require={
-        "dev": [
-            "pytest==7.1",
-            "coverage",
-            "pytest-cov",
-            "pre-commit==2.20",
-            "black==22.6",
-            "twine",
-        ]
-    },
+    extras_require={"dev": ["cktgym_discovery_dev"]},
 )

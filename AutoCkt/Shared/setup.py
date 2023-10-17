@@ -31,14 +31,5 @@ setup(
         ## Maybe, but it's nice for intra-workspace consistency.
         "numpy==1.21.5",
     ],
-    # extras_require={
-    #     "dev": [
-    #         "pytest==7.1",
-    #         "coverage",
-    #         "pytest-cov",
-    #         "pre-commit==2.20",
-    #         "black==22.6",
-    #         "twine",
-    #     ]
-    # },
+    extras_require={"dev": ["cktgym_discovery_dev"]},
 )
