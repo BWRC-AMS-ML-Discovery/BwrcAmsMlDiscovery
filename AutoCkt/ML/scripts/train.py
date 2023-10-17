@@ -16,7 +16,7 @@ import ray
 import ray.tune as tune
 
 # Workspace Imports
-from autockt.envs.ngspice_vanilla_opamp import TwoStageAmp
+from autockt_ml.envs.ngspice_vanilla_opamp import TwoStageAmp
 
 
 parser = argparse.ArgumentParser()

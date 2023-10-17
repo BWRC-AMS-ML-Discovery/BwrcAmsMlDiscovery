@@ -1,5 +1,8 @@
-from autockt.autockt_gym import AutoCktGym
 import IPython
+from dotenv import dotenv_values
+
+from autockt_ml.autockt_gym import AutoCktGym
+from autockt_shared import OpAmpInput, OpAmpOutput, auto_ckt_sim
 from autockt_shared.cktopt import (
     CircuitOptimization,
     AutoCktGymEnvConfig,
@@ -8,15 +11,8 @@ from autockt_shared.cktopt import (
     MetricSpec,
     MetricSpecs,
 )
-from dotenv import dotenv_values
 from autockt_shared.rewards import settaluri_reward
-from autockt import (
-    OpAmpInput,
-    OpAmpOutput,
-    auto_ckt_sim,
-    start_client,
-    Config,
-)
+from autockt_client import start_client, Config
 
 
 def _test_https() -> AutoCktGym:

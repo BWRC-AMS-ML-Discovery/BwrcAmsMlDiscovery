@@ -1,6 +1,6 @@
 import time
 from dotenv import dotenv_values
-from autockt.client import (
+from autockt_client import (
     start as start_client,
     Config,
 )

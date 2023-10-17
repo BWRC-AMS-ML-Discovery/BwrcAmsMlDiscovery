@@ -18,8 +18,8 @@ from ray.rllib.algorithms import Algorithm
 from ray.tune.registry import register_env
 
 # Workspace Imports
-from autockt.envs.ngspice_vanilla_opamp import TwoStageAmp
-from autockt.autockt_gym import AutoCktGym
+from autockt_ml.envs.ngspice_vanilla_opamp import TwoStageAmp
+from autockt_ml.autockt_gym import AutoCktGym
 
 EXAMPLE_USAGE = """
 Example Usage via RLlib CLI:

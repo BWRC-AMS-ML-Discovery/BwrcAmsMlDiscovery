@@ -1,5 +1,5 @@
 from autockt_shared import OpAmpInput, OpAmpOutput
-from autockt import auto_ckt_sim
+from autockt_server import auto_ckt_sim
 
 
 def ordered_dict_to_input(param_val):

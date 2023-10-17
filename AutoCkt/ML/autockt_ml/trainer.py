@@ -2,7 +2,7 @@
 from ray import tune
 
 # Local imports
-from autockt.autockt_gym import AutoCktGym
+from autockt_ml.autockt_gym import AutoCktGym
 from autockt_shared.cktopt import AutoCktGymEnvConfig
 
 

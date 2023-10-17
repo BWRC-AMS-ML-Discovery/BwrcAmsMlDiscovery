@@ -1,7 +1,7 @@
 # Local Imports
-from autockt.client import Config, start as start_client
-from autockt.trainer import autockt_train
 from autockt_shared import CircuitOptimization, AutoCktGymEnvConfig
+from autockt_client import Config, start as start_client
+from autockt_ml.trainer import autockt_train
 
 from dotenv import dotenv_values
 
