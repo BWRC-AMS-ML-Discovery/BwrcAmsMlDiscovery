@@ -19,4 +19,4 @@ def start(cfg: Config):
         dc.client_start()
     else:
         # Short-circuiting by directly calling server functions
-        import eval_engines as _
+        import autockt_server as _

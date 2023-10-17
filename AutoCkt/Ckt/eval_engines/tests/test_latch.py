@@ -1,5 +1,5 @@
 from discovery_shared.rpc import Rpc
-from eval_engines import latch_sim, LatchInput
+from autockt_server import latch_sim, LatchInput
 
 
 def test_types():

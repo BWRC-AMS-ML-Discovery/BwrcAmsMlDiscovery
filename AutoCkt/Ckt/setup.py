@@ -16,7 +16,7 @@ long_description = "" if not readme.exists() else readme.read_text(encoding="utf
 
 
 setup(
-    name="eval_engines",
+    name="autockt_server",
     version="0.0.1",
     description="BWRC AMS ML Discovery AutoCkt - Circuits",
     long_description=long_description,

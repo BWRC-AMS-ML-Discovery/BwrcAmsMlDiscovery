@@ -15,7 +15,7 @@ from gym import spaces
 # Workspace Imports
 from .create_design_and_simulate_lib import create_design_and_simulate
 from shared import *
-from eval_engines import PARAMS_RANGE, NORM_CONSTANT, TARGET_RANGE
+from autockt_server import PARAMS_RANGE, NORM_CONSTANT, TARGET_RANGE
 
 PARAMS_RANGE = PARAMS_RANGE
 NORM_CONSTANT = NORM_CONSTANT

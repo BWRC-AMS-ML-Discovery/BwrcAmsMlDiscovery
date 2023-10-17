@@ -1,5 +1,5 @@
 from dotenv import dotenv_values
-from eval_engines import start_server, Config
+from autockt_server import start_server, Config
 
 env = dotenv_values()
 

@@ -6,8 +6,9 @@ pip install \
     -e "./Discovery/Client[dev]" \
     -e "./Discovery/Server[dev]" \
     -e "./AutoCkt/Shared[dev]" \
-    -e "./AutoCkt/Ckt[dev]" \
-    -e "./AutoCkt/Auto[dev]"
+    -e "./AutoCkt/Server[dev]" \
+    -e "./AutoCkt/Client[dev]" \
+    -e "./AutoCkt/Ml[dev]"
 
 # Swap to the ray/ OpenAI/ ML-stuff preferred version of protobuf
 # Hdl21 includes a dependency on a newer version, 
