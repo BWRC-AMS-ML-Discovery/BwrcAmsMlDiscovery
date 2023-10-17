@@ -61,7 +61,7 @@ output = my_rpc(input) # Returns an `Output` object
 # Std-Lib Imports
 import inspect
 from dataclasses import is_dataclass
-from typing import Callable, Type, Dict
+from typing import Callable, Type, Dict, Optional
 
 # Local Imports
 from .dataclasses import dataclass
@@ -81,7 +81,7 @@ class Rpc:
     docstring: str = ""  # Docstring
     # Inner Function
     # An http POST in the client, and a function call in the server
-    func: Callable | None = None
+    func: Optional[Callable] = None
 
     def __post_init__(self) -> "Rpc":
         # Register to dictionary

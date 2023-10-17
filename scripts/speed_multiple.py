@@ -9,7 +9,7 @@ if __name__ != "__main__":
 
 
 # Local Imports
-from autockt.trainer import autockt_train
+from autockt_ml.trainer import autockt_train
 from autockt_shared.cktopt import (
     CircuitOptimization,
     AutoCktGymEnvConfig,
