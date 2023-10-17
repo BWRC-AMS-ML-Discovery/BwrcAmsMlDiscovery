@@ -18,6 +18,8 @@ from hdl21.external_module import SpiceType
 from hdl21.prefix import µ, NANO
 import numpy
 
+from autockt_shared import LDOInput, LDOOutput
+
 CURRENT_PATH = Path(os.path.dirname(os.path.abspath(__file__)))
 SPICE_MODEL_45NM_BULK_PATH = CURRENT_PATH / "45nm_bulk.txt"
 
@@ -180,6 +182,13 @@ def LDO_Sim(params: LDO_Params) -> h.sim.Sim:
         mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
 
     return MosDcopSim
+
+
+def ldo_sim(inp: LDOInput) -> LDOOutput:
+    """
+    LDO Simulation
+    """
+    # TODO implement
 
 
 def main():

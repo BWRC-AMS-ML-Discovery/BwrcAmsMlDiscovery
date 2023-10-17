@@ -5,28 +5,10 @@
 import hdl21 as h
 from autockt_shared import OpAmpInput, OpAmpOutput, auto_ckt_sim_hdl21
 
-from .tb import simulate
+from ..typing import as_hdl21_paramclass, Hdl21Paramclass
+from ..pdk import nmos, pmos
 from .params import TbParams
-from .pdk import nmos, pmos
-from .typing import as_hdl21_paramclass, Hdl21Paramclass
-
-
-@h.paramclass
-class OpAmpParams:
-    """Parameter class"""
-
-    wp1 = h.Param(dtype=int, desc="Width of PMOS mp1", default=10)
-    wp2 = h.Param(dtype=int, desc="Width of PMOS mp2", default=10)
-    wp3 = h.Param(dtype=int, desc="Width of PMOS mp3", default=4)
-    wn1 = h.Param(dtype=int, desc="Width of NMOS mn1", default=38)
-    wn2 = h.Param(dtype=int, desc="Width of NMOS mn2", default=38)
-    wn3 = h.Param(dtype=int, desc="Width of NMOS mn3", default=9)
-    wn4 = h.Param(dtype=int, desc="Width of NMOS mn4", default=20)
-    wn5 = h.Param(dtype=int, desc="Width of NMOS mn5", default=60)
-    VDD = h.Param(dtype=h.Scalar, desc="VDD voltage", default=1.2)
-    CL = h.Param(dtype=h.Scalar, desc="CL capacitance", default=1e-11)
-    Cc = h.Param(dtype=h.Scalar, desc="Cc capacitance", default=3e-12)
-    ibias = h.Param(dtype=h.Scalar, desc="ibias current", default=3e-5)
+from .tb import simulate
 
 
 @h.generator
@@ -77,7 +59,7 @@ def OpAmp(p: Hdl21Paramclass(OpAmpInput)) -> h.Module:
 def opamp_inner(inp: OpAmpInput) -> OpAmpOutput:
     """# Two-Stage OpAmp RPC Implementation"""
 
-    # Convert our input into `OpAmpParams`
+    # Convert `inp` into the generator's parameters
     params = as_hdl21_paramclass(inp)
 
     VDD = h.prefix.Prefixed(number=1.2)

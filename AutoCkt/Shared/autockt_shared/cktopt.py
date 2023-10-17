@@ -1,5 +1,5 @@
 # Stdlib imports
-from typing import Callable, Generic, TypeVar
+from typing import Callable, Union
 from dataclasses import asdict
 
 # PyPI imports
@@ -10,7 +10,7 @@ from discovery_shared.rpc import Rpc
 
 
 # FIXME When training, everything converts to float, why?
-Number = float | int
+Number = Union[float, int]
 
 
 @dataclass

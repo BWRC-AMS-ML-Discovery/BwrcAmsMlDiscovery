@@ -3,14 +3,13 @@
 
 """
 
-import sys
-from copy import deepcopy
 import hdl21 as h
 import hdl21.sim as hs
 import vlsirtools.spice as vsp
-from hdl21.external_module import SpiceType
-from hdl21.prefix import µ, NANO, PICO, FEMTO
+from hdl21.prefix import NANO, PICO
 import numpy
+
+from autockt_shared import FlipFlopInput, FlipFlopOutput
 
 # import Latch
 from .Latch import LatchParams, LatchGen
@@ -218,6 +217,98 @@ def FF_inner(
 
     # And return them as an `OpAmpOutput`
     return True, output_delay, power
+
+
+def flip_flop_sim(inp: FlipFlopInput) -> FlipFlopOutput:
+    """
+    FlipFlop Simulation
+    """
+    ifdebug = False
+
+    params = FFParams(
+        LatchParams(inp.l1), LatchParams(inp.l2)
+    )  # TODO: Is this a correct way?
+    ifwork, output_delay, power = FF_inner(params, 0, 0)
+    if ifdebug:
+        print("clk->q delay:    " + str(output_delay))
+        print("power:           " + str(power))
+        print("==============================")
+    shift_min = 0 * NANO
+    shift_max = 5 * NANO
+    cursor = (shift_min + shift_max) / 2
+    ifwork, temp_delay, power_null = FF_inner(params, cursor, 1)
+    round = 1
+
+    if ifdebug:
+        print("round:           " + str(round))
+        print("clk->q delay:    " + str(temp_delay))
+        print("max shift:       " + str(float(shift_max)))
+        print("min shift:       " + str(float(shift_min)))
+        print("==============================")
+
+    while (shift_max - shift_min) > 0.1 * PICO:
+        if ifwork == False:
+            shift_max = cursor
+        elif temp_delay > 1.05 * output_delay:
+            shift_max = cursor
+        elif temp_delay == 1.05 * output_delay:
+            break
+        else:
+            shift_min = cursor
+        cursor = (shift_min + shift_max) / 2
+        round += 1
+        ifwork, temp_delay, power_null = FF_inner(params, cursor, round)
+
+        if ifdebug:
+            print("round:           " + str(round))
+            print("clk->q delay:    " + str(temp_delay))
+            print("max shift:       " + str(float(shift_max)))
+            print("min shift:       " + str(float(shift_min)))
+            print("==============================")
+
+    setup_time = 5 * NANO - cursor
+
+    shift_min = 0 * NANO
+    shift_max = -10 * NANO + cursor
+    cursor = (shift_min + shift_max) / 2
+    ifwork, temp_delay, power_null = FF_inner(params, cursor, 100)
+    round = 100
+
+    if ifdebug:
+        print("round:           " + str(round))
+        print("clk->q delay:    " + str(temp_delay))
+        print("max shift:       " + str(float(shift_max)))
+        print("min shift:       " + str(float(shift_min)))
+        print("==============================")
+
+    while (shift_min - shift_max) > 0.1 * PICO:
+        if ifwork == False:
+            shift_max = cursor
+        elif temp_delay > 1.05 * output_delay:
+            shift_max = cursor
+        elif temp_delay == 1.05 * output_delay:
+            break
+        else:
+            shift_min = cursor
+        cursor = (shift_min + shift_max) / 2
+        round += 1
+        ifwork, temp_delay, power_null = FF_inner(params, cursor, round)
+
+        if ifdebug:
+            print("round:           " + str(round))
+            print("clk->q delay:    " + str(temp_delay))
+            print("max shift:       " + str(float(shift_max)))
+            print("min shift:       " + str(float(shift_min)))
+            print("==============================")
+
+    hold_time = 5 * NANO + cursor
+
+    return FlipFlopOutput(
+        power=power,
+        output_delay=output_delay,
+        setup_time=setup_time,
+        hold_time=hold_time,
+    )
 
 
 def main():

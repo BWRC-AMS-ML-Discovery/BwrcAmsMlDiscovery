@@ -38,12 +38,3 @@ def test_sim():
     )
     out = two_stage_op_amp_ngm_sim(inp)
     print(out)
-
-
-def test():
-    test_types()
-    test_sim()
-
-
-if __name__ == "__main__":
-    test()

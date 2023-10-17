@@ -53,12 +53,3 @@ def test_sim():
 
     out = folded_cascode_sim(inp)
     print(out)
-
-
-def test():
-    test_types()
-    test_sim()
-
-
-if __name__ == "__main__":
-    test()

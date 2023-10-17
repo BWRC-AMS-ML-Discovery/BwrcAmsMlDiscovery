@@ -15,6 +15,8 @@ from hdl21.external_module import SpiceType
 from hdl21.prefix import µ, NANO, PICO
 import numpy
 
+from autockt_shared import LatchInput, LatchOutput
+
 CURRENT_PATH = Path(os.path.dirname(os.path.abspath(__file__)))
 SPICE_MODEL_45NM_BULK_PATH = CURRENT_PATH / "45nm_bulk.txt"
 
@@ -175,7 +177,6 @@ def LatchSim(params: LatchParams, input_shift: float) -> h.sim.Sim:
     class LatchSimGen:
         @h.module
         class Tb:
-
             VSS = h.Port()  # The testbench interface: sole port VSS
             vdc = h.Vdc(dc=1.2)(n=VSS)  # A DC voltage source
 
@@ -289,6 +290,76 @@ def Latch_inner(
 
     # And return them as an `OpAmpOutput`
     return True, output_delay, power
+
+
+def latch_sim(inp: LatchInput) -> LatchOutput:
+    """
+    Latch Simulation
+    FIXME: find this a real home, and/or organize it with this other stuff.
+    """
+    opts = vsp.SimOptions(
+        simulator=vsp.SupportedSimulators.NGSPICE,
+        fmt=vsp.ResultFormat.SIM_DATA,  # Get Python-native result types
+        rundir="./scratch",  # Set the working directory for the simulation. Uses a temporary directory by default.
+    )
+    if not vsp.ngspice.available():
+        print("ngspice is not available. Skipping simulation.")
+        return
+
+    ifdebug = False
+
+    params = LatchParams(
+        w1=inp.w1,
+        w2=inp.w2,
+        w3=inp.w3,
+        w4=inp.w4,
+        w5=inp.w5,
+        w6=inp.w6,
+        w7=inp.w7,
+        w8=inp.w8,
+        w9=inp.w9,
+        w10=inp.w10,
+        VDD=inp.VDD,
+    )
+    ifwork, output_delay, power = Latch_inner(params, 5 * NANO, 0, ifdebug)
+    if ifdebug:
+        print("clk->q delay:    " + str(output_delay))
+        print("power:           " + str(power))
+        print("==============================")
+    shift_min = 5 * NANO
+    shift_max = 11 * NANO
+    cursor = (shift_min + shift_max) / 2
+    ifwork, temp_delay, power_null = Latch_inner(params, cursor, 1, ifdebug)
+    round = 1
+    if ifdebug:
+        print("round:           " + str(round))
+        print("clk->q delay:    " + str(temp_delay))
+        print("max shift:       " + str(float(shift_max)))
+        print("min shift:       " + str(float(shift_min)))
+        print("==============================")
+
+    while (shift_max - shift_min) > 0.1 * PICO:
+        if ifwork == False:
+            shift_max = cursor
+        elif temp_delay > 1.05 * output_delay:
+            shift_max = cursor
+        elif temp_delay == 1.05 * output_delay:
+            break
+        else:
+            shift_min = cursor
+        cursor = (shift_min + shift_max) / 2
+        round += 1
+        ifwork, temp_delay, power_null = Latch_inner(params, cursor, round, ifdebug)
+        if ifdebug:
+            print("round:           " + str(round))
+            print("clk->q delay:    " + str(temp_delay))
+            print("max shift:       " + str(float(shift_max)))
+            print("min shift:       " + str(float(shift_min)))
+            print("==============================")
+
+    setup_time = 10 * NANO - cursor
+
+    return LatchOutput(power=power, output_delay=output_delay, setup_time=setup_time)
 
 
 def main():

@@ -11,7 +11,7 @@ import vlsirtools.spice as vsp
 from autockt_shared import OpAmpOutput
 
 from .params import TbParams
-from .pdk import SPICE_MODEL_45NM_BULK_PATH
+from ..pdk import SPICE_MODEL_45NM_BULK_PATH
 
 
 def OpAmpSim(params: TbParams) -> h.sim.Sim:
