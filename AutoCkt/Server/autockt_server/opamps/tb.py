@@ -14,29 +14,38 @@ from .params import TbParams
 from ..pdk import SPICE_MODEL_45NM_BULK_PATH
 
 
-def OpAmpSim(params: TbParams) -> h.sim.Sim:
+@h.generator
+def OpAmpTb(params: TbParams) -> h.Module:
+    """# Generic Op-Amp Testbench"""
+
+    @h.module
+    class OpAmpTb:
+        VSS = h.Port()  # The testbench interface: sole port VSS
+
+        # Drive VDD
+        vdc = h.Vdc(dc=params.VDD)(n=VSS)
+        inp = h.Diff()
+        sig_out = h.Signal()
+        ibias = h.Signal()
+        sig_p = h.Vdc(dc=params.VDD / 2, ac=0.5)(p=inp.p, n=VSS)
+        sig_n = h.Vdc(dc=params.VDD / 2, ac=-0.5)(p=inp.n, n=VSS)
+        Isource = h.Isrc(dc=params.ibias)(p=vdc.p, n=ibias)
+
+        # The Op-Amp DUT
+        inst = params.dut(VDD=vdc.p, VSS=VSS, ibias=ibias, inp=inp, out=sig_out)
+
+    return OpAmpTb
+
+
+def OpAmpSim(tbmodule: h.Instantiable) -> h.sim.Sim:
     """# Op Amp Simulation Input"""
 
     @hs.sim
     class OpAmpSim:
         """# OpAmp Simulation Input"""
 
-        @h.module
-        class Tb:
-            """# Op-Amp Testbench"""
-
-            VSS = h.Port()  # The testbench interface: sole port VSS
-
-            vdc = h.Vdc(dc=params.VDD)(n=VSS)  # A DC voltage source
-            dcin = h.Diff()
-            sig_out = h.Signal()
-            i_bias = h.Signal()
-            sig_p = h.Vdc(dc=params.VDD / 2, ac=0.5)(p=dcin.p, n=VSS)
-            sig_n = h.Vdc(dc=params.VDD / 2, ac=-0.5)(p=dcin.n, n=VSS)
-            Isource = h.Isrc(dc=params.ibias)(p=vdc.p, n=i_bias)
-
-            # The Op-Amp DUT
-            inst = params.dut(VDD=vdc.p, VSS=VSS, ibias=i_bias, inp=dcin, out=sig_out)
+        # The testbench
+        tb = tbmodule
 
         # Simulation Stimulus
         op = hs.Op()
@@ -45,19 +54,16 @@ def OpAmpSim(params: TbParams) -> h.sim.Sim:
         # Model Includes
         mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
 
-    # Add any extra simulator control elements
-    ctrls = params.ctrls or []
-    for ctrl in ctrls:
-        OpAmpSim.add(ctrl)
-
     return OpAmpSim
 
 
-def simulate(params: TbParams) -> OpAmpOutput:
+def simulate(tbmodule: h.Instantiable) -> OpAmpOutput:
     """# Simulate an op-amp testbench, parse and return its metrics."""
 
+    # Apply `params` to generate the test
+
     # Get our simulation input
-    sim_input = OpAmpSim(params=params)
+    sim_input = OpAmpSim(tbmodule)
 
     if not vsp.ngspice.available():
         raise RuntimeError(f"No ngspice available")

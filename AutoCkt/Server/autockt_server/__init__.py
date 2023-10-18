@@ -37,7 +37,7 @@ from . import opamps, Latch, FF, LDO
 
 ## OpAmps
 auto_ckt_sim_hdl21.impl(opamps.TwoStageOpAmp.opamp_inner)
-folded_cascode_sim.impl(opamps.FoldedCascode.folded_cascode_sim)
+folded_cascode_sim.impl(opamps.FoldedCascode.endpoint)
 two_stage_op_amp_ngm_sim.impl(opamps.TwoStageOpAmp_ngm.two_stage_op_amp_ngm_sim)
 
 ## Others
