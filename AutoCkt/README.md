@@ -18,6 +18,6 @@ python -c "import autockt"
 conda create --name autockt-server python=3.10
 conda activate autockt-server
 bash scripts/install_server.sh 
-python -c "import eval_engines"
+python -c "import autockt_server"
 
 ```

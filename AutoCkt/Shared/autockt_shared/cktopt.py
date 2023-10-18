@@ -1,13 +1,16 @@
 # Stdlib imports
-from typing import Callable, Generic, TypeVar
+from typing import Callable, Union
 from dataclasses import asdict
 
 # PyPI imports
 from pydantic.dataclasses import dataclass
 
 # Local imports
-from autockt_shared.typing import Number
 from discovery_shared.rpc import Rpc
+
+
+# FIXME When training, everything converts to float, why?
+Number = Union[float, int]
 
 
 @dataclass
@@ -17,14 +20,14 @@ class Range:
 
 
 @dataclass
-class AutoCktParam:
+class ParamSpec:
     name: str
     range: Range
     step: Number
     init: Number
 
 
-AutoCktParams = list[AutoCktParam]
+ParamSpecs = list[ParamSpec]
 """
 Why not define a dataclass when we want to use different parameters?
 Because it might just be too tedious to create a new dataclass
@@ -33,13 +36,13 @@ when we simply want to control which parameters to vary.
 
 
 @dataclass
-class AutoCktSpec:
+class MetricSpec:
     name: str
     range: Range
     normalize: Number
 
 
-AutoCktSpecs = list[AutoCktSpec]
+MetricSpecs = list[MetricSpec]
 """
 Why not define a dataclass when we want to achieve different specs?
 Because it might just be too tedious to create a new dataclass
@@ -48,9 +51,9 @@ when we simply want to control which specs to achieve.
 
 
 @dataclass
-class AutoCktCircuitOptimization:
-    params: AutoCktParams
-    specs: AutoCktSpecs
+class CircuitOptimization:
+    params: ParamSpecs
+    specs: MetricSpecs
     input_type: type
     output_type: type
     reward: Callable[
@@ -67,7 +70,7 @@ class AutoCktCircuitOptimization:
 
 @dataclass
 class AutoCktGymEnvConfig:
-    circuit_optimization: AutoCktCircuitOptimization
+    circuit_optimization: CircuitOptimization
     actions_per_param: list[
         int  # TODO Here, int is number of steps. Can be more general.
     ]
