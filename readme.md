@@ -18,9 +18,10 @@ Example is a use case of `discovery_client` and `discovery_server`, exposing a s
 
 ## [AutoCkt](./AutoCkt/) 
 
-@wayne-wang start fixing from here
+AutoCkt uses the server client interaction from (./Discovery/) to run the ML environment and provide it with necessary information to use proprietary software in (./Discovery/)
 
-`example_shared` contains data classes for rpcs and defined rpc classes that are used for registering in the `discovery_shared`, which in terms of example AutoCkt, would be:
+`autockt_shared` under `AutoCkt/Shared` contains the following:
+1. data classes for rpcs and defined rpc classes that are used for registering in the `discovery_shared`, which in terms of example AutoCkt, would be:
 ```sh
 auto_ckt_sim_hdl21 = Rpc(
     name="auto_ckt_sim_hdl21",
@@ -29,19 +30,19 @@ auto_ckt_sim_hdl21 = Rpc(
     docstring="Simulation on the Server",
 )
 ```
-where OpAmpInput and OpAmpOutput are also contained in here.
+2. reward function used for ML environment with Ray.
 
-`example_client` creates a call for client to send to `example_server`, in terms of autockt, it is called `test_autockt_sim`. 
-
-`example_server` handles the input sent from the client side, using a server function defined here. In terms of autockt, it would be:
+`eval_engines` under `AutoCkt/Ckt` creates a call for client to send to `discovery_server`, in terms of autockt, it is called under different names according to circuit types. The `TwoStageOpAmp.py` is used for AutoCkt's ML training script under `scripts`. One example:
 ```sh
 @auto_ckt_sim_hdl21.impl
 def auto_ckt_sim_hdl21(inp: OpAmpInput) -> OpAmpOutput:
-    """
-    AutoCkt Simulation
-    """
+    """# Our RPC Handler"""
+    return opamp_inner(inp)
 ```
-which correctly uses the rpcs registered in the previous step in `bwrc_discovery`
+where the `opamp_inner()` is from `TwoStageOpAmp.py` under `eval_engines`.
+And the sample training script called `train_opamp.py`
+
+`autockt` under `AutoCkt/Auto` handles the input using a ML script defined here. The complete implementation are divided into three major parts for AutoCkt, all with the name `autockt_gym_...`. They are manager classes used to update the parameters and the gym environment implementation for correctly invoking the simulation environment with Ray. 
 
 ### Autockt: autockt contains three packages, autockt_auto, autockt_ckt, and autockt_shared
 
@@ -57,20 +58,20 @@ In `autockt_shared`, we defined supporting data classes for RL, which includes d
 
 Currently recommends Python == 3.10
 
+Due to dependency issues, create two separate python environments, one for `client` and one for `server`. 
+For client py env, run:
 ```sh
-sh scripts/install.sh
+sh scripts/install_client.sh
+```
+And for server py env, run:
+```sh
+sh scripts/install_server.sh
 ```
 
 ## Running a Local Dev Server
 
 ```sh
-python scripts/server_start.py
-```
-
-## Running Client Examples
-
-```sh
-python scripts/client_do_example_stuff.py
+python AutoCkt/scripts/start_server.py
 ```
 
 ## Running AutoCkt Training
@@ -98,3 +99,4 @@ pytest
 
 1. To register and obtain the auth token, go to [website](https://cktgym-1.web.app/).
 2. Put the auth token in the `.env` file as `DISCOVERY_AUTH_TOKEN`.
+
