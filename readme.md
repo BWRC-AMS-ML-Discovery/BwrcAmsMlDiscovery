@@ -10,11 +10,15 @@ Includes:
 
 ## [Discovery](./Discovery/) Libraries
 
-Use these to create a new server instance pair. 
+Use these to create a new server instance pair. Read into this to understand how the server and client are setup, how they use shared utils to interact, and support simulations.
+
+1. `cktgym_discovery_client`: focusing on authentication functions that sets up everything to be sent to server for requests using Firestore
+2. `cktgym_discovery_server`: authenticates requests sent by clients and registers their rpcs to be used in simulations. The actual authentication function are under `auth`.
+3. `cktgym_discovery_shared`: a shared folder for utils to be used by both client and server, and the most important part: the definition and implementation of the rpcs under the `rpc.py`.
 
 ## [Example](./Example) Use Case
 
-Example is a use case of `discovery_client` and `discovery_server`, exposing a single simple endpoint.
+Example is a use case of `discovery_client` and `discovery_server`, exposing a single simple endpoint. Read it first to understand how the (./Discovery/) servers as a trunk that hosts server functionalities and essential server - client interactions.
 
 ## [AutoCkt](./AutoCkt/) 
 
