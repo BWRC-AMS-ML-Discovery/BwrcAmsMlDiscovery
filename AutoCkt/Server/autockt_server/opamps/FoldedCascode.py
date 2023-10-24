@@ -4,6 +4,7 @@
 
 from dataclasses import asdict
 import hdl21 as h
+from hdl21.prefix import µ, m
 
 from autockt_shared import FoldedCascodeInput, OpAmpOutput
 
@@ -13,163 +14,123 @@ from .tb import TbParams, simulate
 
 
 @h.paramclass
-class FoldedCascodeParams:
-    """Parameter class"""
+class FcascParams:
+    """# Fcasc Generator Parameters
+    In terms of unit device sizes and current ratios"""
 
-    w1_2 = h.Param(dtype=int, desc="Width of M1/2", default=10)
-    w5_6 = h.Param(dtype=int, desc="Width of M5/6", default=10)
-    w7_8 = h.Param(dtype=int, desc="Width of M7/8", default=10)
-    w9_10 = h.Param(dtype=int, desc="width of M9/10", default=10)
-    w11_12 = h.Param(dtype=int, desc="Width of M11/12", default=10)
-    w13_14 = h.Param(dtype=int, desc="Width of M13/14", default=10)
-    w15_16 = h.Param(dtype=int, desc="Width of M15/16", default=10)
-    w17 = h.Param(dtype=int, desc="Width of M17", default=10)
-    w18 = h.Param(dtype=int, desc="width of M18", default=10)
+    # Unit device sizes
+    nbias = h.Param(dtype=int, desc="Bias Nmos Unit Width", default=2)
+    pbias = h.Param(dtype=int, desc="Bias Pmos Unit Width", default=2)
+    ncasc = h.Param(dtype=int, desc="Cascode Nmos Unit Width", default=2)
+    pcasc = h.Param(dtype=int, desc="Cascode Pmos Unit Width", default=2)
+    ninp = h.Param(dtype=int, desc="Input Nmos Unit Width", default=2)
+    pinp = h.Param(dtype=int, desc="Input Pmos Unit Width", default=2)
 
-    cl = h.Param(dtype=h.Scalar, desc="cl capacitance", default=1e-14)
-    cc = h.Param(dtype=h.Scalar, desc="cc capacitance", default=1e-14)
-    rc = h.Param(dtype=h.Scalar, desc="rc resistor", default=100)
-    VDD = h.Param(dtype=h.Scalar, desc="VDD voltage", default=1.2)
+    # Current Mirror Ratios
+    alpha = h.Param(dtype=int, desc="Alpha (Pmos Input) Current Ratio", default=2)
+    beta = h.Param(dtype=int, desc="Beta (Nmos Input) Current Ratio", default=2)
+    gamma = h.Param(dtype=int, desc="Gamma (Output Cascode) Current Ratio", default=2)
 
-    wb0 = h.Param(dtype=int, desc="Width of MB0 ", default=10)
-    wb1 = h.Param(dtype=int, desc="Width of MB1 ", default=10)
-    wb2 = h.Param(dtype=int, desc="Width of MB2 ", default=10)
-    wb3 = h.Param(dtype=int, desc="Width of MB3 ", default=10)
-    wb4 = h.Param(dtype=int, desc="Width of MB4 ", default=10)
-    wb5 = h.Param(dtype=int, desc="Width of MB5 ", default=10)
-    wb6 = h.Param(dtype=int, desc="Width of MB6 ", default=10)
-    wb7 = h.Param(dtype=int, desc="Width of MB7 ", default=10)
-    wb8 = h.Param(dtype=int, desc="Width of MB8 ", default=10)
-    wb9 = h.Param(dtype=int, desc="Width of MB9 ", default=10)
-    wb10 = h.Param(dtype=int, desc="Width of MB10", default=10)
-    wb11 = h.Param(dtype=int, desc="Width of MB11", default=10)
-    wb12 = h.Param(dtype=int, desc="Width of MB12", default=10)
-    wb13 = h.Param(dtype=int, desc="Width of MB13", default=10)
-    wb14 = h.Param(dtype=int, desc="Width of MB14", default=10)
-    wb15 = h.Param(dtype=int, desc="Width of MB15", default=10)
-    wb16 = h.Param(dtype=int, desc="Width of MB16", default=10)
-    wb17 = h.Param(dtype=int, desc="Width of MB17", default=10)
-    wb18 = h.Param(dtype=int, desc="Width of MB18", default=10)
-    wb19 = h.Param(dtype=int, desc="Width of MB19", default=10)
+    # Input Bias Current
+    # Applied on *both* bias inputs
+    ibias = h.Param(dtype=h.Prefixed, desc="Input Bias Current", default=100 * µ)
 
-    ibias = h.Param(dtype=h.Scalar, desc="ibias current", default=30e-6)
-    Vcm = h.Param(dtype=h.Scalar, desc="Vcm", default=1)
+    # Cascode Bias Voltages
+    vcp = h.Param(dtype=h.Prefixed, desc="Cascode Pmos Bias Voltage", default=200 * m)
+    vcn = h.Param(dtype=h.Prefixed, desc="Cascode Nmos Bias Voltage", default=200 * m)
 
 
 @h.generator
-def Fcasc(params: FoldedCascodeParams) -> h.Module:
+def Fcasc(params: FcascParams) -> h.Module:
     """# Rail-to-Rail, Dual Input Pair, Folded Cascode, Diff to SE Op-Amp"""
 
-    Nbias = lambda x: nmos(m=x)
-    Ncasc = nmos()
-    Pbias = lambda x: pmos(m=x)
-    Pcasc = pmos()
+    # Multiplier functions of the parametric devices
+    nbias = lambda x: nmos(m=params.nbias * x)
+    ncasc = lambda x: nmos(m=params.ncasc * x)
+    ninp = lambda x: nmos(m=params.ninp * x)
+    pbias = lambda x: pmos(m=params.pbias * x)
+    pcasc = lambda x: pmos(m=params.pcasc * x)
+    pinp = lambda x: pmos(m=params.pinp * x)
+
+    # Give these some shorter-hands
+    alpha, beta, gamma = params.alpha, params.beta, params.gamma
 
     @h.module
     class Fcasc:
-        # IO
-        VDD, VSS = h.Ports(2)
-        inp = h.Diff(port=True)
-        out = h.Output()
-        ibias1, ibias2 = h.Inputs(2)
+        # IO Interface
+        VDD, VSS = h.PowerGround()
+        inp = h.Diff(port=True, role=h.Diff.Roles.SINK)
+        out = h.Output()  # Single ended output
+        ibias1, ibias2 = 2 * h.Input()
 
         # Implementation
+        ## Internal Signals
         outn = h.Signal()
         outd = h.bundlize(p=outn, n=out)
         psd = h.Diff()
         nsd = h.Diff()
-        pcascg, pbias = h.Signals(2)
+        pcascg, pbiasg = h.Signals(2)
 
-        ## Output Folded Stack
-        ptop = h.Pair(Pbias(x=2))(g=outn, d=psd, s=VDD, b=VDD)
-        pcasc = h.Pair(Pcasc)(g=pcascg, s=psd, d=outd, b=VDD)
-        ncasc = h.Pair(Ncasc)(g=ibias2, s=nsd, d=outd, b=VSS)
-        nbot = h.Pair(Nbias(x=2))(g=ibias1, d=nsd, s=VSS, b=VSS)
+        ## ###########################################################################
+        ## Output Stack
+        ## ###########################################################################
+        ## Cascodes have current `gamma`
+        ## Top has current `gamma + beta`
+        ## Bottom has current `gamma + alpha`
+        ## ###########################################################################
+        pbo = h.Pair(pbias(x=gamma + beta))(g=outn, d=psd, s=VDD, b=VDD)
+        pco = h.Pair(pcasc(x=gamma))(g=pcascg, s=psd, d=outd, b=VDD)
+        nco = h.Pair(ncasc(x=gamma))(g=ibias2, s=nsd, d=outd, b=VSS)
+        nbo = h.Pair(nbias(x=gamma + alpha))(g=ibias1, d=nsd, s=VSS, b=VSS)
 
+        ## ###########################################################################
+        ## Input Pairs
+        ## Nmos has current `alpha` per leg, `2*alpha` in the bias devices
+        ## Pmos has current `beta` per leg, `2*beta` in the bias devices
+        ## ###########################################################################
+        ##
         ## Nmos Input Pair
-        nin_bias = Nbias(x=2)(g=ibias1, s=VSS, b=VSS)
-        nin = h.Pair(nmos(nser=1, npar=4))(g=inp, d=psd, s=nin_bias.d, b=VSS)
-
+        nin_bias = nbias(x=2 * alpha)(g=ibias1, s=VSS, b=VSS)
+        nin_casc = ncasc(x=2 * alpha)(g=ibias2, s=nin_bias.d, b=VSS)
+        nin = h.Pair(ninp(x=alpha))(g=inp, d=psd, s=nin_casc.d, b=VSS)
+        ##
         ## Pmos Input Pair
-        pin_bias = Pbias(x=2)(g=pbias, s=VDD, b=VDD)
-        pin = h.Pair(pmos(nser=1, npar=4))(g=inp, d=nsd, s=pin_bias.d, b=VDD)
+        pin_bias = pbias(x=2 * beta)(g=pbiasg, s=VDD, b=VDD)
+        pin_casc = pbias(x=2 * beta)(g=pbiasg, s=pin_bias.d, b=VDD)
+        pin = h.Pair(pinp(x=beta))(g=inp, d=nsd, s=pin_casc.d, b=VDD)
 
-        ## Bias Tree
-        ### Nmos Cascode Gate Generator, with series-nmos "resistor"
-        ncdiode = nmos(nser=32)(g=ibias2, d=ibias2, s=VSS, b=VSS)
+        ## ###########################################################################
+        ## Bias Section
+        ## ###########################################################################
+        ## Everything in here is current-ratio one, i.e. all branches have `i=ibias`.
+        ## Note every value of `x` equals one.
+        ## ###########################################################################
+
+        ### Nmos Cascode Gate Generator
+        rrcn = h.Res(r=params.vcp / params.ibias)(n=VSS)
+        ncdiode = ncasc(x=1)(g=ibias2, d=ibias2, s=rrcn.p, b=VSS)
 
         ### Bottom Nmos Diode (with cascode)
-        ndiode_casc = Ncasc(g=ibias2, d=ibias1, b=VSS)
-        ndiode = Nbias(x=1)(g=ibias1, d=ndiode_casc.s, s=VSS, b=VSS)
+        ndiode_casc = ncasc(x=1)(g=ibias2, d=ibias1, b=VSS)
+        ndiode = nbias(x=1)(g=ibias1, d=ndiode_casc.s, s=VSS, b=VSS)
 
         ### Nmos Mirror to pmos Cascode Bias
-        n1casc = Ncasc(g=ibias2, d=pcascg, b=VSS)
-        n1src = Nbias(x=1)(g=ibias1, d=n1casc.s, s=VSS, b=VSS)
+        n1casc = ncasc(x=1)(g=ibias2, d=pcascg, b=VSS)
+        n1src = nbias(x=1)(g=ibias1, d=n1casc.s, s=VSS, b=VSS)
 
-        ### Pmos cascode bias, with magic voltage source
-        pcdiode = pmos(nser=16)(g=pcascg, d=pcascg, s=VDD, b=VDD)
+        ### Pmos cascode gate generator
+        rrcp = h.Res(r=params.vcp / params.ibias)(p=VDD)
+        pcdiode = pcasc(x=1)(g=pcascg, d=pcascg, s=rrcp.n, b=VDD)
 
         ### Nmos Mirror to top pmos Bias
-        n2casc = Ncasc(g=ibias2, d=pbias, b=VSS)
-        n2src = Nbias(x=1)(g=ibias1, d=n2casc.s, s=VSS, b=VSS)
+        n2casc = ncasc(x=1)(g=ibias2, d=pbiasg, b=VSS)
+        n2src = nbias(x=1)(g=ibias1, d=n2casc.s, s=VSS, b=VSS)
 
-        ### Top Pmos Bias
-        pdiode = Pbias(x=1)(g=pbias, s=VDD, b=VDD)
-        pdiode_casc = Pcasc(s=pdiode.d, g=pcascg, d=pbias, b=VDD)
+        ### Top Pmos Bias (with cascode)
+        pdiode = pbias(x=1)(g=pbiasg, s=VDD, b=VDD)
+        pdiode_casc = pcasc(x=1)(s=pdiode.d, g=pcascg, d=pbiasg, b=VDD)
 
     return Fcasc
-
-
-# def folded_cascode_sim(inp: FoldedCascodeInput) -> OpAmpOutput:
-#     """
-#     FoldedCascode Simulation
-#     """
-#     opts = vsp.SimOptions(
-#         simulator=vsp.SupportedSimulators.NGSPICE,
-#         fmt=vsp.ResultFormat.SIM_DATA,  # Get Python-native result types
-#         rundir="./scratch",  # Set the working directory for the simulation. Uses a temporary directory by default.
-#     )
-#     if not vsp.ngspice.available():
-#         print("ngspice is not available. Skipping simulation.")
-#         return
-
-#     params = FoldedCascodeParams(
-#         w1_2=inp.w1_2,
-#         w5_6=inp.w5_6,
-#         w7_8=inp.w7_8,
-#         w9_10=inp.w9_10,
-#         w11_12=inp.w11_12,
-#         w13_14=inp.w13_14,
-#         w15_16=inp.w15_16,
-#         w17=inp.w17,
-#         w18=inp.w18,
-#         # VDD=inp.VDD,
-#         cl=inp.cl,
-#         cc=inp.cc,
-#         rc=inp.rc,
-#         wb0=inp.wb0,
-#         wb1=inp.wb1,
-#         wb2=inp.wb2,
-#         wb3=inp.wb3,
-#         wb4=inp.wb4,
-#         wb5=inp.wb5,
-#         wb6=inp.wb6,
-#         wb7=inp.wb7,
-#         wb8=inp.wb8,
-#         wb9=inp.wb9,
-#         wb10=inp.wb10,
-#         wb11=inp.wb11,
-#         wb12=inp.wb12,
-#         wb13=inp.wb13,
-#         wb14=inp.wb14,
-#         wb15=inp.wb15,
-#         wb16=inp.wb16,
-#         wb17=inp.wb17,
-#         wb18=inp.wb18,
-#         wb19=inp.wb19,
-#         ibias=inp.ibias,
-#         Vcm=inp.Vcm,
-#     )
 
 
 @h.generator
@@ -190,7 +151,7 @@ def FcascTb(params: TbParams) -> h.Module:
         # Primary difference: the two bias current inputs
         ibias1, ibias2 = 2 * h.Signal()
         xibias1 = h.Isrc(dc=params.ibias)(p=vdc.p, n=ibias1)
-        xibias1 = h.Isrc(dc=params.ibias)(p=vdc.p, n=ibias2)
+        xibias2 = h.Isrc(dc=params.ibias)(p=vdc.p, n=ibias2)
 
         # The Op-Amp DUT
         inst = params.dut(
@@ -210,7 +171,7 @@ def endpoint(inp: FoldedCascodeInput) -> OpAmpOutput:
     ibias = h.prefix.Prefixed(number=3e-5)
 
     # Create a testbench, simulate it, and return the metrics!
-    opamp = FoldedCascodeParams(**asdict(inp))
+    opamp = FcascParams(**asdict(inp))
     tbparams = TbParams(
         dut=opamp,
         VDD=VDD,
