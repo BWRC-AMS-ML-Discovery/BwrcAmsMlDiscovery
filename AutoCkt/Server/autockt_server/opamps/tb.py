@@ -2,6 +2,7 @@
 # Testbench & Test Utilities
 """
 
+from typing import Optional
 import numpy
 
 import hdl21 as h
@@ -89,11 +90,10 @@ def find_dc_gain(vout: numpy.array) -> float:
 
 def find_ugbw(freq: numpy.array, vout: numpy.array) -> float:
     gain = numpy.abs(vout)
-    ugbw_index, valid = _get_best_crossing(gain, val=1)
-    if valid:
-        return freq[ugbw_index]
-    else:
-        return freq[0]
+    ugbw_index = _get_best_crossing(gain, val=1)
+    if ugbw_index is None:
+        return freq[0]  # None found; return the minimum frequency
+    return freq[ugbw_index]
 
 
 def find_phm(freq: numpy.array, vout: numpy.array) -> float:
@@ -102,24 +102,30 @@ def find_phm(freq: numpy.array, vout: numpy.array) -> float:
     phase = numpy.unwrap(phase)  # unwrap the discontinuity
     phase = numpy.rad2deg(phase)  # convert to degrees
 
-    ugbw_index, valid = _get_best_crossing(gain, val=1)
-    if valid:
-        if phase[ugbw_index] > 0:
-            return -180 + phase[ugbw_index]
-        else:
-            return 180 + phase[ugbw_index]
-    else:
+    ugbw_index = _get_best_crossing(gain, val=1)
+    if ugbw_index is None:
         return -180
 
+    if phase[ugbw_index] > 0:
+        return phase[ugbw_index] - 180
+    return phase[ugbw_index] + 180
 
-def _get_best_crossing(yvec: numpy.array, val: float) -> tuple[int, bool]:
+
+def _get_best_crossing(yvec: numpy.array, val: float) -> Optional[int]:
+    """
+    Get the index of the "best" crossing of `yvec` across `val`.
+    Returns None if no sufficiently good crossing (no crossing at all?) is found.
+    FIXME @HarryYanH: what do you mean "best"?
+    """
+
     zero_crossings = numpy.where(numpy.diff(numpy.sign(yvec - val)))[0]
     if len(zero_crossings) == 0:
-        return 0, False
+        return None
+
+    # FIXME @HarryYanH: what is this comparison here?
     if abs((yvec - val)[zero_crossings[0]]) < abs((yvec - val)[zero_crossings[0] + 1]):
-        return zero_crossings[0], True
-    else:
-        return (zero_crossings[0] + 1), True
+        return zero_crossings[0]
+    return zero_crossings[0] + 1
 
 
 def extract_outputs(results: h.sim.SimResult) -> OpAmpOutput:
@@ -127,6 +133,8 @@ def extract_outputs(results: h.sim.SimResult) -> OpAmpOutput:
 
     ac_result = results["ac"]
     sig_out = ac_result.data["v(xtop.sig_out)"]
+
+    # FIXME: @HarryYanH: why are these all multiplied by 2?
     gain = find_dc_gain(2 * sig_out)
     ugbw = find_ugbw(ac_result.freq, 2 * sig_out)
     phm = find_phm(ac_result.freq, 2 * sig_out)

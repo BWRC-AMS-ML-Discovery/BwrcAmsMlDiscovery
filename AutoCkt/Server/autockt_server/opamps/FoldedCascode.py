@@ -4,7 +4,7 @@
 
 from dataclasses import asdict
 import hdl21 as h
-from hdl21.prefix import µ, m
+from hdl21.prefix import µ, m, f
 
 from autockt_shared import FoldedCascodeInput, OpAmpOutput
 
@@ -38,6 +38,9 @@ class FcascParams:
     # Cascode Bias Voltages
     vcp = h.Param(dtype=h.Prefixed, desc="Cascode Pmos Bias Voltage", default=200 * m)
     vcn = h.Param(dtype=h.Prefixed, desc="Cascode Nmos Bias Voltage", default=200 * m)
+
+    # Load/ Compensation Cap Value
+    cc = h.Param(dtype=h.Scalar, desc="Load/ Compensation Cap Value", default=1000 * f)
 
 
 @h.generator
@@ -130,12 +133,15 @@ def Fcasc(params: FcascParams) -> h.Module:
         pdiode = pbias(x=1)(g=pbiasg, s=VDD, b=VDD)
         pdiode_casc = pcasc(x=1)(s=pdiode.d, g=pcascg, d=pbiasg, b=VDD)
 
+        ## Compensation/ Load Cap
+        ccc = h.Cap(c=params.cc)(p=out, n=VSS)
+
     return Fcasc
 
 
 @h.generator
 def FcascTb(params: TbParams) -> h.Module:
-    """# FoldecCascode Op-Amp Testbench"""
+    """# Folded Cascode Op-Amp Testbench"""
 
     vicm = params.vicm or params.VDD / 2
 

@@ -2,7 +2,7 @@
 # Parameters
 """
 
-from typing import Optional, List
+from typing import Optional
 import hdl21 as h
 
 
