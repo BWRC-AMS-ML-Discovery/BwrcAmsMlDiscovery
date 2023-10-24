@@ -20,11 +20,11 @@ class FcascParams:
 
     # Unit device sizes
     nbias = h.Param(dtype=int, desc="Bias Nmos Unit Width", default=2)
-    pbias = h.Param(dtype=int, desc="Bias Pmos Unit Width", default=2)
+    pbias = h.Param(dtype=int, desc="Bias Pmos Unit Width", default=4)
     ncasc = h.Param(dtype=int, desc="Cascode Nmos Unit Width", default=2)
-    pcasc = h.Param(dtype=int, desc="Cascode Pmos Unit Width", default=2)
+    pcasc = h.Param(dtype=int, desc="Cascode Pmos Unit Width", default=4)
     ninp = h.Param(dtype=int, desc="Input Nmos Unit Width", default=2)
-    pinp = h.Param(dtype=int, desc="Input Pmos Unit Width", default=2)
+    pinp = h.Param(dtype=int, desc="Input Pmos Unit Width", default=4)
 
     # Current Mirror Ratios
     alpha = h.Param(dtype=int, desc="Alpha (Pmos Input) Current Ratio", default=2)
@@ -33,7 +33,7 @@ class FcascParams:
 
     # Input Bias Current
     # Applied on *both* bias inputs
-    ibias = h.Param(dtype=h.Prefixed, desc="Input Bias Current", default=100 * µ)
+    ibias = h.Param(dtype=h.Prefixed, desc="Input Bias Current", default=10 * µ)
 
     # Cascode Bias Voltages
     vcp = h.Param(dtype=h.Prefixed, desc="Cascode Pmos Bias Voltage", default=200 * m)
@@ -137,6 +137,8 @@ def Fcasc(params: FcascParams) -> h.Module:
 def FcascTb(params: TbParams) -> h.Module:
     """# FoldecCascode Op-Amp Testbench"""
 
+    vicm = params.vicm or params.VDD / 2
+
     @h.module
     class OpAmpTb:
         VSS = h.Port()  # The testbench interface: sole port VSS
@@ -145,8 +147,8 @@ def FcascTb(params: TbParams) -> h.Module:
         vdc = h.Vdc(dc=params.VDD)(n=VSS)
         inp = h.Diff()
         sig_out = h.Signal()
-        sig_p = h.Vdc(dc=params.VDD / 2, ac=0.5)(p=inp.p, n=VSS)
-        sig_n = h.Vdc(dc=params.VDD / 2, ac=-0.5)(p=inp.n, n=VSS)
+        sig_p = h.Vdc(dc=vicm, ac=+0.5)(p=inp.p, n=VSS)
+        sig_n = h.Vdc(dc=vicm, ac=-0.5)(p=inp.n, n=VSS)
 
         # Primary difference: the two bias current inputs
         ibias1, ibias2 = 2 * h.Signal()
@@ -173,9 +175,7 @@ def endpoint(inp: FoldedCascodeInput) -> OpAmpOutput:
     # Create a testbench, simulate it, and return the metrics!
     opamp = FcascParams(**asdict(inp))
     tbparams = TbParams(
-        dut=opamp,
-        VDD=VDD,
-        ibias=ibias,
+        dut=opamp, VDD=VDD, ibias=ibias, vicm=None  # Use the default common mode
     )
     tbmodule = FcascTb(tbparams)
     return simulate(tbmodule)

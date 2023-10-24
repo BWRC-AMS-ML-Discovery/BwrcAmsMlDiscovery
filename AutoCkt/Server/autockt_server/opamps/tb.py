@@ -18,6 +18,8 @@ from ..pdk import SPICE_MODEL_45NM_BULK_PATH
 def OpAmpTb(params: TbParams) -> h.Module:
     """# Generic Op-Amp Testbench"""
 
+    vicm = params.vicm or params.VDD / 2
+
     @h.module
     class OpAmpTb:
         VSS = h.Port()  # The testbench interface: sole port VSS
@@ -27,8 +29,8 @@ def OpAmpTb(params: TbParams) -> h.Module:
         inp = h.Diff()
         sig_out = h.Signal()
         ibias = h.Signal()
-        sig_p = h.Vdc(dc=params.VDD / 2, ac=0.5)(p=inp.p, n=VSS)
-        sig_n = h.Vdc(dc=params.VDD / 2, ac=-0.5)(p=inp.n, n=VSS)
+        sig_p = h.Vdc(dc=vicm, ac=+0.5)(p=inp.p, n=VSS)
+        sig_n = h.Vdc(dc=vicm, ac=-0.5)(p=inp.n, n=VSS)
         Isource = h.Isrc(dc=params.ibias)(p=vdc.p, n=ibias)
 
         # The Op-Amp DUT
@@ -81,10 +83,6 @@ def simulate(tbmodule: h.Instantiable) -> OpAmpOutput:
     return extract_outputs(results)
 
 
-def find_I_vdd(vout: numpy.array) -> float:
-    return numpy.abs(vout)[0]
-
-
 def find_dc_gain(vout: numpy.array) -> float:
     return numpy.abs(vout)[0]
 
@@ -127,20 +125,20 @@ def _get_best_crossing(yvec: numpy.array, val: float) -> tuple[int, bool]:
 def extract_outputs(results: h.sim.SimResult) -> OpAmpOutput:
     """# Extract our metrics from `results`"""
 
-    print(results)
-
     ac_result = results["ac"]
     sig_out = ac_result.data["v(xtop.sig_out)"]
     gain = find_dc_gain(2 * sig_out)
     ugbw = find_ugbw(ac_result.freq, 2 * sig_out)
     phm = find_phm(ac_result.freq, 2 * sig_out)
-    idd = ac_result.data["i(v.xtop.vvdc)"]
-    ibias = find_I_vdd(idd)
+
+    # Get the supply current from the DC operating point results
+    op_result = results["op"]
+    idd = numpy.abs(op_result.data["i(v.xtop.vvdc)"])
 
     # And return them as an `OpAmpOutput`
     return OpAmpOutput(
         ugbw=ugbw,
         gain=gain,
         phm=phm,
-        ibias=ibias,
+        ibias=idd,
     )
