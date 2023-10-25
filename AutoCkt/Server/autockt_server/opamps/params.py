@@ -2,7 +2,7 @@
 # Parameters
 """
 
-from typing import Optional, List
+from typing import Optional
 import hdl21 as h
 
 
@@ -10,9 +10,11 @@ import hdl21 as h
 class TbParams:
     """# Testbench Parameters"""
 
+    # Required
     dut = h.Param(dtype=h.Instantiable, desc="Design Under Test")
     VDD = h.Param(dtype=h.Scalar, desc="VDD voltage")
     ibias = h.Param(dtype=h.Scalar, desc="ibias current")
-    ctrls = h.Param(
-        dtype=Optional[List[h.sim.Control]], desc="Simulation Controls", default=None
+    # Optional
+    vicm = h.Param(
+        dtype=Optional[h.Scalar], desc="Input common-mode voltage", default=None
     )

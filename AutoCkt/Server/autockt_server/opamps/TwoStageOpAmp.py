@@ -8,16 +8,19 @@ from autockt_shared import OpAmpInput, OpAmpOutput, auto_ckt_sim_hdl21
 from ..typing import as_hdl21_paramclass, Hdl21Paramclass
 from ..pdk import nmos, pmos
 from .params import TbParams
-from .tb import simulate
+from .tb import simulate, OpAmpTb
+
+Params = Hdl21Paramclass(OpAmpInput)
 
 
 @h.generator
-def OpAmp(p: Hdl21Paramclass(OpAmpInput)) -> h.Module:
-    """# Two stage OpAmp"""
+def TwoStageOpAmp(p: Params) -> h.Module:
+    """# Two Stage OpAmp"""
+
+    cl = h.prefix.Prefixed(number=1e-11)
 
     @h.module
-    class DiffOta:
-        cl = h.prefix.Prefixed(number=1e-11)
+    class TwoStageOpAmp:
 
         # IO Interface
         VDD, VSS = 2 * h.Input()
@@ -53,7 +56,7 @@ def OpAmp(p: Hdl21Paramclass(OpAmpInput)) -> h.Module:
         # Compensation Network
         Cc = h.Cap(c=p.cc)(p=net5, n=out)  # Miller Capacitance
 
-    return DiffOta
+    return TwoStageOpAmp
 
 
 def opamp_inner(inp: OpAmpInput) -> OpAmpOutput:
@@ -66,10 +69,11 @@ def opamp_inner(inp: OpAmpInput) -> OpAmpOutput:
     ibias = h.prefix.Prefixed(number=3e-5)
 
     # Create a testbench, simulate it, and return the metrics!
-    opamp = OpAmp(params)
+    opamp = TwoStageOpAmp(params)
     tbparams = TbParams(
         dut=opamp,
         VDD=VDD,
         ibias=ibias,
     )
-    return simulate(tbparams)
+    tbmodule = OpAmpTb(tbparams)
+    return simulate(tbmodule)
