@@ -116,6 +116,7 @@ def _get_best_crossing(yvec: numpy.array, val: float) -> Optional[int]:
     Get the index of the "best" crossing of `yvec` across `val`.
     Returns None if no sufficiently good crossing (no crossing at all?) is found.
     FIXME @HarryYanH: what do you mean "best"?
+    the value which is closest to our threshold
     """
 
     zero_crossings = numpy.where(numpy.diff(numpy.sign(yvec - val)))[0]
@@ -135,6 +136,7 @@ def extract_outputs(results: h.sim.SimResult) -> OpAmpOutput:
     sig_out = ac_result.data["v(xtop.sig_out)"]
 
     # FIXME: @HarryYanH: why are these all multiplied by 2?
+    # Because the amplitude of our AC signal is 0.5, *2 here means /0.5
     gain = find_dc_gain(2 * sig_out)
     ugbw = find_ugbw(ac_result.freq, 2 * sig_out)
     phm = find_phm(ac_result.freq, 2 * sig_out)
