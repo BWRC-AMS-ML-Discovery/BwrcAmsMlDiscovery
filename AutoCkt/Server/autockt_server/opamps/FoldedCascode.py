@@ -4,47 +4,17 @@
 
 from dataclasses import asdict
 import hdl21 as h
-from hdl21.prefix import µ, m, f
-
+from hdl21.prefix import FEMTO, MILLI, MICRO
 from autockt_shared import FoldedCascodeInput, OpAmpOutput
 
 # Local Imports
+from ..typing import Hdl21Paramclass
 from ..pdk import nmos, pmos
 from .tb import TbParams, simulate
 
 
-@h.paramclass
-class FcascParams:
-    """# Fcasc Generator Parameters
-    In terms of unit device sizes and current ratios"""
-
-    # Unit device sizes
-    nbias = h.Param(dtype=int, desc="Bias Nmos Unit Width", default=2)
-    pbias = h.Param(dtype=int, desc="Bias Pmos Unit Width", default=4)
-    ncasc = h.Param(dtype=int, desc="Cascode Nmos Unit Width", default=2)
-    pcasc = h.Param(dtype=int, desc="Cascode Pmos Unit Width", default=4)
-    ninp = h.Param(dtype=int, desc="Input Nmos Unit Width", default=2)
-    pinp = h.Param(dtype=int, desc="Input Pmos Unit Width", default=4)
-
-    # Current Mirror Ratios
-    alpha = h.Param(dtype=int, desc="Alpha (Pmos Input) Current Ratio", default=2)
-    beta = h.Param(dtype=int, desc="Beta (Nmos Input) Current Ratio", default=2)
-    gamma = h.Param(dtype=int, desc="Gamma (Output Cascode) Current Ratio", default=2)
-
-    # Input Bias Current
-    # Applied on *both* bias inputs
-    ibias = h.Param(dtype=h.Prefixed, desc="Input Bias Current", default=10 * µ)
-
-    # Cascode Bias Voltages
-    vcp = h.Param(dtype=h.Prefixed, desc="Cascode Pmos Bias Voltage", default=200 * m)
-    vcn = h.Param(dtype=h.Prefixed, desc="Cascode Nmos Bias Voltage", default=200 * m)
-
-    # Load/ Compensation Cap Value
-    cc = h.Param(dtype=h.Scalar, desc="Load/ Compensation Cap Value", default=1000 * f)
-
-
 @h.generator
-def Fcasc(params: FcascParams) -> h.Module:
+def Fcasc(params: Hdl21Paramclass(FoldedCascodeInput)) -> h.Module:
     """# Rail-to-Rail, Dual Input Pair, Folded Cascode, Diff to SE Op-Amp"""
 
     # Multiplier functions of the parametric devices
@@ -110,8 +80,8 @@ def Fcasc(params: FcascParams) -> h.Module:
         ## ###########################################################################
 
         ### Nmos Cascode Gate Generator
-        rrcn = h.Res(r=params.vcp / params.ibias)(n=VSS)
-        ncdiode = ncasc(x=1)(g=ibias2, d=ibias2, s=rrcn.p, b=VSS)
+        vcbn = h.Vdc(dc=params.vcb * MILLI)(n=VSS)
+        ncdiode = ncasc(x=1)(g=ibias2, d=ibias2, s=vcbn.p, b=VSS)
 
         ### Bottom Nmos Diode (with cascode)
         ndiode_casc = ncasc(x=1)(g=ibias2, d=ibias1, b=VSS)
@@ -122,8 +92,8 @@ def Fcasc(params: FcascParams) -> h.Module:
         n1src = nbias(x=1)(g=ibias1, d=n1casc.s, s=VSS, b=VSS)
 
         ### Pmos cascode gate generator
-        rrcp = h.Res(r=params.vcp / params.ibias)(p=VDD)
-        pcdiode = pcasc(x=1)(g=pcascg, d=pcascg, s=rrcp.n, b=VDD)
+        vcbp = h.Vdc(dc=params.vcb * MILLI)(p=VDD)
+        pcdiode = pcasc(x=1)(g=pcascg, d=pcascg, s=vcbp.n, b=VDD)
 
         ### Nmos Mirror to top pmos Bias
         n2casc = ncasc(x=1)(g=ibias2, d=pbiasg, b=VSS)
@@ -134,7 +104,7 @@ def Fcasc(params: FcascParams) -> h.Module:
         pdiode_casc = pcasc(x=1)(s=pdiode.d, g=pcascg, d=pbiasg, b=VDD)
 
         ## Compensation/ Load Cap
-        ccc = h.Cap(c=params.cc)(p=out, n=VSS)
+        ccc = h.Cap(c=params.cc * FEMTO)(p=out, n=VSS)
 
     return Fcasc
 
@@ -175,11 +145,11 @@ def endpoint(inp: FoldedCascodeInput) -> OpAmpOutput:
     # Convert `inp` into the generator's parameters
     # params = as_hdl21_paramclass(inp)
 
-    VDD = h.prefix.Prefixed(number=1.2)
-    ibias = h.prefix.Prefixed(number=3e-5)
+    VDD = 1200 * MILLI
+    ibias = 35 * MICRO
 
     # Create a testbench, simulate it, and return the metrics!
-    opamp = FcascParams(**asdict(inp))
+    opamp = Fcasc(**asdict(inp))
     tbparams = TbParams(
         dut=opamp, VDD=VDD, ibias=ibias, vicm=None  # Use the default common mode
     )

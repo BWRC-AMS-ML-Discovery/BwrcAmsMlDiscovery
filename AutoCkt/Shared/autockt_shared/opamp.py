@@ -1,20 +1,13 @@
 # Std-Lib Imports
-from pydantic.dataclasses import dataclass
+from pydantic.dataclasses import dataclass, Field
 
 # Workspace Imports
 from discovery_shared import Rpc
-from pydantic.dataclasses import Field
 
 # Local Imports
 from .opamp_output import OpAmpOutput
 from .rewards import settaluri_reward
-from .cktopt import (
-    CircuitOptimization,
-    MetricSpec,
-    MetricSpecs,
-    ParamSpec,
-    ParamSpecs,
-)
+from .cktopt import CircuitOptimization
 from .typing import as_param_specs, as_target_specs
 
 
