@@ -8,32 +8,9 @@ from hdl21.prefix import FEMTO, MILLI, MICRO
 from autockt_shared import FoldedCascodeInput, OpAmpOutput
 
 # Local Imports
-from ..typing import as_hdl21_paramclass, Hdl21Paramclass
+from ..typing import Hdl21Paramclass
 from ..pdk import nmos, pmos
 from .tb import TbParams, simulate
-
-
-# @h.paramclass
-# class FcascParams:
-#     """# Fcasc Generator Parameters
-#     In terms of unit device sizes and current ratios"""
-
-#     # Unit device sizes
-#     nbias = h.Param(dtype=int, desc="Bias Nmos Unit Width", default=2)
-#     pbias = h.Param(dtype=int, desc="Bias Pmos Unit Width", default=4)
-#     ncasc = h.Param(dtype=int, desc="Cascode Nmos Unit Width", default=2)
-#     pcasc = h.Param(dtype=int, desc="Cascode Pmos Unit Width", default=4)
-#     ninp = h.Param(dtype=int, desc="Input Nmos Unit Width", default=2)
-#     pinp = h.Param(dtype=int, desc="Input Pmos Unit Width", default=4)
-
-#     # Current Mirror Ratios
-#     alpha = h.Param(dtype=int, desc="Alpha (Pmos Input) Current Ratio", default=2)
-#     beta = h.Param(dtype=int, desc="Beta (Nmos Input) Current Ratio", default=2)
-#     gamma = h.Param(dtype=int, desc="Gamma (Output Cascode) Current Ratio", default=2)
-
-#     # Other
-#     vcb = h.Param(dtype=int, desc="Cascode Bias Voltage (mV)", default=200)
-#     cc = h.Param(dtype=int, desc="Load/ Compensation Cap Value (fF)", default=1000)
 
 
 @h.generator
