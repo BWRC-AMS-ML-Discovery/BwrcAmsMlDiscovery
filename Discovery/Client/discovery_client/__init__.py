@@ -22,6 +22,7 @@ from dataclasses import asdict
 # PyPi Imports
 import dotenv
 import httpx
+from httpx._types import TimeoutTypes
 
 # Workspace Imports
 # from discovery_shared.git import GitInfo
@@ -38,6 +39,7 @@ class Config:
 
     server_url: str = "localhost:8000"
     enable_https: bool = True
+    timeout: TimeoutTypes = 60.0
 
 
 # Create the module-scope configuration
@@ -102,6 +104,7 @@ def _setup_client_rpcs():
                     os.environ.get("DISCOVERY_USERNAME"),
                     os.environ.get("DISCOVERY_API_KEY"),
                 ),
+                timeout=config.timeout,
             )
             return rpc.return_type(**resp.json())
 
