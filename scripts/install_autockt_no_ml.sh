@@ -11,7 +11,7 @@ pip install \
     -e "./AutoCkt/Client" 
 
 # The point: leaving out this one: 
-##-e "./AutoCkt/Ml"
+##-e "./AutoCkt/ML"
 
 # Swap to the ray/ OpenAI/ ML-stuff preferred version of protobuf
 # Hdl21 includes a dependency on a newer version, 

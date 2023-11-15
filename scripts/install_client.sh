@@ -6,7 +6,8 @@ pip install \
     -e "./Discovery/Shared[dev]" \
     -e "./Discovery/Client[dev]" \
     -e "./AutoCkt/Shared[dev]" \
-    -e "./AutoCkt/Auto[dev]"
+    -e "./AutoCkt/Client[dev]" \
+    -e "./AutoCkt/ML[dev]"
 
 # Set up pre-commit hooks
 pre-commit install
