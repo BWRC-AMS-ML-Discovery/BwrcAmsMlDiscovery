@@ -53,7 +53,7 @@ class SpecManager:
         for spec in init_spec:
             self.global_norm[spec.name] = spec.normalize
 
-        self.num_specs = 350
+        self.num_specs = 350  # FIXME This should not be hardcoded
 
         self.ideal_specs = []
         for i in range(self.num_specs):
