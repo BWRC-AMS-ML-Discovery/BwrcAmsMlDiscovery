@@ -41,7 +41,9 @@ def autockt_train(
         "config": config_train,
         "run": "PPO",
         "checkpoint_freq": 1,
-        "stop": {"episodes_total": 1},  # FIXME Sometimes we will never reach this
+        "stop": {
+            "episodes_total": 1_000_000
+        },  # FIXME Sometimes we will never reach this
     }
 
     tune.run_experiments(
