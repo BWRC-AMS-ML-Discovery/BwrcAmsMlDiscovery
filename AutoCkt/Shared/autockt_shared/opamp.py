@@ -11,61 +11,40 @@ from .cktopt import CircuitOptimization
 from .typing import as_param_specs, as_target_specs
 
 
+def intparam(desc: str, default: int = 4) -> Field:
+    """# Positive integer-valued parameter"""
+    return Field(
+        description=desc,
+        default=default,
+        ge=1,
+        le=100,
+        step=1,
+    )
+
+
 @dataclass
 class OpAmpInput:
     """
     Input type for AutoCkt library, a state of result
     """
 
-    mp1: int = Field(
-        description="number of units of specific pmos transistor",
-        default=34,
-        ge=1,
-        le=100,
-        step=1,
+    # Unit device sizes
+    nbias: int = intparam("Bias Nmos Unit Width", 2)
+    ninp: int = intparam("Input Nmos Unit Width", 2)
+    pmoses: int = intparam("Pmos Unit Width", 2)
+
+    # Current Mirror Ratios
+    alpha: int = intparam("Alpha (Input) Current Ratio", 40)
+    beta: int = intparam("Beta (Output) Current Ratio", 40)
+
+    # Other
+    cc: int = Field(
+        description="Compensation Cap Value (fF)",
+        default=1000,
+        ge=10,
+        le=10_000,
+        step=10,
     )
-    mn1: int = Field(
-        description="number of units of specific nmos transistor",
-        default=34,
-        ge=1,
-        le=100,
-        step=1,
-    )
-    mp3: int = Field(
-        description="number of units of specific pmos transistor",
-        default=34,
-        ge=1,
-        le=100,
-        step=1,
-    )
-    mn3: int = Field(
-        description="number of units of specific nmos transistor",
-        default=34,
-        ge=1,
-        le=100,
-        step=1,
-    )
-    mn4: int = Field(
-        description="number of units of specific nmos transistor",
-        default=34,
-        ge=1,
-        le=100,
-        step=1,
-    )
-    mn5: int = Field(
-        description="number of units of specific nmos transistor",
-        default=15,
-        ge=1,
-        le=100,
-        step=1,
-    )
-    cc: float = Field(
-        description="capacitance of specific capacitor",
-        default=2.1e-12,
-        ge=0.1e-12,
-        le=10.0e-12,
-        step=0.1e-12,
-    )  # Or maybe `str`, or the Hdl21/ VLSIR `Prefixed` fixed-point type
 
 
 @dataclass

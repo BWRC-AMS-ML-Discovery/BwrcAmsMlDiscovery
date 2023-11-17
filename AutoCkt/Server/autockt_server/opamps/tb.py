@@ -26,16 +26,15 @@ def OpAmpTb(params: TbParams) -> h.Module:
         VSS = h.Port()  # The testbench interface: sole port VSS
 
         # Drive VDD
-        vdc = h.Vdc(dc=params.VDD)(n=VSS)
+        VDD, sig_out, ibias = 3 * h.Signal()
+        vdc = h.Vdc(dc=params.VDD)(p=VDD, n=VSS)
         inp = h.Diff()
-        sig_out = h.Signal()
-        ibias = h.Signal()
         sig_p = h.Vdc(dc=vicm, ac=+0.5)(p=inp.p, n=VSS)
         sig_n = h.Vdc(dc=vicm, ac=-0.5)(p=inp.n, n=VSS)
-        Isource = h.Isrc(dc=params.ibias)(p=vdc.p, n=ibias)
+        Isource = h.Isrc(dc=params.ibias)(p=VSS, n=ibias)
 
         # The Op-Amp DUT
-        inst = params.dut(VDD=vdc.p, VSS=VSS, ibias=ibias, inp=inp, out=sig_out)
+        inst = params.dut(VDD=VDD, VSS=VSS, ibias=ibias, inp=inp, out=sig_out)
 
     return OpAmpTb
 
