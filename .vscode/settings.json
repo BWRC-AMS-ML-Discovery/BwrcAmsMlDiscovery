@@ -28,6 +28,7 @@
     "pytest",
     "rpcs",
     "settaluri",
+    "tensorboard",
     "tfall",
     "trise",
     "ugbw",
