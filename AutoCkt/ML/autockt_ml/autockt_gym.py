@@ -126,10 +126,10 @@ class AutoCktGym(gym.Env):
 
         # ----------------- Tensorboard -----------------
         log = {
-            "step": int(self.num_steps),
+            "training_step": int(self.num_steps),
             "done": bool(done),
             "reward": float(reward),
-            "action_taken": {
+            "action_steps_taken": {
                 k: self.params_manager.actions_per_param[v] for k, v in action.items()
             },
             "curr_inputs": dict(cur_params),
