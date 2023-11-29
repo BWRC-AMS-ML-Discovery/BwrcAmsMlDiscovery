@@ -135,7 +135,7 @@ class AutoCktGym(gym.Env):
             "ideal_outputs": ideal_spec,
             "curr_output_norm": cur_norm,
             "ideal_output_norm": ideal_norm,
-            "observation": observation,
+            "observation": observation.tolist(),
         }
         pretty_log = json.dumps(log, indent=4)
         with open(self.log_file, "a") as f:
