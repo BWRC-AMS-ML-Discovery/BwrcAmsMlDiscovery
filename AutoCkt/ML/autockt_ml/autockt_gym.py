@@ -1,3 +1,5 @@
+import datetime
+from pathlib import Path
 from dataclasses import asdict
 
 # PyPI imports
@@ -121,7 +123,23 @@ class AutoCktGym(gym.Env):
             ]
         )
 
-        # TODO update env steps
+        # ----------------- Tensorboard -----------------
+        log = {
+            "step": self.num_steps,
+            "done": done,
+            "reward": reward,
+            "action": action,
+            "curr_inputs": cur_params,
+            "curr_outputs": cur_spec,
+            "ideal_outputs": ideal_spec,
+            "curr_output_norm": cur_norm,
+            "ideal_output_norm": ideal_norm,
+            "observation": observation,
+        }
+        with open(self.log_file, "a") as f:
+            f.write(f"{log}\n")
+
+        self.num_steps += 1
 
         return observation, reward, done, {}
 
