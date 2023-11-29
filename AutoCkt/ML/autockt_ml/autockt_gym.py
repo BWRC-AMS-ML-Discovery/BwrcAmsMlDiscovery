@@ -126,15 +126,17 @@ class AutoCktGym(gym.Env):
 
         # ----------------- Tensorboard -----------------
         log = {
-            "step": self.num_steps,
-            "done": done,
-            "reward": reward,
-            "action": action,
-            "curr_inputs": cur_params,
-            "curr_outputs": cur_spec,
-            "ideal_outputs": ideal_spec,
-            "curr_output_norm": cur_norm,
-            "ideal_output_norm": ideal_norm,
+            "step": int(self.num_steps),
+            "done": bool(done),
+            "reward": float(reward),
+            "action_taken": {
+                k: self.params_manager.actions_per_param[v] for k, v in action.items()
+            },
+            "curr_inputs": dict(cur_params),
+            "curr_outputs": dict(cur_spec),
+            "ideal_outputs": dict(ideal_spec),
+            "curr_output_norm": dict(cur_norm),
+            "ideal_output_norm": dict(ideal_norm),
             "observation": observation.tolist(),
         }
         pretty_log = json.dumps(log, indent=4)
