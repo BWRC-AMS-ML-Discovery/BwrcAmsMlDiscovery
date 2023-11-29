@@ -60,6 +60,16 @@ class AutoCktGym(gym.Env):
         self.action_space = self._build_action_space(params, actions_per_param)
         self.observation_space = self._build_observation_space(params, specs)
 
+        # Logging
+        current_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        self.log_dir = Path(f"{Path.home()}/cktgym_results/{current_time}")
+        self.log_dir.mkdir(parents=True, exist_ok=True)
+        self.log_file = self.log_dir / "logs.jsonl"
+        with open(self.log_file, "w") as f:
+            pass
+
+        self.num_steps = 0
+
     def reset(self):
         # ----------------- Params -----------------
         self.params_manager.reset_to_init()
