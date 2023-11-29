@@ -1,4 +1,5 @@
 import datetime
+import json
 from pathlib import Path
 from dataclasses import asdict
 
@@ -136,8 +137,9 @@ class AutoCktGym(gym.Env):
             "ideal_output_norm": ideal_norm,
             "observation": observation,
         }
+        pretty_log = json.dumps(log, indent=4)
         with open(self.log_file, "a") as f:
-            f.write(f"{log}\n")
+            f.write(f"{pretty_log}\n")
 
         self.num_steps += 1
 
