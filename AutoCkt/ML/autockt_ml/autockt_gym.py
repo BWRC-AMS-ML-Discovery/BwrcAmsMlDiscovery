@@ -124,7 +124,7 @@ class AutoCktGym(gym.Env):
             ]
         )
 
-        # ----------------- Tensorboard -----------------
+        # ----------------- Logging -----------------
         log = {
             "training_step": int(self.num_steps),
             "done": bool(done),
