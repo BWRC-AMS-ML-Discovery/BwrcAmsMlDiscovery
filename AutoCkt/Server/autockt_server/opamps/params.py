@@ -15,6 +15,5 @@ class TbParams:
     VDD = h.Param(dtype=h.Scalar, desc="VDD voltage")
     ibias = h.Param(dtype=h.Scalar, desc="ibias current")
     # Optional
-    vicm = h.Param(
-        dtype=Optional[h.Scalar], desc="Input common-mode voltage", default=None
-    )
+    cl = h.Param(dtype=Optional[h.Scalar], desc="Load Cap", default=None)
+    vicm = h.Param(dtype=Optional[h.Scalar], desc="Input common-mode", default=None)

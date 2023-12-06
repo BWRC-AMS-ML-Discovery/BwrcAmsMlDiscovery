@@ -19,6 +19,8 @@ from ..pdk import SPICE_MODEL_45NM_BULK_PATH
 def OpAmpTb(params: TbParams) -> h.Module:
     """# Generic Op-Amp Testbench"""
 
+    # Set the default input common mode to VDD/2,
+    # if one is not provided by the params
     vicm = params.vicm or params.VDD / 2
 
     @h.module
@@ -32,6 +34,10 @@ def OpAmpTb(params: TbParams) -> h.Module:
         sig_p = h.Vdc(dc=vicm, ac=+0.5)(p=inp.p, n=VSS)
         sig_n = h.Vdc(dc=vicm, ac=-0.5)(p=inp.n, n=VSS)
         Isource = h.Isrc(dc=params.ibias)(p=VSS, n=ibias)
+
+        # Load Cap
+        if params.cl is not None:
+            cl = h.Cap(c=params.cl)(p=sig_out, n=VSS)
 
         # The Op-Amp DUT
         inst = params.dut(VDD=VDD, VSS=VSS, ibias=ibias, inp=inp, out=sig_out)
