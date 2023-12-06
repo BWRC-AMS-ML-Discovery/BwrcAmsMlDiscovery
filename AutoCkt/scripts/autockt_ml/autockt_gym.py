@@ -1,3 +1,6 @@
+import datetime
+import json
+from pathlib import Path
 from dataclasses import asdict
 
 # PyPI imports
@@ -60,6 +63,16 @@ class AutoCktGym(gym.Env):
         self.action_space = self._build_action_space(params, actions_per_param)
         self.observation_space = self._build_observation_space(params, specs)
 
+        # Logging
+        current_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        self.log_dir = Path(f"{Path.home()}/cktgym_results/{current_time}")
+        self.log_dir.mkdir(parents=True, exist_ok=True)
+        self.log_file = self.log_dir / "logs.jsonl"
+        with open(self.log_file, "w") as f:
+            pass
+
+        self.num_steps = 0
+
     def reset(self):
         # ----------------- Params -----------------
         self.params_manager.reset_to_init()
@@ -111,7 +124,26 @@ class AutoCktGym(gym.Env):
             ]
         )
 
-        # TODO update env steps
+        # ----------------- Logging -----------------
+        log = {
+            "training_step": int(self.num_steps),
+            "done": bool(done),
+            "reward": float(reward),
+            "action_steps_taken": {
+                k: self.params_manager.actions_per_param[v] for k, v in action.items()
+            },
+            "curr_inputs": dict(cur_params),
+            "curr_outputs": dict(cur_spec),
+            "ideal_outputs": dict(ideal_spec),
+            "curr_output_norm": dict(cur_norm),
+            "ideal_output_norm": dict(ideal_norm),
+            "observation": observation.tolist(),
+        }
+        pretty_log = json.dumps(log, indent=4)
+        with open(self.log_file, "a") as f:
+            f.write(f"{pretty_log}\n")
+
+        self.num_steps += 1
 
         return observation, reward, done, {}
 
