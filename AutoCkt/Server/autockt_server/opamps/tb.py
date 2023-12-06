@@ -19,6 +19,8 @@ from ..pdk import SPICE_MODEL_45NM_BULK_PATH
 def OpAmpTb(params: TbParams) -> h.Module:
     """# Generic Op-Amp Testbench"""
 
+    # Set the default input common mode to VDD/2,
+    # if one is not provided by the params
     vicm = params.vicm or params.VDD / 2
 
     @h.module
@@ -26,16 +28,19 @@ def OpAmpTb(params: TbParams) -> h.Module:
         VSS = h.Port()  # The testbench interface: sole port VSS
 
         # Drive VDD
-        vdc = h.Vdc(dc=params.VDD)(n=VSS)
+        VDD, sig_out, ibias = 3 * h.Signal()
+        vdc = h.Vdc(dc=params.VDD)(p=VDD, n=VSS)
         inp = h.Diff()
-        sig_out = h.Signal()
-        ibias = h.Signal()
         sig_p = h.Vdc(dc=vicm, ac=+0.5)(p=inp.p, n=VSS)
         sig_n = h.Vdc(dc=vicm, ac=-0.5)(p=inp.n, n=VSS)
-        Isource = h.Isrc(dc=params.ibias)(p=vdc.p, n=ibias)
+        Isource = h.Isrc(dc=params.ibias)(p=VSS, n=ibias)
+
+        # Load Cap
+        if params.cl is not None:
+            cl = h.Cap(c=params.cl)(p=sig_out, n=VSS)
 
         # The Op-Amp DUT
-        inst = params.dut(VDD=vdc.p, VSS=VSS, ibias=ibias, inp=inp, out=sig_out)
+        inst = params.dut(VDD=VDD, VSS=VSS, ibias=ibias, inp=inp, out=sig_out)
 
     return OpAmpTb
 
@@ -52,7 +57,7 @@ def OpAmpSim(tbmodule: h.Instantiable) -> h.sim.Sim:
 
         # Simulation Stimulus
         op = hs.Op()
-        ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
+        ac = hs.Ac(sweep=hs.LogSweep(start=1, stop=1e10, npts=10))
 
         # Model Includes
         mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)

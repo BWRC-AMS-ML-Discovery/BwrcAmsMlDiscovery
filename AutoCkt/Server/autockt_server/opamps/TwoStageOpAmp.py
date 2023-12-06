@@ -3,7 +3,8 @@
 """
 
 import hdl21 as h
-from autockt_shared import OpAmpInput, OpAmpOutput, auto_ckt_sim_hdl21
+from hdl21.prefix import FEMTO, PICO, MILLI, MICRO
+from autockt_shared import OpAmpInput, OpAmpOutput
 
 from ..typing import as_hdl21_paramclass, Hdl21Paramclass
 from ..pdk import nmos, pmos
@@ -17,44 +18,39 @@ Params = Hdl21Paramclass(OpAmpInput)
 def TwoStageOpAmp(p: Params) -> h.Module:
     """# Two Stage OpAmp"""
 
-    cl = h.prefix.Prefixed(number=1e-11)
+    # Multiplier functions of the parametric devices
+    nbias = lambda x: nmos(m=p.nbias * x)
+    ninp = lambda x: nmos(m=p.ninp * x)
+    pmoses = lambda x: pmos(m=p.pmoses * x)
 
     @h.module
     class TwoStageOpAmp:
-
         # IO Interface
         VDD, VSS = 2 * h.Input()
         ibias = h.Input()
-
         inp = h.Diff(desc="Differential Input", port=True, role=h.Diff.Roles.SINK)
         out = h.Output()
 
-        # Internal Signals
-        net3, net4, net5 = h.Signals(3)
+        # Implementation
+        out1 = h.Diff()
 
-        # Input Stage
-        mp1 = pmos(m=p.mp1)(
-            d=net4, g=net4, s=VDD, b=VDD
-        )  # Current mirror within the input stage
-        mp2 = pmos(m=p.mp1)(
-            d=net5, g=net4, s=VDD, b=VDD
-        )  # Current mirror within the input stage
-        mn1 = nmos(m=p.mn1)(d=net4, g=inp.n, s=net3, b=net3)  # Input MOS pair
-        mn2 = nmos(m=p.mn1)(d=net5, g=inp.p, s=net3, b=net3)  # Input MOS pair
-        mn3 = nmos(m=p.mn3)(d=net3, g=ibias, s=VSS, b=VSS)  # Mirrored current source
+        # Input Bias
+        miin = nbias(x=1)(d=ibias, g=ibias, s=VSS, b=VSS)
+        mbias_inp = nbias(x=2 * p.alpha)(g=ibias, s=VSS, b=VSS)
+
+        # Input Pair
+        minp = h.Pair(ninp(x=p.alpha))(d=out1, g=inp, s=mbias_inp.d, b=VSS)
+
+        # Input Stage Load
+        # mpld = h.Pair(pmoses(x=p.alpha))(d=out1, g=outn, s=VDD, b=VDD)
+        mpld = h.Pair(pmoses(x=p.alpha))(d=out1, g=out1.n, s=VDD, b=VDD)
 
         # Output Stage
-        mp3 = pmos(m=p.mp3)(d=out, g=net5, s=VDD, b=VDD)  # Output inverter
-        mn5 = nmos(m=p.mn5)(d=out, g=ibias, s=VSS, b=VSS)  # Output inverter
-        CL = h.Cap(c=cl)(p=out, n=VSS)  # Load capacitance
+        mp3 = pmoses(x=p.beta)(d=out, g=out1.p, s=VDD, b=VDD)
+        mn5 = nbias(x=p.beta)(d=out, g=ibias, s=VSS, b=VSS)
 
-        # Biasing
-        mn4 = nmos(m=p.mn4)(
-            d=ibias, g=ibias, s=VSS, b=VSS
-        )  # Current mirror co-operating with mn3
-
-        # Compensation Network
-        Cc = h.Cap(c=p.cc)(p=net5, n=out)  # Miller Capacitance
+        # Miller Compensation Cap
+        cc = h.Cap(c=p.cc * FEMTO)(p=out, n=out1.p)
 
     return TwoStageOpAmp
 
@@ -72,8 +68,10 @@ def opamp_inner(inp: OpAmpInput) -> OpAmpOutput:
     opamp = TwoStageOpAmp(params)
     tbparams = TbParams(
         dut=opamp,
-        VDD=VDD,
-        ibias=ibias,
+        # FIXME: make the rest of these test parameters visible to the client!
+        VDD=1800 * MILLI,
+        ibias=30 * MICRO,
+        cl=10 * PICO,
     )
     tbmodule = OpAmpTb(tbparams)
     return simulate(tbmodule)
