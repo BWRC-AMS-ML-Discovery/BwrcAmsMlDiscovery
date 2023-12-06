@@ -3,7 +3,8 @@
 """
 
 import hdl21 as h
-from autockt_shared import OpAmpInput, OpAmpOutput, auto_ckt_sim_hdl21
+from hdl21.prefix import FEMTO
+from autockt_shared import OpAmpInput, OpAmpOutput
 
 from ..typing import as_hdl21_paramclass, Hdl21Paramclass
 from ..pdk import nmos, pmos
@@ -37,14 +38,17 @@ def TwoStageOpAmp(p: Params) -> h.Module:
         out1 = h.Diff()
 
         # Input Bias
-        mn4 = nbias(x=1)(d=ibias, g=ibias, s=VSS, b=VSS)
-        mn3 = nbias(x=2 * p.alpha)(g=ibias, s=VSS, b=VSS)
+        miin = nbias(x=1)(d=ibias, g=ibias, s=VSS, b=VSS)
+        mbias_inp = nbias(x=2 * p.alpha)(g=ibias, s=VSS, b=VSS)
 
         # Input Pair
-        minp = h.Pair(ninp(x=p.alpha))(d=out1, g=inp, s=mn3.d, b=VSS)
+        minp = h.Pair(ninp(x=p.alpha))(d=out1, g=inp, s=mbias_inp.d, b=VSS)
 
         # Input Stage Load
+        # mpld = h.Pair(pmoses(x=p.alpha))(d=out1, g=outn, s=VDD, b=VDD)
         mpld = h.Pair(pmoses(x=p.alpha))(d=out1, g=out1.n, s=VDD, b=VDD)
+
+        # FIXME: hacking out the output stage for the time being
 
         # Output Stage
         mp3 = pmoses(x=p.beta)(d=out, g=out1.p, s=VDD, b=VDD)
@@ -54,7 +58,7 @@ def TwoStageOpAmp(p: Params) -> h.Module:
         CL = h.Cap(c=cl)(p=out, n=VSS)
 
         # Miller Compensation Cap
-        cc = h.Cap(c=p.cc)(p=out1.p, n=out)
+        cc = h.Cap(c=p.cc * FEMTO)(p=out, n=out1.p)
 
     return TwoStageOpAmp
 

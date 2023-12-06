@@ -51,7 +51,7 @@ def OpAmpSim(tbmodule: h.Instantiable) -> h.sim.Sim:
 
         # Simulation Stimulus
         op = hs.Op()
-        ac = hs.Ac(sweep=hs.LogSweep(1e1, 1e10, 10))
+        ac = hs.Ac(sweep=hs.LogSweep(start=1, stop=1e10, npts=10))
 
         # Model Includes
         mod = hs.Include(SPICE_MODEL_45NM_BULK_PATH)
